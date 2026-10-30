@@ -10,7 +10,7 @@ Layout: `backend/app/{main,config,db,cli}.py`, `models/`, `schemas/`, `services/
 ## Code
 - Python 3.12, full type hints on all public functions, ruff-clean (`ruff check`, `ruff format`).
 - FastAPI routes are thin: validate with Pydantic, call a service, return a schema. Business logic lives in `services/`.
-- SQLAlchemy 2.x style (`Mapped[...]`, `select()`); one session per request via a dependency; `PRAGMA foreign_keys=ON`; constraints in the models (CHECK, UNIQUE). No migrations: `Base.metadata.create_all` in `init_db`.
+- SQLAlchemy 2.x style (`Mapped[...]`, `select()`); import the `Session` model under an alias (for example `AuthSession`) wherever SQLAlchemy's `Session` is also used; one session per request via a dependency; `PRAGMA foreign_keys=ON`; constraints in the models (CHECK, UNIQUE). No migrations: `Base.metadata.create_all` in `init_db`.
 - Pydantic v2 schemas separate input and output models. Strings are trimmed; description max 500.
 - Settings via `pydantic-settings` from `.env` (repo root) and environment; no hardcoded secrets; relative sqlite paths resolve against `backend/`.
 

@@ -236,11 +236,13 @@ check(
   `docs/tasks.md lists all ${ids.length} tasks`,
 );
 
-// out of scope: no application code yet
+// Phase 2 exit check only: application code is expected once Phase 3 has started.
+const phase3Started = /Current phase: (?:[3-9]|2 complete)/.test(tasks);
 check(
-  !existsSync(resolve(root, "backend/app")) &&
-    !existsSync(resolve(root, "frontend/src")),
-  "no application code exists yet (Phase 2 only)",
+  phase3Started ||
+    (!existsSync(resolve(root, "backend/app")) &&
+      !existsSync(resolve(root, "frontend/src"))),
+  "no application code before Phase 3",
 );
 
 console.log(

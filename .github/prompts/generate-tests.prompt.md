@@ -10,3 +10,5 @@ Apply the `automated-testing` skill for the requested scope.
 3. Run them (`make test-backend`, `make test-frontend`, `make test-e2e` or `scripts/check-all.sh`), saving output to `docs/evidence/test-runs/`.
 4. File defects for production failures in `docs/defects.md`; never edit production code.
 5. Hand off with exact commands, exit codes and counts.
+
+Finish with the run status marker line defined under Conventions in `.github/copilot-instructions.md`.

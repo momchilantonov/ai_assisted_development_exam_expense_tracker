@@ -30,7 +30,7 @@ Write only `docs/tasks.md`, `docs/agent-handoffs.md`, `docs/decisions.md` (and a
 1. Read `docs/tasks.md` and the latest entries of `docs/agent-handoffs.md`. Skills to apply: `agent-handoff`, `ai-dev-evidence`, `verification-before-completion`.
 2. Pick the next tasks whose dependencies are `VERIFIED` (or `COMPLETED` where the plan allows). Mark them `IN_PROGRESS`.
 3. Delegate to the owning agent as a subagent. Subagents get only your prompt, so every delegation must contain: task IDs, exact files to read (`docs/api-contract.md`, instruction files, relevant handoffs), acceptance criteria and the commands to run, what files it may write, and the instruction to finish with a handoff block and to log evidence.
-4. When it returns, verify independently: run the relevant `make` target(s) yourself (`make check` or `scripts/check-all.sh`), run `scripts/check-ownership.sh <agent>` and read the handoff. Do not trust claims without output.
+4. When it returns, verify independently: run `scripts/check-all.sh` yourself (not bare `make`, so the output is saved under `docs/evidence/test-runs/`), run `scripts/check-ownership.sh <agent>` and read the handoff. Do not trust claims without output.
 5. Update `docs/tasks.md`: `COMPLETED` only with evidence; `VERIFIED` only after an agent other than the implementer (you or `testing`) re-ran the check and the output is saved. After a task is verified, create one local Conventional Commit for it (`git add -A && git commit`, never push) so later ownership checks only see new changes.
 6. Failures: file/forward a defect to its owner. Limits: 3 fix attempts per defect, 5 delegation cycles per stage; then mark `BLOCKED` and escalate to the human with the evidence.
 

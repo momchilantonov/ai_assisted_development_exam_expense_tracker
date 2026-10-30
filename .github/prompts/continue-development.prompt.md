@@ -10,3 +10,5 @@ Resume the build from the files, not from memory.
 3. Determine the next unblocked tasks (all dependencies `VERIFIED`/allowed `COMPLETED`). If a human checkpoint (HC2-HC6) is due, stop and ask.
 4. Delegate them to the owning agents using the delegation template in the orchestrator instructions, verify the results yourself, update the board.
 5. Stop after one stage gate or when blocked. End with the next action.
+
+Finish with the run status marker line defined under Conventions in `.github/copilot-instructions.md`.

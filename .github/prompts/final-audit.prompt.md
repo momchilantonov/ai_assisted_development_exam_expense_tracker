@@ -9,3 +9,5 @@ Run DOC-05 (read-only except the audit result recorded in `docs/agent-handoffs.m
 3. Secrets scan: `git ls-files` contains no `.env`, `*.db` or credentials; grep tracked files for passwords/tokens; `.env.example` has placeholders only.
 4. Confirm `git status` is clean, no files outside ownership changed (`scripts/check-ownership.sh` for each agent), and the README commands work.
 5. Report PASS/FAIL per item. Flag that the GitHub URL and Google Drive link are still to be provided by the human (HC5, HC6). Do not push.
+
+Finish with the run status marker line defined under Conventions in `.github/copilot-instructions.md`.

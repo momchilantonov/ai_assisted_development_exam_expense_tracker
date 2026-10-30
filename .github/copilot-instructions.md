@@ -47,6 +47,10 @@ Acceptance checks pass; relevant `make` targets are green (`make lint`, `make ty
 
 ## Conventions
 
+- Run status marker: the top-level agent of a slash-prompt run (the one that received the prompt, not a subagent) ends its final message with exactly one of these lines, as the last line, after checking `docs/tasks.md` and the real command output:
+  - `=== RUN COMPLETE: <prompt> | tasks <IDs> VERIFIED | next: <next prompt or "none"> ===` only when every task of the run is `VERIFIED` (or `COMPLETED` where the plan allows) with evidence and nothing is left to do in this prompt.
+  - `=== RUN PAUSED: <prompt> | waiting for you: <checkpoint or decision> | reply: "<text to type>" ===` at a human checkpoint (HC3, HC4, HC5) or a question only the human can answer.
+  - `=== RUN STOPPED EARLY: <prompt> | reason: <blocker> | resume: /continue-development ===` for anything else (blocked task, failing check, tool or hook error, ran out of steps). Never print COMPLETE when work or evidence is missing.
 - Commit messages: Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `chore:`). Never push; the human publishes.
 - Keep the solution small and educational; prefer the simplest approach that satisfies the requirement.
 - Money: integer cents in the database, decimal strings in the API, never binary floats.

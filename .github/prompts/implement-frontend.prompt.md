@@ -9,3 +9,5 @@ Run Stage E tasks F-01..F-06 from `docs/tasks.md`. The contract in `docs/api-con
 2. Verify each with `make lint-frontend`, `make typecheck-frontend`, `make test-frontend`, and `scripts/check-ownership.sh frontend`.
 3. Record any contract gaps reported by the frontend agent as proposals for `backend`; do not let the frontend invent behaviour.
 4. Update the board with evidence. Stop at the end of the stage.
+
+Finish with the run status marker line defined under Conventions in `.github/copilot-instructions.md`.

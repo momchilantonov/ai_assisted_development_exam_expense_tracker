@@ -1,5 +1,5 @@
-# command: scripts/validate-infra.sh (after formatter edits)
-# started: 2026-10-30T15:28:19Z
+# command: scripts/validate-infra.sh (after run-marker change)
+# started: 2026-10-30T16:06:52Z
 
 == toolchain
 python     Python 3.12.12 (/home/manto/.local/bin/python3.12)
@@ -66,7 +66,7 @@ PASS .env.example exists
 PASS .gitignore exists
 PASS Makefile exists
 PASS docs/tasks.md lists all 44 tasks
-PASS no application code exists yet (Phase 2 only)
+PASS no application code before Phase 3
 structure: all checks passed
 
 == hook fixtures
@@ -96,4 +96,4 @@ OK no .agents/ directory
     parallel write-capable subagents.
 
 validate-infra: PASS
-# finished: 2026-10-30T15:28:21Z exit=0
+# finished: 2026-10-30T16:06:54Z exit=0

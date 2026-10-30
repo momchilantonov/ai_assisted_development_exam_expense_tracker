@@ -9,3 +9,5 @@ Run tasks T-06 (and T-01..T-05 if still open).
 3. Every failure becomes a defect with an owner; run `/fix-defects` logic until green or `BLOCKED` (3 attempts per defect).
 4. Ensure `docs/test-report.md` contains actual outputs and the 16-step workflow plus persistence scenario results.
 5. Stop for human checkpoint HC4.
+
+Finish with the run status marker line defined under Conventions in `.github/copilot-instructions.md`.

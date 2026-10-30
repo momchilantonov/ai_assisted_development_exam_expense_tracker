@@ -8,3 +8,5 @@ Run task I-01. Prerequisites: X-06 and F-06 verified.
 2. Verify with real requests/browser checks and record evidence: login and invalid login, protected-route redirect, expense create/edit/delete, category and date-range filters and sort, dashboard figures against known data, logout (old cookie returns 401), API error handling in the UI, persistence after restarting the backend.
 3. Delegate defects to the owners (`backend` or `frontend`) via `docs/defects.md`; re-verify. Limit 3 attempts each.
 4. Write the checklist results into `docs/test-report.md` through the `testing` agent. Update the board.
+
+Finish with the run status marker line defined under Conventions in `.github/copilot-instructions.md`.
