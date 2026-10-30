@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api import auth, health
+from app.api import auth, expenses, health
 from app.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.origin import origin_check
@@ -34,6 +34,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.middleware("http")(origin_check)
     app.include_router(health.router, prefix="/api")
     app.include_router(auth.router, prefix="/api")
+    app.include_router(expenses.categories_router, prefix="/api")
+    app.include_router(expenses.expenses_router, prefix="/api")
+    app.include_router(expenses.dashboard_router, prefix="/api")
     return app
 
 

@@ -104,3 +104,12 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** `backend/tests/integration/conftest.py`, `backend/tests/integration/test_auth_http.py`, `docs/defects.md`, handoff.
 - **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (104 passed); `scripts/check-all.sh` exit 0, `docs/evidence/test-runs/check-20261030T163842Z.txt`; `scripts/check-ownership.sh testing` exit 1 (backend-owned uncommitted files only).
 - **Challenge:** `ENV_FILE` is fixed to the repo root, so the black-box test copies `app/` to a temp layout instead of touching the real `.env`.
+
+## 2026-10-30 - Stage D expense backend (X-01..X-05)
+
+- **Module:** Backend / expenses, dashboard, categories
+- **Agent / AI tool (model):** GitHub Copilot backend agent (model: Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** expense CRUD with integer-cent money, filters/sort/pagination, dashboard summary, categories, contract update.
+- **Files created/changed:** `backend/app/schemas/expense.py`, `backend/app/services/expenses.py`, `backend/app/api/expenses.py`, `backend/app/main.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0.
+- **Challenge:** first lint run failed on line length (E501) and two summary tests got 401 because the fake clock jump expired the test session (TTL is clock-based); fixed by logging in again after moving the clock.

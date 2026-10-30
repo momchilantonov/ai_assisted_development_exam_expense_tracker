@@ -127,3 +127,18 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (104 passed, 1 httpx warning); `scripts/check-all.sh` exit 0 (104 passed, saved to `check-20261030T163842Z.txt`); `scripts/check-ownership.sh testing` exit 1 only because of uncommitted backend-owned changes (`backend/app/cli.py`, `backend/tests/conftest.py`, `backend/tests/unit/test_auth.py`); none of my files are flagged. Should pass once the backend changes are committed.
 - **Known issues:** new integration test not run against the old CLI under pytest (manual before/after run only).
 - **Next action:** commit backend and testing changes, re-run ownership check; HC3.
+
+---
+
+### HANDOFF X-01..X-05 - backend agent - 2026-10-30
+
+- **Task ID(s):** X-01, X-02, X-03, X-04, X-05
+- **Responsible agent:** backend
+- **State set:** COMPLETED (not VERIFIED; needs a non-implementing agent, X-06 integration tests).
+- **Completed work:** `schemas/expense.py` (money parsing to integer cents, decimal-string output, no floats); `services/expenses.py` (CRUD, filters, sorting, pagination, summary with `APP_TIMEZONE` month); `api/expenses.py` with three routers (`/categories`, `/expenses`, `/dashboard`), each with router-level `Depends(require_auth)`; registered in `main.py`.
+- **Endpoints (all authenticated):** GET `/api/categories`; POST/GET `/api/expenses`; GET/PUT/DELETE `/api/expenses/{id}`; GET `/api/dashboard/summary`.
+- **Modified files:** `backend/app/schemas/expense.py`, `backend/app/services/expenses.py`, `backend/app/api/expenses.py`, `backend/app/main.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`, `docs/tasks.md`, `docs/agent-handoffs.md`, `docs/evidence/development-log.md`.
+- **Contract deviations (documented in api-contract.md, shapes unchanged):** whitespace-only description is stored as null; amount strings must match `\d{1,8}(\.\d{1,2})?`; `expense_date` must be a `YYYY-MM-DD` string (no timestamps); path id < 1 or non-integer -> 422 `validation_error`; JSON number amounts are parsed via `Decimal(str(n))` and rejected above 2 decimals.
+- **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed, 1 httpx deprecation warning); `scripts/check-ownership.sh backend` exit 0. Not run: mypy, frontend, E2E.
+- **Known issues:** none known. The existing route-guard test passes with the new routes (7 expense/dashboard/category operations checked as 401 unauthenticated).
+- **Next action:** testing agent X-06 (integration tests), then verify X-01..X-05.

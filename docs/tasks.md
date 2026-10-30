@@ -32,11 +32,11 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | A-04 | Route guard test and auth unit tests | backend | A-03 | VERIFIED | Verified by testing agent in A-06 review (check-20261030T161944Z.txt, 102 passed). route guard test (via OpenAPI paths) + 20 auth tests; `make lint-backend` exit 0; `make test-backend` exit 0 (47 passed); `scripts/check-ownership.sh backend` exit 0; handoff A-01..A-04 |
 | A-05 | Black-box auth integration tests | testing | A-03 | VERIFIED | 55 tests in backend/tests/integration/test_auth_http.py; `scripts/check-all.sh` exit 0 (102 passed), saved docs/evidence/test-runs/check-20261030T161629Z.txt; `scripts/check-ownership.sh testing` exit 0; no defects; orchestrator re-ran scripts/check-all.sh exit 0, 102 passed (docs/evidence/test-runs/check-20261030T162205Z.txt) |
 | A-06 | Auth security review (HC3) | testing | A-05 | VERIFIED | review in docs/test-report.md (12 PASS, 1 FAIL minor, 2 NOT RUN frontend; DEF-001, DEF-002 minor); `make lint-backend` exit 0; `make test-backend` exit 0 (102 passed); `scripts/check-all.sh` exit 0, docs/evidence/test-runs/check-20261030T161944Z.txt; `scripts/check-ownership.sh testing` exit 0; orchestrator re-ran check-all exit 0 after DEF-001/002 fixes; HC3 approved 2026-10-30 |
-| X-01 | Expense schemas and money handling | backend | A-06 | TODO | |
-| X-02 | Expense service and CRUD routes | backend | X-01 | TODO | |
-| X-03 | Filters, sorting, pagination | backend | X-02 | TODO | |
-| X-04 | Dashboard service/route and categories | backend | X-02 | TODO | |
-| X-05 | Publish contract updates | backend | X-04 | TODO | |
+| X-01 | Expense schemas and money handling | backend | A-06 | COMPLETED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05 |
+| X-02 | Expense service and CRUD routes | backend | X-01 | COMPLETED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05 |
+| X-03 | Filters, sorting, pagination | backend | X-02 | COMPLETED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05 |
+| X-04 | Dashboard service/route and categories | backend | X-02 | COMPLETED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05 |
+| X-05 | Publish contract updates | backend | X-04 | COMPLETED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05 |
 | X-06 | Expense and dashboard integration tests | testing | X-05 | TODO | |
 | F-01 | Frontend scaffold (Vite react-ts strict, ESLint, Vitest, RTL, MSW, proxy) | frontend | INF-11 | TODO | |
 | F-02 | API client, AuthContext, ProtectedRoute, login page | frontend | F-01 | TODO | |

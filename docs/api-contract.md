@@ -1,6 +1,6 @@
 # API contract v1 (frozen at Phase 2; backend maintains it)
 
-Status: design-time contract. Nothing is implemented yet. The backend agent updates the status column and records any deviation in its handoff. Frontend and testing agents rely on this file only.
+Status: all endpoints below are implemented (X-01..X-05). Deviations: a blank (whitespace-only) description is stored as null; request `amount` strings must match `\d{1,8}(\.\d{1,2})?` (no exponent, sign or spaces inside); `expense_date` must be a `YYYY-MM-DD` string; path `id` < 1 or non-integer -> 422 `validation_error`. Frontend and testing agents rely on this file only.
 
 Base path `/api`. JSON bodies. Session cookie `expense_session` (HttpOnly, SameSite=Strict, Path=/). Unsafe methods (POST, PUT, DELETE): if an `Origin` header is present it must be in `ALLOWED_ORIGINS`, otherwise 403 `forbidden_origin`. No CORS.
 
@@ -24,13 +24,13 @@ Codes: `not_authenticated` (401), `invalid_credentials` (401), `validation_error
 | POST `/api/auth/login` | Start session | No | `{username, password}` (both non-empty) | 200 `{username, expires_at}` + Set-Cookie | 401 `invalid_credentials` (same for unknown user and bad password), 422, 403 | implemented |
 | POST `/api/auth/logout` | Delete session row, clear cookie | No (idempotent) | - | 204 | 403 | implemented |
 | GET `/api/auth/me` | Auth status | Yes | - | 200 `{username, expires_at}` | 401 | implemented |
-| GET `/api/categories` | Category list | Yes | - | 200 `Category[]` | 401 | planned |
-| POST `/api/expenses` | Create | Yes | `ExpenseInput` | 201 `Expense` + `Location` header | 401, 422, 403 | planned |
-| GET `/api/expenses` | List and filter | Yes | query below | 200 `{items: Expense[], total, limit, offset}` | 401, 422 | planned |
-| GET `/api/expenses/{id}` | Read one | Yes | - | 200 `Expense` | 401, 404 | planned |
-| PUT `/api/expenses/{id}` | Full replace | Yes | `ExpenseInput` | 200 `Expense` | 401, 404, 422, 403 | planned |
-| DELETE `/api/expenses/{id}` | Delete | Yes | - | 204 | 401, 404, 403 | planned |
-| GET `/api/dashboard/summary` | Statistics | Yes | - | 200 `Summary` | 401 | planned |
+| GET `/api/categories` | Category list | Yes | - | 200 `Category[]` | 401 | implemented |
+| POST `/api/expenses` | Create | Yes | `ExpenseInput` | 201 `Expense` + `Location` header | 401, 422, 403 | implemented |
+| GET `/api/expenses` | List and filter | Yes | query below | 200 `{items: Expense[], total, limit, offset}` | 401, 422 | implemented |
+| GET `/api/expenses/{id}` | Read one | Yes | - | 200 `Expense` | 401, 404 | implemented |
+| PUT `/api/expenses/{id}` | Full replace | Yes | `ExpenseInput` | 200 `Expense` | 401, 404, 422, 403 | implemented |
+| DELETE `/api/expenses/{id}` | Delete | Yes | - | 204 | 401, 404, 403 | implemented |
+| GET `/api/dashboard/summary` | Statistics | Yes | - | 200 `Summary` | 401 | implemented |
 
 OpenAPI UI at `/api/docs`.
 
