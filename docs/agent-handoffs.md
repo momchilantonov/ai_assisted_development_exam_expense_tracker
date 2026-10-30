@@ -54,3 +54,18 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Known issues:** none new.
 - **Dependencies:** unblocks A-01, A-02.
 - **Next action:** A-01 / A-02.
+
+---
+
+### HANDOFF A-01..A-04 - backend agent - 2026-10-30
+
+- **Task ID(s):** A-01, A-02, A-03, A-04
+- **Responsible agent:** backend
+- **State set:** COMPLETED (not VERIFIED)
+- **Completed work:** `core/security.py` (Argon2id hash/verify with dummy-hash path, rehash check, `secrets.token_urlsafe(32)` token, SHA-256 token hash); `services/auth.py` (provision, authenticate, create/get/delete session, expired purge at login); `core/deps.py` (`require_auth`, injectable clock via `app.state.clock`); `core/origin.py` (Origin check middleware on POST/PUT/DELETE/PATCH, no CORS); `api/auth.py` (login, logout, me); `schemas/auth.py`; `cli.py` (`create-user`, `--reset-password`); tests in `backend/tests/unit/test_auth.py` and fixtures in `backend/tests/conftest.py`.
+- **Modified files:** `backend/app/{main,cli}.py`, `backend/app/{core,services,schemas,api}/...`, `backend/requirements.txt` (+`argon2-cffi==25.1.0`), `backend/tests/conftest.py`, `backend/tests/unit/test_auth.py`; `docs/api-contract.md` (auth rows -> implemented); `docs/tasks.md`. Makefile and `.env.example`: unchanged.
+- **Important decisions:** no design change. Reset-password also deletes all existing sessions. The CLI reads `INITIAL_USERNAME`/`INITIAL_PASSWORD` from the process environment only (not `.env`), otherwise prompts via `getpass`; non-interactive without both exits 2. `expires_at` is serialised as ISO-8601 UTC with `Z`. The route guard test enumerates OpenAPI paths (this FastAPI version wraps included routers, so `app.routes` is not flat); routes hidden from OpenAPI would be missed. Expense/dashboard/category routers must add router-level `Depends(require_auth)` when created (X tasks).
+- **Test results:** `make lint-backend` -> exit 0; `make test-backend` -> exit 0, 47 passed, 1 warning (httpx deprecation); `scripts/check-ownership.sh backend` -> exit 0. First test run had 1 failure (route guard test iterating `app.routes`), fixed and re-run. CLI was tested through `main()` in unit tests; not run manually against a real terminal prompt.
+- **Known issues:** `.env.example` documents `INITIAL_*` but the CLI does not read `.env` for them; `make seed-user` therefore needs them exported or a prompt. No rate limiting on login (out of contract).
+- **Dependencies:** unblocks A-05 (testing agent).
+- **Next action:** A-05 black-box auth integration tests, then A-06 (HC3).

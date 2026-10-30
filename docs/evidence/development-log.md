@@ -55,3 +55,13 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** see handoff B-02 in `docs/agent-handoffs.md`.
 - **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (24 passed); `scripts/check-ownership.sh backend` exit 0.
 - **Challenge:** first run failed: ruff UP042 (use `StrEnum`) and a test that committed a session in the same flush as its user, which SQLAlchemy ordered wrongly without a relationship; fixed by committing the user first.
+
+## 2026-10-30 - A-01..A-04 authentication (Phase 3, Stage C)
+
+- **Module:** Authentication and security
+- **Agent / AI tool (model):** GitHub Copilot backend agent (model: Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** Provisioning CLI, Argon2id hashing, hashed server-side sessions, login/logout/me, `require_auth`, Origin check, route guard test.
+- **Reasoning / approach:** follow ADR-002 unchanged; only SHA-256 of the token is stored; identical 401 for unknown user and wrong password via dummy-hash verification; injectable clock for expiry tests.
+- **Files created/changed:** see handoff A-01..A-04 in `docs/agent-handoffs.md`.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (47 passed); `scripts/check-ownership.sh backend` exit 0.
+- **Challenge:** the route guard test first iterated `app.routes`, which in this FastAPI version contains opaque included-router objects; switched to enumerating OpenAPI paths.

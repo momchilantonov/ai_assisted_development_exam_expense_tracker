@@ -26,10 +26,10 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 |---|---|---|---|---|---|
 | B-01 | Backend scaffold, config, init_db, health, error envelope, pytest fixtures | backend | INF-11 | VERIFIED | Orchestrator re-ran lint/test/ownership: all exit 0 (7 passed). Owner evidence: `make lint-backend` exit 0; `make test-backend` exit 0 (7 passed); `scripts/check-ownership.sh backend` exit 0; handoff B-01 in docs/agent-handoffs.md |
 | B-02 | Models users/sessions/expenses with constraints | backend | B-01 | VERIFIED | Orchestrator re-ran lint/test/ownership: all exit 0 (24 passed). Owner evidence: `make lint-backend` exit 0; `make test-backend` exit 0 (24 passed); `scripts/check-ownership.sh backend` exit 0; handoff B-02 in docs/agent-handoffs.md |
-| A-01 | Provisioning CLI (create-user) | backend | B-02 | TODO | |
-| A-02 | Hashing and session services | backend | B-02 | TODO | |
-| A-03 | Auth routes, require_auth, Origin middleware | backend | A-01, A-02 | TODO | |
-| A-04 | Route guard test and auth unit tests | backend | A-03 | TODO | |
+| A-01 | Provisioning CLI (create-user) | backend | B-02 | COMPLETED | `python -m app.cli create-user` (env/prompt, idempotent, `--reset-password`); tests in backend/tests/unit/test_auth.py |
+| A-02 | Hashing and session services | backend | B-02 | COMPLETED | core/security.py (Argon2id, SHA-256 token) and services/auth.py; unit tests |
+| A-03 | Auth routes, require_auth, Origin middleware | backend | A-01, A-02 | COMPLETED | api/auth.py, core/deps.py, core/origin.py; unit tests |
+| A-04 | Route guard test and auth unit tests | backend | A-03 | COMPLETED | route guard test (via OpenAPI paths) + 20 auth tests; `make lint-backend` exit 0; `make test-backend` exit 0 (47 passed); `scripts/check-ownership.sh backend` exit 0; handoff A-01..A-04 |
 | A-05 | Black-box auth integration tests | testing | A-03 | TODO | |
 | A-06 | Auth security review (HC3) | testing | A-05 | TODO | |
 | X-01 | Expense schemas and money handling | backend | A-06 | TODO | |
