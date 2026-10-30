@@ -24,3 +24,18 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Test results:** `scripts/validate-infra.sh` -> exit 0, 33/33 hook cases (docs/evidence/test-runs/infra.txt).
 - **Known issues:** GitHub CLI (`gh`) is not installed and no GitHub repository exists yet; nothing has been pushed. Ownership hooks in agent front matter remain UNVERIFIED until a delegated task runs.
 - **Next action:** human creates the GitHub repository and pushes; then `/implement-backend` stage B and `/implement-frontend`.
+
+---
+
+### HANDOFF B-01 - backend agent - 2026-10-30
+
+- **Task ID(s):** B-01
+- **Responsible agent:** backend
+- **State set:** COMPLETED (not VERIFIED)
+- **Completed work:** backend scaffold (`backend/app/{main,config,db}.py`, `core/errors.py`, `api/health.py`); `create_app(settings)` factory with lifespan `init_db`; settings from env/`.env` via pydantic-settings; SQLAlchemy 2.x engine (relative sqlite paths resolved against `backend/`, `PRAGMA foreign_keys=ON`), `Base`, `init_db`, `get_db`; error envelope handlers (validation with `input`/`ctx` stripped, HTTP, unhandled -> 500 `internal_error`, no traceback); `GET /api/health`; docs at `/api/docs`; pytest fixtures (temp SQLite per test) and 7 unit tests.
+- **Modified files:** `backend/pyproject.toml`, `backend/requirements.txt`, `backend/requirements-dev.txt` (pinned to installed versions), `backend/app/**`, `backend/tests/conftest.py`, `backend/tests/unit/test_health.py`, `backend/tests/unit/test_errors.py`; `docs/api-contract.md` (health status -> implemented); `docs/tasks.md` B-01 row. Makefile and `.env.example`: unchanged.
+- **Important decisions:** `AppError` exception class added for later services. HTTPException mapping: 401 `not_authenticated`, 403 `forbidden_origin`, 404 `not_found`, other 4xx (e.g. 405) `validation_error`, 5xx `internal_error`. `allowed_origins` is a comma-separated string with an `allowed_origins_list` property. `app.main` builds a module-level `app` (no DB file created until lifespan starts).
+- **Test results:** `make lint-backend` -> exit 0; `make test-backend` -> exit 0, 7 passed, 1 warning (Starlette deprecation: TestClient with `httpx`, suggests `httpx2`); `scripts/check-ownership.sh backend` -> exit 0. mypy not run (not installed).
+- **Known issues:** the httpx deprecation warning; `argon2-cffi` not yet in requirements (needed in A-02).
+- **Dependencies:** unblocks B-02.
+- **Next action:** B-02 models (users, sessions, expenses).

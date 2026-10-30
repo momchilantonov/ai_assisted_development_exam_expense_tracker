@@ -20,7 +20,7 @@ Codes: `not_authenticated` (401), `invalid_credentials` (401), `validation_error
 
 | Method and path | Purpose | Auth | Request | Success | Errors | Status |
 |---|---|---|---|---|---|---|
-| GET `/api/health` | Liveness | No | - | 200 `{status:"ok"}` | - | planned |
+| GET `/api/health` | Liveness | No | - | 200 `{status:"ok"}` | - | implemented |
 | POST `/api/auth/login` | Start session | No | `{username, password}` (both non-empty) | 200 `{username, expires_at}` + Set-Cookie | 401 `invalid_credentials` (same for unknown user and bad password), 422, 403 | planned |
 | POST `/api/auth/logout` | Delete session row, clear cookie | No (idempotent) | - | 204 | 403 | planned |
 | GET `/api/auth/me` | Auth status | Yes | - | 200 `{username, expires_at}` | 401 | planned |

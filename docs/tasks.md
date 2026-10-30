@@ -24,8 +24,8 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 
 | ID | Task | Agent | Depends | State | Evidence |
 |---|---|---|---|---|---|
-| B-01 | Backend scaffold, config, init_db, health, error envelope, pytest fixtures | backend | INF-11 | TODO | |
-| B-02 | Models users/sessions/expenses with constraints | backend | B-01 | TODO | |
+| B-01 | Backend scaffold, config, init_db, health, error envelope, pytest fixtures | backend | INF-11 | VERIFIED | Orchestrator re-ran lint/test/ownership: all exit 0 (7 passed). Owner evidence: `make lint-backend` exit 0; `make test-backend` exit 0 (7 passed); `scripts/check-ownership.sh backend` exit 0; handoff B-01 in docs/agent-handoffs.md |
+| B-02 | Models users/sessions/expenses with constraints | backend | B-01 | IN_PROGRESS | delegated to backend agent |
 | A-01 | Provisioning CLI (create-user) | backend | B-02 | TODO | |
 | A-02 | Hashing and session services | backend | B-02 | TODO | |
 | A-03 | Auth routes, require_auth, Origin middleware | backend | A-01, A-02 | TODO | |

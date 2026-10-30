@@ -35,3 +35,13 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **CHAL-03:** `gh` (GitHub CLI) is not installed and installing it needs sudo, so the agent cannot create the GitHub repository; the human creates it and pushes (the safety hook also blocks agent `git push` by design).
 - **CHAL-04:** the first `git push` over HTTPS failed ("No credential store has been selected", then "Password authentication is not supported"). Resolved by switching `origin` to the SSH alias from `~/.ssh/config` (`git@GitHub:...`); `ssh -T GitHub` authenticated. The human ran the push; `git ls-remote origin` then showed `refs/heads/main` at commit 215fb2e, equal to the local HEAD.
 - **Repository (provided by the human):** https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker
+
+## 2026-10-30 - B-01 backend scaffold (Phase 3, Stage B)
+
+- **Module:** Backend
+- **Agent / AI tool (model):** GitHub Copilot backend agent (model: Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** Scaffold FastAPI app, config, SQLAlchemy engine/init_db, health route, error envelope and isolated pytest fixtures.
+- **Reasoning / approach:** app factory taking `Settings` so tests inject a temp SQLite file; error handlers strip validation input to avoid echoing secrets; versions pinned to those `uv` resolved at setup.
+- **Files created/changed:** see handoff B-01 in `docs/agent-handoffs.md`.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (7 passed, 1 deprecation warning); `scripts/check-ownership.sh backend` exit 0.
+- **Challenge:** none blocking; Starlette warns that TestClient with `httpx` is deprecated (left as is).
