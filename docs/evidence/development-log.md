@@ -140,3 +140,12 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** `backend/tests/integration/test_expenses_http.py`, `docs/defects.md`, `docs/tasks.md`.
 - **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (291 passed); `scripts/check-all.sh` exit 0, `docs/evidence/test-runs/check-20261030T170746Z.txt`; `scripts/check-ownership.sh testing` exit 1 (only uncommitted backend-agent files listed).
 - **Challenge:** ownership check cannot go green until backend changes are committed.
+
+## 2026-10-30 - F-01/F-02 frontend scaffold and authentication
+
+- **Module:** Frontend / scaffold and auth
+- **Agent / AI tool (model):** GitHub Copilot frontend agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** Vite react-ts strict scaffold with ESLint, Vitest, RTL, MSW and proxy; typed API client, AuthContext, ProtectedRoute and accessible login page with tests.
+- **Files created/changed:** `frontend/**` (config, `src/api`, `src/auth`, `src/components`, `src/pages`, `src/test`), `docs/tasks.md`.
+- **Testing:** `make lint-frontend` exit 0; `make typecheck-frontend` exit 0; `make test-frontend` exit 0 (20 passed); `scripts/check-ownership.sh frontend` exit 0. Not run: browser, E2E.
+- **Challenge:** Node's `fetch` rejects relative URLs under jsdom, so `src/test/setup.ts` resolves `/api/...` against the jsdom location; `npm audit` flags dev-only vitest dependencies (left unchanged).

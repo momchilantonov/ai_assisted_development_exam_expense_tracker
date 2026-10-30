@@ -38,8 +38,8 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | X-04 | Dashboard service/route and categories | backend | X-02 | VERIFIED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05; verified by testing agent: backend/tests/integration/test_expenses_http.py, 283 passed 2 xfailed, check-20261030T165536Z.txt |
 | X-05 | Publish contract updates | backend | X-04 | VERIFIED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05; verified by testing agent: backend/tests/integration/test_expenses_http.py, 283 passed 2 xfailed, check-20261030T165536Z.txt |
 | X-06 | Expense and dashboard integration tests | testing | X-05 | COMPLETED | make lint-backend exit 0; make test-backend exit 0 (283 passed, 2 xfailed for open DEF-003); scripts/check-all.sh exit 0, docs/evidence/test-runs/check-20261030T165536Z.txt; scripts/check-ownership.sh testing exit 0 |
-| F-01 | Frontend scaffold (Vite react-ts strict, ESLint, Vitest, RTL, MSW, proxy) | frontend | INF-11 | TODO | |
-| F-02 | API client, AuthContext, ProtectedRoute, login page | frontend | F-01 | TODO | |
+| F-01 | Frontend scaffold (Vite react-ts strict, ESLint, Vitest, RTL, MSW, proxy) | frontend | INF-11 | COMPLETED | make lint-frontend/typecheck-frontend/test-frontend exit 0 (docs/agent-handoffs.md) |
+| F-02 | API client, AuthContext, ProtectedRoute, login page | frontend | F-01 | COMPLETED | 20 component/client tests pass (docs/agent-handoffs.md) |
 | F-03 | Layout, navigation, logout, global 401 handling | frontend | F-02 | TODO | |
 | F-04 | Expense list, filters, sort, pagination | frontend | F-03 | TODO | |
 | F-05 | Create/edit forms, validation, delete confirmation, toasts | frontend | F-04 | TODO | |

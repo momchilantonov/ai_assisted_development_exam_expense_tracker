@@ -178,3 +178,17 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (291 passed); `scripts/check-all.sh` exit 0 (291 passed, frontend not present), saved to `docs/evidence/test-runs/check-20261030T170746Z.txt`. `scripts/check-ownership.sh testing` exit 1: lists only backend-agent files (`backend/app/schemas/expense.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`) that are uncommitted; none changed by me.
 - **Known issues:** ownership check stays red until the backend changes are committed. Not run: frontend, E2E, mypy.
 - **Next action:** human commits backend changes; frontend F-tasks; then I-01.
+
+---
+
+### HANDOFF F-01, F-02 - frontend agent - 2026-10-30
+
+- **Task ID(s):** F-01, F-02
+- **Responsible agent:** frontend
+- **State set:** COMPLETED (not VERIFIED; needs a non-implementing agent).
+- **Completed work:** F-01: `frontend/` Vite + React 19 + TypeScript strict scaffold (hand-written, `tsc -b` with app/node tsconfigs), ESLint flat config (typescript-eslint, react-hooks, no-explicit-any), Vitest + RTL + jest-dom + jsdom, MSW (`src/test/handlers.ts` follows the contract: health, auth login/logout/me, categories), Vite proxy `/api` -> `http://127.0.0.1:8000` on port 5173, `package-lock.json` committed-ready. F-02: `src/api/client.ts` (fetch, `credentials: 'include'`, normalised `ApiError`, `network_error` code, no logging, 401 hook skipped for login/logout/me), `src/api/auth.ts`, `src/auth/` (`AuthProvider`, `useAuth`; in-memory state only, `GET /api/auth/me` on boot), `ProtectedRoute` (redirect to `/login?next=<path>`), `LoginPage` (labels, field errors with `aria-describedby`/`aria-invalid`, `role="alert"` server error, pending state, same-origin-only `next`).
+- **Modified files:** `frontend/**` (new, no files under `frontend/tests/`), `docs/tasks.md` (F-01, F-02 rows), `docs/agent-handoffs.md`, `docs/evidence/development-log.md`. Makefile and `.env.example` unchanged.
+- **Test results (Node v22.23.4):** `make lint-frontend` exit 0; `make typecheck-frontend` exit 0; `make test-frontend` exit 0 (3 files, 20 tests passed); `scripts/check-ownership.sh frontend` exit 0. Not run: dev server in a browser, 360 px check, E2E, backend suite.
+- **Known issues:** `npm audit` reports 3 vulnerabilities (1 moderate, 2 critical) in dev-only test tooling (`@vitest/mocker`, `tinypool` via vitest); not fixed (would need a vitest major upgrade, `npm audit fix --force`). Home page is a placeholder until F-04. Global 401 hook exists in the client and `AuthProvider` resets state on it; redirect UX and navigation/logout button are F-03.
+- **Contract gaps / proposals for backend:** (1) Contract header says request amounts match `\d{1,8}(\.\d{1,2})?` while frontend rules say `\d{1,6}`; harmless (the frontend is stricter) but worth aligning. (2) Login 422 `validation_error` message/details shape is not specified; the frontend validates empties client-side and shows `error.message` for any failure. (3) Not specified whether a login while already authenticated replaces the session; the frontend avoids this by redirecting authenticated users away from `/login`.
+- **Next action:** F-03 (layout, logout button, global 401 redirect); an independent agent verifies F-01/F-02.
