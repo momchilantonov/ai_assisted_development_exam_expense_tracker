@@ -149,3 +149,12 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** `frontend/**` (config, `src/api`, `src/auth`, `src/components`, `src/pages`, `src/test`), `docs/tasks.md`.
 - **Testing:** `make lint-frontend` exit 0; `make typecheck-frontend` exit 0; `make test-frontend` exit 0 (20 passed); `scripts/check-ownership.sh frontend` exit 0. Not run: browser, E2E.
 - **Challenge:** Node's `fetch` rejects relative URLs under jsdom, so `src/test/setup.ts` resolves `/api/...` against the jsdom location; `npm audit` flags dev-only vitest dependencies (left unchanged).
+
+## 2026-10-30 - F-03/F-04 layout, logout, 401 handling and expense list
+
+- **Module:** Frontend / layout and expense list
+- **Agent / AI tool (model):** GitHub Copilot frontend agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** Layout with navigation and logout; 401 redirect through the existing client hook; expense list with category/date filters, sort and pagination using decimal-string money; MSW list handler following the contract.
+- **Files created/changed:** `frontend/src/{components/Layout,pages/ExpensesPage,api/expenses,lib/money}.ts(x)`, `frontend/src/api/types.ts`, `frontend/src/App.tsx`, `frontend/src/index.css`, `frontend/src/test/handlers.ts`, colocated tests, `docs/tasks.md` (F-03, F-04 rows).
+- **Testing:** `make lint-frontend` exit 0; `make typecheck-frontend` exit 0; `make test-frontend` exit 0 (6 files, 33 passed); `scripts/check-ownership.sh frontend` exit 0. Not run: browser, E2E, 360 px visual check.
+- **Challenge:** the app-level "Loading…" status of `ProtectedRoute` matched the first test query; the test now waits for the page's own loading text.

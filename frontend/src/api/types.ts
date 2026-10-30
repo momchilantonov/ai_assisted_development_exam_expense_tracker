@@ -28,3 +28,40 @@ export interface Session {
   username: string
   expires_at: string
 }
+
+export type Category =
+  | 'Food'
+  | 'Transport'
+  | 'Shopping'
+  | 'Bills'
+  | 'Entertainment'
+  | 'Healthcare'
+  | 'Other'
+
+export interface Expense {
+  id: number
+  amount: string
+  category: Category
+  description: string | null
+  expense_date: string
+  created_at: string
+  updated_at: string
+}
+
+export type ExpenseSort = 'date_desc' | 'date_asc'
+
+export interface ExpenseListQuery {
+  category?: Category
+  date_from?: string
+  date_to?: string
+  sort?: ExpenseSort
+  limit?: number
+  offset?: number
+}
+
+export interface ExpenseList {
+  items: Expense[]
+  total: number
+  limit: number
+  offset: number
+}
