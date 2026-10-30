@@ -44,6 +44,8 @@ def init_db(engine: Engine) -> None:
     database = engine.url.database
     if engine.url.get_backend_name() == "sqlite" and database and database != ":memory:":
         Path(database).parent.mkdir(parents=True, exist_ok=True)
+    import app.models  # noqa: F401  (registers tables on Base.metadata)
+
     Base.metadata.create_all(engine)
 
 

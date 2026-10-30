@@ -39,3 +39,18 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Known issues:** the httpx deprecation warning; `argon2-cffi` not yet in requirements (needed in A-02).
 - **Dependencies:** unblocks B-02.
 - **Next action:** B-02 models (users, sessions, expenses).
+
+---
+
+### HANDOFF B-02 - backend agent - 2026-10-30
+
+- **Task ID(s):** B-02
+- **Responsible agent:** backend
+- **State set:** COMPLETED (not VERIFIED)
+- **Completed work:** SQLAlchemy 2.x models `User` (CHECK id = 1, unique username, `password_hash`), `Session` (`token_hash` PK holding a SHA-256 hex digest, FK `user_id` with cascade, `expires_at`), `Expense` (`amount_cents` CHECK > 0, `category` CHECK in the 7 contract values, optional description, indexed `expense_date`, timestamps) and `Category` StrEnum; `init_db` imports the models before `create_all`; 17 new unit tests with temp SQLite DBs.
+- **Modified files:** `backend/app/models/{__init__,user,session,expense}.py`, `backend/app/db.py`, `backend/tests/unit/test_models.py`; `docs/tasks.md` B-02 row. `docs/api-contract.md`, Makefile, `.env.example`: unchanged.
+- **Important decisions:** timestamps are naive UTC datetimes (SQLite drops tzinfo); services must treat them as UTC. `Expense.category` is stored as a string validated by CHECK; the enum lives in `app.models.expense`.
+- **Test results:** `make lint-backend` -> exit 0; `make test-backend` -> exit 0, 24 passed, 1 warning (httpx deprecation); `scripts/check-ownership.sh backend` -> exit 0. First run failed (ruff UP042, and a test inserting session before user in one commit); both fixed and re-run.
+- **Known issues:** none new.
+- **Dependencies:** unblocks A-01, A-02.
+- **Next action:** A-01 / A-02.

@@ -45,3 +45,13 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** see handoff B-01 in `docs/agent-handoffs.md`.
 - **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (7 passed, 1 deprecation warning); `scripts/check-ownership.sh backend` exit 0.
 - **Challenge:** none blocking; Starlette warns that TestClient with `httpx` is deprecated (left as is).
+
+## 2026-10-30 - B-02 database models (Phase 3, Stage B)
+
+- **Module:** Database and persistence
+- **Agent / AI tool (model):** GitHub Copilot backend agent (model: Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** Models for users, sessions and expenses with DB-level constraints, created through `init_db`.
+- **Reasoning / approach:** constraints in the schema (CHECK amount > 0, category enum, single-user id, unique username, session FK) so they hold regardless of service code; tests assert `IntegrityError` on a temp SQLite file.
+- **Files created/changed:** see handoff B-02 in `docs/agent-handoffs.md`.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (24 passed); `scripts/check-ownership.sh backend` exit 0.
+- **Challenge:** first run failed: ruff UP042 (use `StrEnum`) and a test that committed a session in the same flush as its user, which SQLAlchemy ordered wrongly without a relationship; fixed by committing the user first.
