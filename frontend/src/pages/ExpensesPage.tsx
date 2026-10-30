@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ApiError } from '../api/client'
-import { listCategories, listExpenses } from '../api/expenses'
-import type { Category, ExpenseList, ExpenseSort } from '../api/types'
+import { deleteExpense, listCategories, listExpenses } from '../api/expenses'
+import type { Category, Expense, ExpenseList, ExpenseSort } from '../api/types'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { useToast } from '../components/useToast'
 import { formatMoney } from '../lib/money'
 
 export const PAGE_SIZE = 20
@@ -11,6 +14,10 @@ interface Filters {
   dateFrom: string
   dateTo: string
   sort: ExpenseSort
+}
+
+function describe(e: Expense): string {
+  return `${e.description ?? e.category} on ${e.expense_date}`
 }
 
 const initialFilters: Filters = { category: '', dateFrom: '', dateTo: '', sort: 'date_desc' }
@@ -23,6 +30,9 @@ export function ExpensesPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [reloadKey, setReloadKey] = useState(0)
+  const [toDelete, setToDelete] = useState<Expense | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const { notify } = useToast()
 
   const rangeInvalid = filters.dateFrom !== '' && filters.dateTo !== '' && filters.dateFrom > filters.dateTo
 
@@ -69,6 +79,25 @@ export function ExpensesPage() {
     setOffset(0)
   }
 
+  async function confirmDelete() {
+    if (!toDelete) return
+    setDeleting(true)
+    try {
+      await deleteExpense(toDelete.id)
+      notify('Expense deleted.')
+      // Step back a page when the last item of a later page was removed.
+      if (data && data.items.length === 1 && offset > 0) setOffset(Math.max(0, offset - PAGE_SIZE))
+      else setReloadKey((k) => k + 1)
+    } catch (err) {
+      // A 404 means it is already gone; refresh the list in both cases.
+      notify(err instanceof ApiError ? err.message : 'Could not delete the expense.', 'error')
+      setReloadKey((k) => k + 1)
+    } finally {
+      setDeleting(false)
+      setToDelete(null)
+    }
+  }
+
   const total = data?.total ?? 0
   const first = total === 0 ? 0 : offset + 1
   const last = Math.min(offset + PAGE_SIZE, total)
@@ -76,7 +105,12 @@ export function ExpensesPage() {
 
   return (
     <main>
-      <h1>Expenses</h1>
+      <div className="page-heading">
+        <h1>Expenses</h1>
+        <Link to="/expenses/new" className="button-link primary">
+          New expense
+        </Link>
+      </div>
 
       <form className="filters" aria-label="Filter expenses" onSubmit={(e) => e.preventDefault()}>
         <div className="field">
@@ -170,6 +204,7 @@ export function ExpensesPage() {
                   <th scope="col" className="num">
                     Amount
                   </th>
+                  <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -179,6 +214,19 @@ export function ExpensesPage() {
                     <td>{e.category}</td>
                     <td>{e.description ?? ''}</td>
                     <td className="num">{formatMoney(e.amount)}</td>
+                    <td className="row-actions">
+                      <Link to={`/expenses/${e.id}/edit`} aria-label={`Edit expense ${describe(e)}`}>
+                        Edit
+                      </Link>
+                      <button
+                        type="button"
+                        className="danger"
+                        aria-label={`Delete expense ${describe(e)}`}
+                        onClick={() => setToDelete(e)}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -196,6 +244,20 @@ export function ExpensesPage() {
             </button>
           </nav>
         </>
+      )}
+
+      {toDelete && (
+        <ConfirmDialog
+          title="Delete expense?"
+          confirmLabel={deleting ? 'Deleting…' : 'Delete'}
+          pending={deleting}
+          onConfirm={confirmDelete}
+          onCancel={() => setToDelete(null)}
+        >
+          <p>
+            This permanently deletes {describe(toDelete)} ({formatMoney(toDelete.amount)}). This cannot be undone.
+          </p>
+        </ConfirmDialog>
       )}
     </main>
   )

@@ -40,10 +40,10 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | X-06 | Expense and dashboard integration tests | testing | X-05 | COMPLETED | make lint-backend exit 0; make test-backend exit 0 (283 passed, 2 xfailed for open DEF-003); scripts/check-all.sh exit 0, docs/evidence/test-runs/check-20261030T165536Z.txt; scripts/check-ownership.sh testing exit 0 |
 | F-01 | Frontend scaffold (Vite react-ts strict, ESLint, Vitest, RTL, MSW, proxy) | frontend | INF-11 | VERIFIED | Orchestrator re-ran lint/typecheck/test (20 passed)/ownership: all exit 0; owner evidence in docs/agent-handoffs.md |
 | F-02 | API client, AuthContext, ProtectedRoute, login page | frontend | F-01 | VERIFIED | Orchestrator re-ran lint/typecheck/test (20 passed)/ownership: all exit 0; owner evidence in docs/agent-handoffs.md |
-| F-03 | Layout, navigation, logout, global 401 handling | frontend | F-02 | COMPLETED | |
-| F-04 | Expense list, filters, sort, pagination | frontend | F-03 | COMPLETED | |
-| F-05 | Create/edit forms, validation, delete confirmation, toasts | frontend | F-04 | TODO | |
-| F-06 | Dashboard page and SVG chart | frontend | F-03 | TODO | |
+| F-03 | Layout, navigation, logout, global 401 handling | frontend | F-02 | VERIFIED | Orchestrator re-ran lint/typecheck/test (33 passed)/ownership: all exit 0; handoff F-03/F-04 |
+| F-04 | Expense list, filters, sort, pagination | frontend | F-03 | VERIFIED | Orchestrator re-ran lint/typecheck/test (33 passed)/ownership: all exit 0; handoff F-03/F-04 |
+| F-05 | Create/edit forms, validation, delete confirmation, toasts | frontend | F-04 | COMPLETED | lint/typecheck/test (55 passed)/ownership exit 0; handoff F-05/F-06 |
+| F-06 | Dashboard page and SVG chart | frontend | F-03 | COMPLETED | lint/typecheck/test (55 passed)/ownership exit 0; handoff F-05/F-06 |
 | I-01 | Integration run and checklist | orchestrator | X-06, F-06 | TODO | |
 
 ## Phase 4 - testing

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
+import { ToastProvider } from './ToastProvider'
 
 export function Layout() {
   const { username, logout } = useAuth()
@@ -13,7 +14,7 @@ export function Layout() {
   }
 
   return (
-    <>
+    <ToastProvider>
       <header className="app-header">
         <span className="app-title">Expense Tracker</span>
         <nav aria-label="Main">
@@ -30,6 +31,6 @@ export function Layout() {
         </div>
       </header>
       <Outlet />
-    </>
+    </ToastProvider>
   )
 }

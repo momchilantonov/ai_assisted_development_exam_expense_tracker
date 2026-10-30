@@ -158,3 +158,12 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** `frontend/src/{components/Layout,pages/ExpensesPage,api/expenses,lib/money}.ts(x)`, `frontend/src/api/types.ts`, `frontend/src/App.tsx`, `frontend/src/index.css`, `frontend/src/test/handlers.ts`, colocated tests, `docs/tasks.md` (F-03, F-04 rows).
 - **Testing:** `make lint-frontend` exit 0; `make typecheck-frontend` exit 0; `make test-frontend` exit 0 (6 files, 33 passed); `scripts/check-ownership.sh frontend` exit 0. Not run: browser, E2E, 360 px visual check.
 - **Challenge:** the app-level "Loading…" status of `ProtectedRoute` matched the first test query; the test now waits for the page's own loading text.
+
+## 2026-10-30 - F-05/F-06 expense forms, delete confirmation, toasts and dashboard
+
+- **Module:** Frontend / forms, dialogs, dashboard
+- **Agent / AI tool (model):** GitHub Copilot frontend agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** Create/edit expense forms with client validation mirroring the contract, accessible delete confirmation and toasts, New/Edit/Delete controls on the list, and a dashboard with a plain SVG category chart; MSW handlers per contract.
+- **Files created/changed:** `frontend/src/pages/{ExpenseFormPage,DashboardPage,ExpensesPage}.tsx`, `frontend/src/components/{ConfirmDialog,ToastProvider,Layout}.tsx` (+ `toastContext.ts`, `useToast.ts`), `frontend/src/{lib/money.ts,api/*,App.tsx,index.css,test/handlers.ts}`, colocated tests, `docs/tasks.md` (F-05, F-06 rows).
+- **Testing:** `make lint-frontend` exit 0; `make typecheck-frontend` exit 0; `make test-frontend` exit 0 (8 files, 55 passed); `scripts/check-ownership.sh frontend` exit 0. Not run: browser, E2E, 360 px visual check.
+- **Challenge:** the first test run had 14 failures: form tests asserted before the form finished loading (the heading renders during loading) and old tests expected the placeholder home heading; tests now wait for the Amount field and the new "Dashboard" heading.

@@ -18,15 +18,15 @@ describe('login page', () => {
     renderApp('/login')
     await screen.findByRole('heading', { name: 'Sign in' })
     await fillAndSubmit(TEST_USERNAME, TEST_PASSWORD)
-    expect(await screen.findByRole('heading', { name: 'Expense Tracker' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
   })
 
   it('returns to the requested page after login', async () => {
     renderApp('/login?next=%2Fexpenses%2Fnew')
     await screen.findByRole('heading', { name: 'Sign in' })
     await fillAndSubmit(TEST_USERNAME, TEST_PASSWORD)
-    // No /expenses/new route yet: the wildcard sends the user home, never to /login.
-    expect(await screen.findByRole('heading', { name: 'Expense Tracker' })).toBeInTheDocument()
+    // The expense form is loaded and /login is not shown again.
+    expect(await screen.findByRole('heading', { name: 'New expense' })).toBeInTheDocument()
   })
 
   it('shows the server message in an alert when credentials are wrong', async () => {
@@ -35,7 +35,7 @@ describe('login page', () => {
     await fillAndSubmit(TEST_USERNAME, 'wrong')
     expect(await screen.findByRole('alert')).toHaveTextContent('Invalid username or password.')
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeEnabled()
-    expect(screen.queryByRole('heading', { name: 'Expense Tracker' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Dashboard' })).not.toBeInTheDocument()
   })
 
   it('shows field-level errors and sends no request when fields are empty', async () => {
@@ -72,7 +72,7 @@ describe('login page', () => {
     await fillAndSubmit(TEST_USERNAME, TEST_PASSWORD)
     expect(screen.getByRole('button', { name: 'Signing in…' })).toBeDisabled()
     release()
-    expect(await screen.findByRole('heading', { name: 'Expense Tracker' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
   })
 
   it('shows a generic message when the server is unreachable', async () => {
@@ -86,13 +86,13 @@ describe('login page', () => {
   it('redirects away from login when a session already exists', async () => {
     setMockLoggedIn()
     renderApp('/login')
-    expect(await screen.findByRole('heading', { name: 'Expense Tracker' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
   })
 
   it('ignores an external next target', async () => {
     renderApp('/login?next=%2F%2Fevil.example')
     await screen.findByRole('heading', { name: 'Sign in' })
     await fillAndSubmit(TEST_USERNAME, TEST_PASSWORD)
-    await waitFor(() => expect(screen.getByRole('heading', { name: 'Expense Tracker' })).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Dashboard' })).toBeInTheDocument())
   })
 })

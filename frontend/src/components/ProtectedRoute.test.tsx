@@ -9,7 +9,7 @@ describe('protected route', () => {
   it('redirects anonymous users to login with the requested path', async () => {
     renderApp('/')
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Expense Tracker' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Dashboard' })).not.toBeInTheDocument()
   })
 
   it('shows a loading status while the session is being checked', async () => {
@@ -27,7 +27,7 @@ describe('protected route', () => {
   it('renders the page when the session is valid', async () => {
     setMockLoggedIn()
     renderApp('/')
-    expect(await screen.findByRole('heading', { name: 'Expense Tracker' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
   })
 
   it('treats a failing session check as logged out', async () => {

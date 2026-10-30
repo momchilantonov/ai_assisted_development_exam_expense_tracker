@@ -48,6 +48,27 @@ export interface Expense {
   updated_at: string
 }
 
+export interface ExpenseInput {
+  amount: string
+  category: Category
+  description: string | null
+  expense_date: string
+}
+
+export interface CategorySummary {
+  category: Category
+  total: string
+  count: number
+}
+
+export interface Summary {
+  total_amount: string
+  current_month_amount: string
+  expense_count: number
+  by_category: CategorySummary[]
+  recent: Expense[]
+}
+
 export type ExpenseSort = 'date_desc' | 'date_asc'
 
 export interface ExpenseListQuery {

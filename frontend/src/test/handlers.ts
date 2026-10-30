@@ -30,11 +30,12 @@ export function makeExpense(id: number, overrides: Partial<MockExpense> = {}): M
   }
 }
 
-const state = { loggedIn: false, expenses: [] as MockExpense[] }
+const state = { loggedIn: false, expenses: [] as MockExpense[], nextId: 1000 }
 
 export function resetMockState(): void {
   state.loggedIn = false
   state.expenses = []
+  state.nextId = 1000
 }
 
 export function setMockExpenses(expenses: MockExpense[]): void {
@@ -61,6 +62,86 @@ export function errorBody(code: string, message: string, details?: unknown[]) {
 
 const notAuthenticated = () =>
   HttpResponse.json(errorBody('not_authenticated', 'Authentication required.'), { status: 401 })
+
+const AMOUNT_BODY = /^\d{1,8}(\.\d{1,2})?$/
+
+function bodyError(field: string, msg: string) {
+  return HttpResponse.json(errorBody('validation_error', 'Invalid request.', [{ loc: ['body', field], msg }]), {
+    status: 422,
+  })
+}
+
+interface ParsedInput {
+  amount: string
+  category: string
+  description: string | null
+  expense_date: string
+}
+
+/** Validates an ExpenseInput per the contract; returns the normalised input or a 422 response. */
+function parseExpenseInput(raw: Record<string, unknown>): ParsedInput | Response {
+  const amount = typeof raw.amount === 'number' ? String(raw.amount) : raw.amount
+  if (typeof amount !== 'string' || !AMOUNT_BODY.test(amount)) return bodyError('amount', 'Invalid amount')
+  const cents = toCentsMock(amount)
+  if (cents < 1 || cents > 99999999) return bodyError('amount', 'Amount out of range')
+  if (typeof raw.category !== 'string' || !CATEGORIES.includes(raw.category)) {
+    return bodyError('category', 'Invalid category')
+  }
+  if (typeof raw.expense_date !== 'string' || !ISO_DATE.test(raw.expense_date)) {
+    return bodyError('expense_date', 'Invalid date')
+  }
+  let description: string | null = null
+  if (raw.description !== undefined && raw.description !== null) {
+    if (typeof raw.description !== 'string') return bodyError('description', 'Invalid description')
+    const trimmed = raw.description.trim()
+    if (trimmed.length > 500) return bodyError('description', 'Description too long')
+    description = trimmed === '' ? null : trimmed
+  }
+  return { amount: formatCents(cents), category: raw.category, description, expense_date: raw.expense_date }
+}
+
+function toCentsMock(amount: string): number {
+  const [whole = '0', fraction = ''] = amount.split('.')
+  return Number(whole) * 100 + Number(fraction.padEnd(2, '0'))
+}
+
+function formatCents(cents: number): string {
+  return `${Math.floor(cents / 100)}.${String(cents % 100).padStart(2, '0')}`
+}
+
+const notFound = () => HttpResponse.json(errorBody('not_found', 'Expense not found.'), { status: 404 })
+
+function parseId(raw: string | readonly string[] | undefined): number | null {
+  const id = Number(raw)
+  return Number.isInteger(id) && id >= 1 ? id : null
+}
+
+function buildSummary() {
+  const now = new Date().toISOString().slice(0, 7)
+  let total = 0
+  let month = 0
+  const byCategory = CATEGORIES.map((category) => ({ category, cents: 0, count: 0 }))
+  for (const e of state.expenses) {
+    const cents = toCentsMock(e.amount)
+    total += cents
+    if (e.expense_date.startsWith(now)) month += cents
+    const row = byCategory.find((c) => c.category === e.category)
+    if (row) {
+      row.cents += cents
+      row.count += 1
+    }
+  }
+  const recent = [...state.expenses]
+    .sort((a, b) => b.expense_date.localeCompare(a.expense_date) || b.id - a.id)
+    .slice(0, 5)
+  return {
+    total_amount: formatCents(total),
+    current_month_amount: formatCents(month),
+    expense_count: state.expenses.length,
+    by_category: byCategory.map((c) => ({ category: c.category, total: formatCents(c.cents), count: c.count })),
+    recent,
+  }
+}
 
 // Handlers follow docs/api-contract.md; expense endpoints are added with the features that use them.
 export const handlers = [
@@ -122,4 +203,47 @@ export const handlers = [
       .sort((a, b) => direction * (a.expense_date.localeCompare(b.expense_date) || a.id - b.id))
     return HttpResponse.json({ items: matches.slice(offset, offset + limit), total: matches.length, limit, offset })
   }),
+
+  http.post('/api/expenses', async ({ request }) => {
+    if (!state.loggedIn) return notAuthenticated()
+    const parsed = parseExpenseInput((await request.json()) as Record<string, unknown>)
+    if (parsed instanceof Response) return parsed
+    const now = new Date().toISOString()
+    const expense = { id: state.nextId++, ...parsed, created_at: now, updated_at: now }
+    state.expenses.push(expense)
+    return HttpResponse.json(expense, { status: 201, headers: { Location: `/api/expenses/${expense.id}` } })
+  }),
+
+  http.get('/api/expenses/:id', ({ params }) => {
+    if (!state.loggedIn) return notAuthenticated()
+    const id = parseId(params.id)
+    if (id === null) return validationError('id')
+    const found = state.expenses.find((e) => e.id === id)
+    return found ? HttpResponse.json(found) : notFound()
+  }),
+
+  http.put('/api/expenses/:id', async ({ params, request }) => {
+    if (!state.loggedIn) return notAuthenticated()
+    const id = parseId(params.id)
+    if (id === null) return validationError('id')
+    const index = state.expenses.findIndex((e) => e.id === id)
+    if (index === -1) return notFound()
+    const parsed = parseExpenseInput((await request.json()) as Record<string, unknown>)
+    if (parsed instanceof Response) return parsed
+    const updated = { ...state.expenses[index]!, ...parsed, updated_at: new Date().toISOString() }
+    state.expenses[index] = updated
+    return HttpResponse.json(updated)
+  }),
+
+  http.delete('/api/expenses/:id', ({ params }) => {
+    if (!state.loggedIn) return notAuthenticated()
+    const id = parseId(params.id)
+    if (id === null) return validationError('id')
+    const index = state.expenses.findIndex((e) => e.id === id)
+    if (index === -1) return notFound()
+    state.expenses.splice(index, 1)
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.get('/api/dashboard/summary', () => (state.loggedIn ? HttpResponse.json(buildSummary()) : notAuthenticated())),
 ]
