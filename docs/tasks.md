@@ -1,6 +1,6 @@
 # Task board
 
-Current phase: 3 (application). HC2 and HC3 passed 2026-10-30. Current stage: D (expense backend); Stage E (frontend) not started.
+Current phase: 3 (application). HC2 and HC3 passed 2026-10-30. Current stage: E complete (frontend F-01..F-06 VERIFIED); next I-01 once X-06 is VERIFIED.
 
 States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPLETED` = owner finished with evidence; `VERIFIED` = an agent that did not implement the task re-ran the check and saved the output. Update only your own rows; append evidence links. Human checkpoints: HC1 plan (done), HC2 infra, HC3 auth review, HC4 E2E pass, HC5 report review, HC6 publish.
 
@@ -42,8 +42,8 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | F-02 | API client, AuthContext, ProtectedRoute, login page | frontend | F-01 | VERIFIED | Orchestrator re-ran lint/typecheck/test (20 passed)/ownership: all exit 0; owner evidence in docs/agent-handoffs.md |
 | F-03 | Layout, navigation, logout, global 401 handling | frontend | F-02 | VERIFIED | Orchestrator re-ran lint/typecheck/test (33 passed)/ownership: all exit 0; handoff F-03/F-04 |
 | F-04 | Expense list, filters, sort, pagination | frontend | F-03 | VERIFIED | Orchestrator re-ran lint/typecheck/test (33 passed)/ownership: all exit 0; handoff F-03/F-04 |
-| F-05 | Create/edit forms, validation, delete confirmation, toasts | frontend | F-04 | COMPLETED | lint/typecheck/test (55 passed)/ownership exit 0; handoff F-05/F-06 |
-| F-06 | Dashboard page and SVG chart | frontend | F-03 | COMPLETED | lint/typecheck/test (55 passed)/ownership exit 0; handoff F-05/F-06 |
+| F-05 | Create/edit forms, validation, delete confirmation, toasts | frontend | F-04 | VERIFIED | Orchestrator re-ran lint/typecheck/test (55 passed)/ownership: all exit 0; owner: handoff F-05/F-06 |
+| F-06 | Dashboard page and SVG chart | frontend | F-03 | VERIFIED | Orchestrator re-ran lint/typecheck/test (55 passed)/ownership: all exit 0; owner: handoff F-05/F-06 |
 | I-01 | Integration run and checklist | orchestrator | X-06, F-06 | TODO | |
 
 ## Phase 4 - testing
