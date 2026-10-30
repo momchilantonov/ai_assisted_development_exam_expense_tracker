@@ -85,3 +85,22 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** `docs/test-report.md`, `docs/defects.md`, `docs/tasks.md`, handoff A-06.
 - **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (102 passed); `scripts/check-all.sh` exit 0, output in `docs/evidence/test-runs/check-20261030T161944Z.txt`; `scripts/check-ownership.sh testing` exit 0.
 - **Challenge:** frontend items could not be reviewed (no frontend); two minor defects filed (DEF-001, DEF-002).
+
+## 2026-10-30 - Fix DEF-001 and backend half of DEF-002
+
+- **Module:** Backend / provisioning CLI and test fixtures
+- **Agent / AI tool (model):** GitHub Copilot backend agent (model: Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** make `create-user` read INITIAL_* from the repo-root `.env` (process env wins) and generate the unit-test password per run.
+- **Reasoning / approach:** `dotenv_values` fallback in the CLI; per-run `secrets.token_urlsafe` password in `backend/tests/conftest.py`.
+- **Files created/changed:** `backend/app/cli.py`, `backend/tests/conftest.py`, `backend/tests/unit/test_auth.py`, handoff DEF-001/DEF-002.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (103 passed); `scripts/check-ownership.sh backend` exit 0.
+- **Challenge:** `conftest` is imported under two module names, so a plain `secrets` constant differed between fixtures and tests (3 failures, 401 on login); fixed by sharing the value through an environment variable. A pre-existing broken route-guard test (`_IncludedRouter` has no `path`) was reverted to the HEAD version.
+
+## 2026-10-30 - DEF-001 / DEF-002 verification (testing)
+
+- **Module:** Testing / auth defects
+- **Agent / AI tool (model):** GitHub Copilot testing agent
+- **Technical objective:** finish DEF-002 testing half and independently verify DEF-001.
+- **Files created/changed:** `backend/tests/integration/conftest.py`, `backend/tests/integration/test_auth_http.py`, `docs/defects.md`, handoff.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (104 passed); `scripts/check-all.sh` exit 0, `docs/evidence/test-runs/check-20261030T163842Z.txt`; `scripts/check-ownership.sh testing` exit 1 (backend-owned uncommitted files only).
+- **Challenge:** `ENV_FILE` is fixed to the repo root, so the black-box test copies `app/` to a temp layout instead of touching the real `.env`.

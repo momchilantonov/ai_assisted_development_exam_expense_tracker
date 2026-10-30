@@ -3,14 +3,21 @@ import getpass
 import os
 import sys
 
-from app.config import get_settings
+from dotenv import dotenv_values
+
+from app.config import REPO_ROOT, get_settings
 from app.db import create_db_engine, create_session_factory, init_db
 from app.services.auth import provision_user
 
+ENV_FILE = REPO_ROOT / ".env"
+
 
 def _read_credentials() -> tuple[str, str] | None:
-    username = os.environ.get("INITIAL_USERNAME", "").strip()
-    password = os.environ.get("INITIAL_PASSWORD", "")
+    file_values = dotenv_values(ENV_FILE)
+    username = (
+        os.environ.get("INITIAL_USERNAME") or file_values.get("INITIAL_USERNAME") or ""
+    ).strip()
+    password = os.environ.get("INITIAL_PASSWORD") or file_values.get("INITIAL_PASSWORD") or ""
     interactive = sys.stdin.isatty()
     if not username and interactive:
         username = input("Username: ").strip()

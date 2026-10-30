@@ -99,3 +99,31 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Known issues:** DEF-001 (backend, minor: CLI ignores `.env` INITIAL_*), DEF-002 (testing/backend, minor: hardcoded test credentials). No login rate limiting (out of contract). Unhandled-500 envelope has no HTTP-level test. Route guard must be re-run when expense routes exist.
 - **Dependencies:** unblocks HC3 decision and X-01.
 - **Next action:** human HC3 approval; backend X-01.
+
+---
+
+### HANDOFF DEF-001 / DEF-002 (backend half) - backend agent - 2026-10-30
+
+- **Task ID(s):** defect fixes DEF-001, DEF-002 (backend half); no task row changed.
+- **Responsible agent:** backend
+- **State set:** FIXED, awaiting verification by testing (attempt 1 of 3). `docs/defects.md` is owned by testing, so it was not edited; testing should set DEF-001 to FIXED (attempt 1) and re-verify.
+- **Completed work:** DEF-001: `backend/app/cli.py` `_read_credentials` now reads `INITIAL_USERNAME`/`INITIAL_PASSWORD` from the process environment first, then from the repo-root `.env` (`ENV_FILE`, via `dotenv_values`); nothing is printed. DEF-002 (backend): `backend/tests/conftest.py` `TEST_PASSWORD` is generated per run with `secrets.token_urlsafe(16)` (shared through env var `_TEST_RUN_PASSWORD` because `conftest` is imported as both `conftest` and `tests.conftest`, which otherwise yields two different values). New test `test_cli_reads_credentials_from_env_file_and_process_env_wins`; existing CLI tests isolate `ENV_FILE`.
+- **Modified files:** `backend/app/cli.py`, `backend/tests/conftest.py`, `backend/tests/unit/test_auth.py`, `docs/agent-handoffs.md`, `docs/evidence/development-log.md`.
+- **Important decisions:** used `python-dotenv` (already a pydantic-settings dependency) instead of adding Settings fields. The working-tree version of `test_every_non_public_route_requires_authentication` (not from this task) failed with `'_IncludedRouter' object has no attribute 'path'`; reverted it to the OpenAPI-based version from HEAD so the suite is green. `ruff format` also reflowed a few lines in `test_auth.py`.
+- **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (103 passed, 1 httpx deprecation warning); `scripts/check-ownership.sh backend` exit 0. Not run: mypy, frontend, E2E, a manual `make seed-user` with a real `.env`.
+- **Known issues:** DEF-002 testing half remains: `backend/tests/integration/conftest.py:16-17` still has constants. `.env.example` unchanged (comment is now accurate).
+- **Dependencies:** none.
+- **Next action:** testing agent fixes the integration constants, verifies DEF-001 and DEF-002 and updates `docs/defects.md`.
+
+---
+
+### HANDOFF DEF-001 / DEF-002 verification - testing agent - 2026-10-30
+
+- **Task ID(s):** DEF-001, DEF-002 (no task row changed; A-06 stays COMPLETED)
+- **Responsible agent:** testing
+- **State set:** DEF-001 VERIFIED, DEF-002 VERIFIED in `docs/defects.md`.
+- **Completed work:** DEF-002 testing half: `backend/tests/integration/conftest.py` `PASSWORD`/`OTHER_PASSWORD` now `secrets.token_urlsafe(16)`; hardcoded passwords in `test_auth_http.py` replaced. DEF-001: new black-box test `test_provisioning_reads_initial_credentials_from_dotenv_file` (scratch repo layout with temp `.env`, no INITIAL_* in environment). Manual scratch run: HEAD `cli.py` exit 2, fixed `cli.py` exit 0.
+- **Modified files:** `backend/tests/integration/conftest.py`, `backend/tests/integration/test_auth_http.py`, `docs/defects.md`, `docs/agent-handoffs.md`, `docs/evidence/development-log.md`, `docs/evidence/test-runs/check-20261030T163842Z.txt`.
+- **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (104 passed, 1 httpx warning); `scripts/check-all.sh` exit 0 (104 passed, saved to `check-20261030T163842Z.txt`); `scripts/check-ownership.sh testing` exit 1 only because of uncommitted backend-owned changes (`backend/app/cli.py`, `backend/tests/conftest.py`, `backend/tests/unit/test_auth.py`); none of my files are flagged. Should pass once the backend changes are committed.
+- **Known issues:** new integration test not run against the old CLI under pytest (manual before/after run only).
+- **Next action:** commit backend and testing changes, re-run ownership check; HC3.

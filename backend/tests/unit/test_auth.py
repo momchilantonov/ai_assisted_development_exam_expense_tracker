@@ -1,4 +1,6 @@
 import re
+import secrets
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -187,9 +189,14 @@ def test_reset_password_invalidates_existing_sessions(auth_client: TestClient, a
 
 
 def test_cli_creates_user_from_env_without_printing_password(
-    settings: Settings, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], app
+    settings: Settings,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    app,
+    tmp_path: Path,
 ) -> None:
     monkeypatch.setattr("app.cli.get_settings", lambda: settings)
+    monkeypatch.setattr("app.cli.ENV_FILE", tmp_path / "missing.env")
     monkeypatch.setenv("INITIAL_USERNAME", "cliuser")
     monkeypatch.setenv("INITIAL_PASSWORD", "cli-secret-pw")
 
@@ -207,15 +214,49 @@ def test_cli_creates_user_from_env_without_printing_password(
 
 
 def test_cli_fails_without_credentials_when_non_interactive(
-    settings: Settings, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    settings: Settings,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
 ) -> None:
     monkeypatch.setattr("app.cli.get_settings", lambda: settings)
     monkeypatch.delenv("INITIAL_USERNAME", raising=False)
     monkeypatch.delenv("INITIAL_PASSWORD", raising=False)
+    monkeypatch.setattr("app.cli.ENV_FILE", tmp_path / "missing.env")
     monkeypatch.setattr("sys.stdin.isatty", lambda: False, raising=False)
 
     assert cli_main(["create-user"]) == 2
     assert "required" in capsys.readouterr().err
+
+
+def test_cli_reads_credentials_from_env_file_and_process_env_wins(
+    settings: Settings,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    app,
+) -> None:
+    file_password = secrets.token_urlsafe(16)
+    env_password = secrets.token_urlsafe(16)
+    env_file = tmp_path / ".env"
+    env_file.write_text(f"INITIAL_USERNAME=fileuser\nINITIAL_PASSWORD={file_password}\n")
+    monkeypatch.setattr("app.cli.get_settings", lambda: settings)
+    monkeypatch.setattr("app.cli.ENV_FILE", env_file)
+    monkeypatch.delenv("INITIAL_USERNAME", raising=False)
+    monkeypatch.delenv("INITIAL_PASSWORD", raising=False)
+    monkeypatch.setattr("sys.stdin.isatty", lambda: False, raising=False)
+
+    assert cli_main(["create-user"]) == 0
+    monkeypatch.setenv("INITIAL_PASSWORD", env_password)
+    assert cli_main(["create-user", "--reset-password"]) == 0
+
+    out = capsys.readouterr()
+    assert file_password not in out.out + out.err
+    assert env_password not in out.out + out.err
+    with app.state.session_factory() as db:
+        user = db.get(User, 1)
+        assert user is not None and user.username == "fileuser"
+        assert verify_password(user.password_hash, env_password)
 
 
 def test_every_non_public_route_requires_authentication(client: TestClient) -> None:

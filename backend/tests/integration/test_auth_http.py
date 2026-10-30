@@ -1,11 +1,15 @@
+import os
 import re
+import shutil
 import sqlite3
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
-from .conftest import COOKIE, ORIGIN, PASSWORD, USERNAME, Clock
+from .conftest import BACKEND_DIR, COOKIE, ORIGIN, OTHER_PASSWORD, PASSWORD, USERNAME, Clock
 
 LOGIN = "/api/auth/login"
 LOGOUT = "/api/auth/logout"
@@ -371,19 +375,19 @@ def test_session_cookie_is_not_readable_via_response_body(logged_in: TestClient)
 
 def test_provisioning_twice_does_not_overwrite_user(provision, make_client):
     assert provision().returncode == 0
-    second = provision(USERNAME, "different-password-9")
+    second = provision(USERNAME, OTHER_PASSWORD)
     assert second.returncode == 0
     assert "already exists" in second.stdout
     app_client = make_client()
     assert login(app_client).status_code == 200
-    assert_error(login(app_client, password="different-password-9"), 401, "invalid_credentials")
+    assert_error(login(app_client, password=OTHER_PASSWORD), 401, "invalid_credentials")
 
 
 def test_reset_password_replaces_the_credentials(provision, make_client):
     assert provision().returncode == 0
-    assert provision(USERNAME, "new-password-456", "--reset-password").returncode == 0
+    assert provision(USERNAME, OTHER_PASSWORD, "--reset-password").returncode == 0
     app_client = make_client()
-    assert login(app_client, password="new-password-456").status_code == 200
+    assert login(app_client, password=OTHER_PASSWORD).status_code == 200
     assert_error(login(app_client), 401, "invalid_credentials")
 
 
@@ -391,6 +395,31 @@ def test_provisioning_without_credentials_fails_and_creates_no_user(provision, m
     result = provision("", "")
     assert result.returncode != 0
     assert_error(login(make_client()), 401, "invalid_credentials")
+
+
+def test_provisioning_reads_initial_credentials_from_dotenv_file(tmp_path, db_path, make_client):
+    # Copy the app into a scratch repo layout so its repo-root .env is a temp file.
+    scratch = tmp_path / "scratch_repo"
+    shutil.copytree(
+        BACKEND_DIR / "app",
+        scratch / "backend" / "app",
+        ignore=shutil.ignore_patterns("__pycache__"),
+    )
+    (scratch / ".env").write_text(f"INITIAL_USERNAME={USERNAME}\nINITIAL_PASSWORD={PASSWORD}\n")
+    env = {k: v for k, v in os.environ.items() if not k.startswith("INITIAL_")}
+    env["DATABASE_URL"] = f"sqlite:///{db_path}"
+    result = subprocess.run(
+        [sys.executable, "-m", "app.cli", "create-user"],
+        cwd=scratch / "backend",
+        env=env,
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert PASSWORD not in result.stdout + result.stderr
+    assert login(make_client()).status_code == 200
 
 
 def test_provisioning_output_does_not_print_the_password(provision):

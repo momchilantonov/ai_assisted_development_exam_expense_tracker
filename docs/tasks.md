@@ -1,6 +1,6 @@
 # Task board
 
-Current phase: 2 complete (HC2 passed 2026-10-30). Current stage: none; Stage B (backend) and Stage E (frontend) may start.
+Current phase: 3 (application). HC2 and HC3 passed 2026-10-30. Current stage: D (expense backend); Stage E (frontend) not started.
 
 States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPLETED` = owner finished with evidence; `VERIFIED` = an agent that did not implement the task re-ran the check and saved the output. Update only your own rows; append evidence links. Human checkpoints: HC1 plan (done), HC2 infra, HC3 auth review, HC4 E2E pass, HC5 report review, HC6 publish.
 
@@ -31,7 +31,7 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | A-03 | Auth routes, require_auth, Origin middleware | backend | A-01, A-02 | VERIFIED | api/auth.py, core/deps.py, core/origin.py; unit tests. Verified by testing agent in A-06 review (check-20261030T161944Z.txt) |
 | A-04 | Route guard test and auth unit tests | backend | A-03 | VERIFIED | Verified by testing agent in A-06 review (check-20261030T161944Z.txt, 102 passed). route guard test (via OpenAPI paths) + 20 auth tests; `make lint-backend` exit 0; `make test-backend` exit 0 (47 passed); `scripts/check-ownership.sh backend` exit 0; handoff A-01..A-04 |
 | A-05 | Black-box auth integration tests | testing | A-03 | VERIFIED | 55 tests in backend/tests/integration/test_auth_http.py; `scripts/check-all.sh` exit 0 (102 passed), saved docs/evidence/test-runs/check-20261030T161629Z.txt; `scripts/check-ownership.sh testing` exit 0; no defects; orchestrator re-ran scripts/check-all.sh exit 0, 102 passed (docs/evidence/test-runs/check-20261030T162205Z.txt) |
-| A-06 | Auth security review (HC3) | testing | A-05 | COMPLETED | review in docs/test-report.md (12 PASS, 1 FAIL minor, 2 NOT RUN frontend; DEF-001, DEF-002 minor); `make lint-backend` exit 0; `make test-backend` exit 0 (102 passed); `scripts/check-all.sh` exit 0, docs/evidence/test-runs/check-20261030T161944Z.txt; `scripts/check-ownership.sh testing` exit 0 |
+| A-06 | Auth security review (HC3) | testing | A-05 | VERIFIED | review in docs/test-report.md (12 PASS, 1 FAIL minor, 2 NOT RUN frontend; DEF-001, DEF-002 minor); `make lint-backend` exit 0; `make test-backend` exit 0 (102 passed); `scripts/check-all.sh` exit 0, docs/evidence/test-runs/check-20261030T161944Z.txt; `scripts/check-ownership.sh testing` exit 0; orchestrator re-ran check-all exit 0 after DEF-001/002 fixes; HC3 approved 2026-10-30 |
 | X-01 | Expense schemas and money handling | backend | A-06 | TODO | |
 | X-02 | Expense service and CRUD routes | backend | X-01 | TODO | |
 | X-03 | Filters, sorting, pagination | backend | X-02 | TODO | |

@@ -1,4 +1,5 @@
 import os
+import secrets
 import subprocess
 import sys
 from collections.abc import Callable, Iterator
@@ -14,7 +15,8 @@ from app.main import create_app
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 ORIGIN = "http://testserver"
 USERNAME = "integration-user"
-PASSWORD = "integration-pass-123"  # noqa: S105 - throwaway test credential
+PASSWORD = secrets.token_urlsafe(16)
+OTHER_PASSWORD = secrets.token_urlsafe(16)
 COOKIE = "expense_session"
 
 

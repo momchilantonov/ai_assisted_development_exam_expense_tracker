@@ -1,3 +1,5 @@
+import os
+import secrets
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -36,7 +38,8 @@ class FakeClock:
 
 
 TEST_USERNAME = "tester"
-TEST_PASSWORD = "correct-horse-battery"
+# conftest may be imported twice (as "conftest" and "tests.conftest"); share one value per run.
+TEST_PASSWORD = os.environ.setdefault("_TEST_RUN_PASSWORD", secrets.token_urlsafe(16))
 
 
 @pytest.fixture
