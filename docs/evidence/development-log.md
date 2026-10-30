@@ -65,3 +65,23 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** see handoff A-01..A-04 in `docs/agent-handoffs.md`.
 - **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (47 passed); `scripts/check-ownership.sh backend` exit 0.
 - **Challenge:** the route guard test first iterated `app.routes`, which in this FastAPI version contains opaque included-router objects; switched to enumerating OpenAPI paths.
+
+## 2026-10-30 - A-05 black-box auth integration tests (Phase 4)
+
+- **Module:** Testing / authentication
+- **Agent / AI tool (model):** GitHub Copilot testing agent (model: Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** HTTP-only integration tests for login, cookie flags, wrong credentials, validation, protected routes, logout, expiry, Origin check and secret leakage.
+- **Reasoning / approach:** scenarios derived from `docs/api-contract.md` and the testing instructions; user provisioned via the real CLI; temp SQLite per test; injected clock for expiry.
+- **Files created/changed:** see handoff A-05 in `docs/agent-handoffs.md`.
+- **Testing:** `scripts/check-all.sh` exit 0, 102 passed (55 new), output in `docs/evidence/test-runs/check-20261030T161629Z.txt`; `scripts/check-ownership.sh testing` exit 0.
+- **Challenge:** no defects found; first run was green, so the tests were not shown to fail against a broken implementation.
+
+## 2026-10-30 - A-06 authentication security review (Phase 4, HC3 input)
+
+- **Module:** Testing / authentication review
+- **Agent / AI tool (model):** GitHub Copilot testing agent (model: Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** go through the 15-item auth review checklist with evidence.
+- **Reasoning / approach:** read ADR-002, contract, `backend/app/**` and tests; mapped each item to code references and test names; re-ran lint and tests.
+- **Files created/changed:** `docs/test-report.md`, `docs/defects.md`, `docs/tasks.md`, handoff A-06.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (102 passed); `scripts/check-all.sh` exit 0, output in `docs/evidence/test-runs/check-20261030T161944Z.txt`; `scripts/check-ownership.sh testing` exit 0.
+- **Challenge:** frontend items could not be reviewed (no frontend); two minor defects filed (DEF-001, DEF-002).

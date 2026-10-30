@@ -1,0 +1,18 @@
+# command: make check
+# started: 2026-10-30T16:19:44Z
+All checks passed!
+29 files already formatted
+frontend not present - skipping
+backend typecheck skipped (no backend/app or mypy not installed)
+frontend not present - skipping
+........................................................................ [ 70%]
+..............................                                           [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/backend/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+102 passed, 1 warning in 63.45s (0:01:03)
+frontend not present - skipping
+# finished: 2026-10-30T16:20:49Z exit=0

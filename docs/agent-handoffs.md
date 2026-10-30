@@ -69,3 +69,33 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Known issues:** `.env.example` documents `INITIAL_*` but the CLI does not read `.env` for them; `make seed-user` therefore needs them exported or a prompt. No rate limiting on login (out of contract).
 - **Dependencies:** unblocks A-05 (testing agent).
 - **Next action:** A-05 black-box auth integration tests, then A-06 (HC3).
+
+---
+
+### HANDOFF A-05 - testing agent - 2026-10-30
+
+- **Task ID(s):** A-05
+- **Responsible agent:** testing
+- **State set:** COMPLETED. A-01..A-04 are not set to VERIFIED: A-06 (security review) is still open, and this run only exercised their behaviour through HTTP, not their internals.
+- **Completed work:** 55 black-box tests in `backend/tests/integration/test_auth_http.py` with fixtures in `backend/tests/integration/conftest.py`. Each test has its own temp SQLite file; the user is provisioned through the real CLI (`python -m app.cli create-user`) with throwaway credentials. Covered: login success and cookie flags (HttpOnly, SameSite=Strict, Path, Max-Age, Secure when configured), opaque unique token, identical 401 for wrong user and wrong password, 422 validation (missing, empty, null, wrong types, non-JSON), 401 for no/empty/garbage/tampered/truncated cookie, `/me`, OpenAPI route guard, logout (204, cookie cleared, old cookie rejected, idempotent, other sessions unaffected), expiry (before/after TTL, absolute not sliding, configured TTL), Origin check (forged, exact match, GET unchecked, checked before credentials), hash-only password and hashed session token in the DB, no secrets in responses or CLI output, repeated provisioning and `--reset-password`.
+- **Modified files:** `backend/tests/integration/{__init__,conftest,test_auth_http}.py`; `docs/tasks.md`; `docs/agent-handoffs.md`; `docs/evidence/development-log.md`; `docs/evidence/test-runs/check-20261030T161629Z.txt`.
+- **Important decisions:** expiry uses the documented clock injection point `app.state.clock` (same as the unit tests), since waiting 8 hours is not possible. DB assertions use plain `sqlite3` reads (table/column names `users.password_hash`, `sessions`), which couples two tests to the schema. Added `__init__.py` so the integration `conftest.py` does not clash with `backend/tests/conftest.py`.
+- **Test results:** `scripts/check-all.sh` -> exit 0, 102 passed (47 existing + 55 new), 1 httpx deprecation warning, saved to `docs/evidence/test-runs/check-20261030T161629Z.txt`; `make lint-backend` exit 0; `scripts/check-ownership.sh testing` -> exit 0. All tests passed on the first run; no failing-then-fixed cycle, so these tests have not been shown to fail against a broken implementation (no mutation check run). Frontend, typecheck (mypy not installed) and E2E: not run.
+- **Known issues:** no defects found; `docs/defects.md` unchanged. Not covered: login rate limiting (not in contract), Secure cookie over real TLS, concurrency, expense/dashboard routes (do not exist yet; the OpenAPI guard test will cover them when added). Suite takes about 60 s because of Argon2 hashing and CLI subprocesses.
+- **Dependencies:** unblocks A-06.
+- **Next action:** A-06 auth security review (HC3).
+
+---
+
+### HANDOFF A-06 - testing agent - 2026-10-30
+
+- **Task ID(s):** A-06 (also verification of A-01..A-04)
+- **Responsible agent:** testing
+- **State set:** A-06 COMPLETED; A-01..A-04 VERIFIED (implemented by backend; review found no critical/major issue and checks re-ran green). A-05 left COMPLETED (written by testing).
+- **Completed work:** read-only review of the authentication code and tests against `.github/skills/single-user-auth/review-checklist.md`; result in `docs/test-report.md` (12 PASS, 1 FAIL minor, 2 NOT RUN because no frontend exists yet).
+- **Modified files:** `docs/test-report.md` (new), `docs/defects.md`, `docs/tasks.md`, `docs/agent-handoffs.md`, `docs/evidence/development-log.md`, `docs/evidence/test-runs/check-20261030T161944Z.txt`.
+- **Important decisions:** FAIL on checklist item 3 is minor (throwaway test constants, no real secrets). Frontend items 13 and 14 stay NOT RUN until frontend/E2E exist.
+- **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (102 passed, 1 httpx deprecation warning); `scripts/check-all.sh` exit 0 (102 passed; frontend skipped), saved to `docs/evidence/test-runs/check-20261030T161944Z.txt`; `scripts/check-ownership.sh testing` exit 0. mypy and E2E not run.
+- **Known issues:** DEF-001 (backend, minor: CLI ignores `.env` INITIAL_*), DEF-002 (testing/backend, minor: hardcoded test credentials). No login rate limiting (out of contract). Unhandled-500 envelope has no HTTP-level test. Route guard must be re-run when expense routes exist.
+- **Dependencies:** unblocks HC3 decision and X-01.
+- **Next action:** human HC3 approval; backend X-01.

@@ -26,12 +26,12 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 |---|---|---|---|---|---|
 | B-01 | Backend scaffold, config, init_db, health, error envelope, pytest fixtures | backend | INF-11 | VERIFIED | Orchestrator re-ran lint/test/ownership: all exit 0 (7 passed). Owner evidence: `make lint-backend` exit 0; `make test-backend` exit 0 (7 passed); `scripts/check-ownership.sh backend` exit 0; handoff B-01 in docs/agent-handoffs.md |
 | B-02 | Models users/sessions/expenses with constraints | backend | B-01 | VERIFIED | Orchestrator re-ran lint/test/ownership: all exit 0 (24 passed). Owner evidence: `make lint-backend` exit 0; `make test-backend` exit 0 (24 passed); `scripts/check-ownership.sh backend` exit 0; handoff B-02 in docs/agent-handoffs.md |
-| A-01 | Provisioning CLI (create-user) | backend | B-02 | COMPLETED | `python -m app.cli create-user` (env/prompt, idempotent, `--reset-password`); tests in backend/tests/unit/test_auth.py |
-| A-02 | Hashing and session services | backend | B-02 | COMPLETED | core/security.py (Argon2id, SHA-256 token) and services/auth.py; unit tests |
-| A-03 | Auth routes, require_auth, Origin middleware | backend | A-01, A-02 | COMPLETED | api/auth.py, core/deps.py, core/origin.py; unit tests |
-| A-04 | Route guard test and auth unit tests | backend | A-03 | COMPLETED | route guard test (via OpenAPI paths) + 20 auth tests; `make lint-backend` exit 0; `make test-backend` exit 0 (47 passed); `scripts/check-ownership.sh backend` exit 0; handoff A-01..A-04 |
-| A-05 | Black-box auth integration tests | testing | A-03 | TODO | |
-| A-06 | Auth security review (HC3) | testing | A-05 | TODO | |
+| A-01 | Provisioning CLI (create-user) | backend | B-02 | VERIFIED | `python -m app.cli create-user` (env/prompt, idempotent, `--reset-password`); tests in backend/tests/unit/test_auth.py. Verified by testing agent in A-06 review (docs/test-report.md, docs/evidence/test-runs/check-20261030T161944Z.txt); minor DEF-001 open |
+| A-02 | Hashing and session services | backend | B-02 | VERIFIED | core/security.py (Argon2id, SHA-256 token) and services/auth.py; unit tests. Verified by testing agent in A-06 review (check-20261030T161944Z.txt) |
+| A-03 | Auth routes, require_auth, Origin middleware | backend | A-01, A-02 | VERIFIED | api/auth.py, core/deps.py, core/origin.py; unit tests. Verified by testing agent in A-06 review (check-20261030T161944Z.txt) |
+| A-04 | Route guard test and auth unit tests | backend | A-03 | VERIFIED | Verified by testing agent in A-06 review (check-20261030T161944Z.txt, 102 passed). route guard test (via OpenAPI paths) + 20 auth tests; `make lint-backend` exit 0; `make test-backend` exit 0 (47 passed); `scripts/check-ownership.sh backend` exit 0; handoff A-01..A-04 |
+| A-05 | Black-box auth integration tests | testing | A-03 | VERIFIED | 55 tests in backend/tests/integration/test_auth_http.py; `scripts/check-all.sh` exit 0 (102 passed), saved docs/evidence/test-runs/check-20261030T161629Z.txt; `scripts/check-ownership.sh testing` exit 0; no defects; orchestrator re-ran scripts/check-all.sh exit 0, 102 passed (docs/evidence/test-runs/check-20261030T162205Z.txt) |
+| A-06 | Auth security review (HC3) | testing | A-05 | COMPLETED | review in docs/test-report.md (12 PASS, 1 FAIL minor, 2 NOT RUN frontend; DEF-001, DEF-002 minor); `make lint-backend` exit 0; `make test-backend` exit 0 (102 passed); `scripts/check-all.sh` exit 0, docs/evidence/test-runs/check-20261030T161944Z.txt; `scripts/check-ownership.sh testing` exit 0 |
 | X-01 | Expense schemas and money handling | backend | A-06 | TODO | |
 | X-02 | Expense service and CRUD routes | backend | X-01 | TODO | |
 | X-03 | Filters, sorting, pagination | backend | X-02 | TODO | |
