@@ -4,6 +4,8 @@ A single-user expense tracker (FastAPI + SQLite backend, React + TypeScript + Vi
 
 > Status: Phase 2 (AI development infrastructure) only. The application is not implemented yet. This README is finalised in Phase 5.
 
+Repository: https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker
+
 ## Prerequisites
 
 - Python 3.12+ (this machine uses `uv python install 3.12`)
