@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "node .github/hooks/scripts/format-python.mjs",
+        "timeout": 20
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node .github/hooks/scripts/stop-gate.mjs",
+        "timeout": 180
+      }
+    ]
+  }
+}

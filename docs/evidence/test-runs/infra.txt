@@ -1,0 +1,99 @@
+# command: scripts/validate-infra.sh (after formatter edits)
+# started: 2026-10-30T15:28:19Z
+
+== toolchain
+python     Python 3.12.12 (/home/manto/.local/bin/python3.12)
+uv         uv 0.9.22
+node       v22.23.4
+npm        10.9.9
+make       GNU Make 4.3
+git        git version 2.34.1
+
+== structure, front-matter, skills, hooks, docs
+PASS copilot-instructions.md exists
+PASS 4 path instruction files (found 4)
+PASS instructions backend.instructions.md has applyTo and description
+PASS instructions documentation.instructions.md has applyTo and description
+PASS instructions frontend.instructions.md has applyTo and description
+PASS instructions testing.instructions.md has applyTo and description
+PASS agent orchestrator: name, description, tools
+PASS orchestrator can delegate to the 4 specialists
+PASS agent backend: name, description, tools
+PASS agent frontend: name, description, tools
+PASS agent testing: name, description, tools
+PASS agent documentation: name, description, tools
+PASS prompt setup-environment: description and valid agent
+PASS prompt continue-development: description and valid agent
+PASS prompt implement-auth: description and valid agent
+PASS prompt implement-backend: description and valid agent
+PASS prompt implement-frontend: description and valid agent
+PASS prompt integrate-application: description and valid agent
+PASS prompt generate-tests: description and valid agent
+PASS prompt review-auth-security: description and valid agent
+PASS prompt validate-application: description and valid agent
+PASS prompt fix-defects: description and valid agent
+PASS prompt generate-exam-documentation: description and valid agent
+PASS prompt final-audit: description and valid agent
+PASS skill fastapi-feature-development: name matches directory, description <= 1024
+PASS skill single-user-auth: name matches directory, description <= 1024
+PASS skill react-feature-development: name matches directory, description <= 1024
+PASS skill automated-testing: name matches directory, description <= 1024
+PASS skill ai-dev-evidence: name matches directory, description <= 1024
+PASS skill agent-handoff: name matches directory, description <= 1024
+PASS skill fastapi: name matches directory, description <= 1024
+PASS skill vercel-react-best-practices: name matches directory, description <= 1024
+PASS skill playwright-best-practices: name matches directory, description <= 1024
+PASS skill verification-before-completion: name matches directory, description <= 1024
+PASS no unexpected skill directories
+PASS skills-lock.json present (provenance of external skills)
+PASS hook safety.json valid and scripts exist
+PASS hook quality.json valid and scripts exist
+PASS hook context.json valid and scripts exist
+PASS hook evidence.json valid and scripts exist
+PASS ownership-guard.mjs exists
+PASS CI workflow exists
+PASS docs/plan/master-plan.md exists
+PASS docs/architecture.md exists
+PASS docs/api-contract.md exists
+PASS docs/decisions.md exists
+PASS docs/tasks.md exists
+PASS docs/agent-handoffs.md exists
+PASS docs/defects.md exists
+PASS docs/evidence/development-log.md exists
+PASS docs/evidence/prompts.md exists
+PASS README.md exists
+PASS .env.example exists
+PASS .gitignore exists
+PASS Makefile exists
+PASS docs/tasks.md lists all 44 tasks
+PASS no application code exists yet (Phase 2 only)
+structure: all checks passed
+
+== hook fixtures
+PASS session context emits additionalContext
+PASS format hook is a no-op for reads
+33/33 hook cases passed
+
+== make targets parse
+make -n check OK
+make help OK
+
+== ownership script runs
+check-ownership.sh runs (exit 1 is informational here)
+
+== secrets hygiene
+OK .env not tracked
+OK .env.example has placeholders only
+OK no .agents/ directory
+
+== manual prerequisites (cannot be verified by script)
+ 1. VS Code setting chat.useHooks is enabled and the workspace is trusted.
+ 2. Local harness selected in the Chat view (prompt files and handoffs need it).
+ 3. Chat > right-click > Diagnostics lists 5 agents, 12 prompts, 5 instruction files,
+    10 skills and 4 hook files without errors.
+ 4. UNVERIFIED until observed: applyTo comma-separated globs; tool aliases
+    (read/search/edit/execute/agent/todo); agent-scoped PreToolUse hooks firing in Local;
+    parallel write-capable subagents.
+
+validate-infra: PASS
+# finished: 2026-10-30T15:28:21Z exit=0

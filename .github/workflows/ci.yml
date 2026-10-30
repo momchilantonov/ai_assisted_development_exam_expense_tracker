@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# Every step is guarded so the workflow is green on a repository that has no application yet.
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        if: ${{ hashFiles('backend/requirements-dev.txt') != '' }}
+        with:
+          python-version: '3.12'
+      - name: Install backend
+        if: ${{ hashFiles('backend/requirements-dev.txt') != '' }}
+        run: make setup-backend
+      - name: Lint backend
+        if: ${{ hashFiles('backend/requirements-dev.txt') != '' }}
+        run: make lint-backend
+      - name: Test backend (unit, auth and integration)
+        if: ${{ hashFiles('backend/requirements-dev.txt') != '' }}
+        run: make test-backend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        if: ${{ hashFiles('frontend/package-lock.json') != '' }}
+        with:
+          node-version: '22'
+      - name: Install frontend
+        if: ${{ hashFiles('frontend/package-lock.json') != '' }}
+        run: make setup-frontend
+      - name: Lint
+        if: ${{ hashFiles('frontend/package-lock.json') != '' }}
+        run: make lint-frontend
+      - name: Type check
+        if: ${{ hashFiles('frontend/package-lock.json') != '' }}
+        run: make typecheck-frontend
+      - name: Test
+        if: ${{ hashFiles('frontend/package-lock.json') != '' }}
+        run: make test-frontend
+      - name: Production build
+        if: ${{ hashFiles('frontend/package-lock.json') != '' }}
+        run: npm --prefix frontend run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        if: ${{ hashFiles('e2e/package-lock.json') != '' }}
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        if: ${{ hashFiles('e2e/package-lock.json') != '' }}
+        with:
+          node-version: '22'
+      - name: Install everything
+        if: ${{ hashFiles('e2e/package-lock.json') != '' }}
+        run: make setup
+      - name: Playwright E2E
+        if: ${{ hashFiles('e2e/package-lock.json') != '' }}
+        run: make test-e2e
+      - uses: actions/upload-artifact@v7
+        if: ${{ failure() && hashFiles('e2e/package-lock.json') != '' }}
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results

@@ -1,0 +1,44 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+backend/data/
+
+# Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Playwright
+e2e/test-results/
+e2e/playwright-report/
+e2e/.tmp/
+e2e/blob-report/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Agent tooling (raw, unreviewed logs)
+docs/evidence/prompt-log.jsonl
+.github/hooks/*.log
+.github/hooks/.last-stop-gate
+.agents/
