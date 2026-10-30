@@ -16,10 +16,9 @@ def parse_amount_to_cents(value: Any) -> int:
     if isinstance(value, bool) or not isinstance(value, str | int | float):
         raise ValueError("amount must be a decimal string or number")
     if isinstance(value, str):
-        text = value.strip()
-        if not _AMOUNT_RE.match(text):
+        if not _AMOUNT_RE.fullmatch(value):
             raise ValueError("amount must have at most 2 decimals and be 0.01..999999.99")
-        number = Decimal(text)
+        number = Decimal(value)
     else:
         try:
             number = Decimal(str(value))

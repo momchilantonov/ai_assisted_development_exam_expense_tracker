@@ -142,3 +142,39 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed, 1 httpx deprecation warning); `scripts/check-ownership.sh backend` exit 0. Not run: mypy, frontend, E2E.
 - **Known issues:** none known. The existing route-guard test passes with the new routes (7 expense/dashboard/category operations checked as 401 unauthenticated).
 - **Next action:** testing agent X-06 (integration tests), then verify X-01..X-05.
+
+---
+
+### HANDOFF X-06 - testing agent - 2026-10-30
+
+- **Task ID(s):** X-06 (verification of X-01..X-05)
+- **State set:** X-06 COMPLETED; X-02..X-05 VERIFIED; X-01 stays COMPLETED (DEF-003 open).
+- **Modified files:** `backend/tests/integration/test_expenses_http.py`, `docs/defects.md`, `docs/test-report.md`, `docs/tasks.md`, `docs/agent-handoffs.md`, `docs/evidence/development-log.md`, `docs/evidence/test-runs/check-20261030T165536Z.txt`.
+- **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (283 passed, 2 xfailed); `scripts/check-all.sh` exit 0 (saved output above); `scripts/check-ownership.sh testing` exit 0. Not run: frontend, E2E, mypy.
+- **Known issues:** DEF-003 (minor, backend): amount strings with leading/trailing spaces accepted; xfail test will XPASS-fail (strict) once fixed, then remove the marker. 
+- **Next action:** backend fixes DEF-003; frontend F-tasks; then I-01.
+
+---
+
+### HANDOFF DEF-003 - backend agent - 2026-10-30
+
+- **Task ID(s):** DEF-003 fix (X-01 follow-up)
+- **State:** fix implemented, not self-verified; X-01 stays COMPLETED until testing re-verifies.
+- **Modified files:** `backend/app/schemas/expense.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`, `docs/agent-handoffs.md`, `docs/evidence/development-log.md`.
+- **Cause:** `parse_amount_to_cents` (a `mode="before"` validator) called `value.strip()` before matching, so padding was silently accepted. Now the raw string is matched with `fullmatch` (also rejects a trailing newline, which `$` allowed).
+- **Contract:** clarified header wording only: no spaces, including leading/trailing. Behaviour matches the original contract.
+- **Tests added:** `test_parse_amount_rejects_padded_string` (5 cases), `test_expense_input_rejects_padded_amount_string`.
+- **Test results:** `make lint-backend` exit 0. `make test-backend` exit 2: 2 failed, 289 passed; the only failures are the two strict-xfail XPASS tests `tests/integration/test_expenses_http.py::test_amount_string_with_surrounding_spaces_is_rejected_with_422[ 5]` and `[5 ]` (expected). `scripts/check-ownership.sh backend` exit 1: it reports pre-existing uncommitted testing-agent files (`docs/defects.md`, `docs/test-report.md`, `backend/tests/integration/test_expenses_http.py`, `docs/evidence/test-runs/check-20261030T165536Z.txt`), none changed by me. Not run: frontend, E2E, mypy.
+- **Known issues:** none for backend.
+- **Next action:** testing agent removes the two `xfail` markers, sets DEF-003 to VERIFIED, re-verifies X-01.
+
+---
+
+### HANDOFF DEF-003 verification - testing agent - 2026-10-30
+
+- **Task ID(s):** DEF-003, X-01 re-verification
+- **State set:** DEF-003 VERIFIED; X-01 VERIFIED.
+- **Modified files:** `backend/tests/integration/test_expenses_http.py` (removed the `xfail(strict=True)` marker), `docs/defects.md`, `docs/tasks.md`, `docs/agent-handoffs.md`, `docs/evidence/development-log.md`, `docs/evidence/test-runs/check-20261030T170746Z.txt`.
+- **Test results:** `make lint-backend` exit 0; `make test-backend` exit 0 (291 passed); `scripts/check-all.sh` exit 0 (291 passed, frontend not present), saved to `docs/evidence/test-runs/check-20261030T170746Z.txt`. `scripts/check-ownership.sh testing` exit 1: lists only backend-agent files (`backend/app/schemas/expense.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`) that are uncommitted; none changed by me.
+- **Known issues:** ownership check stays red until the backend changes are committed. Not run: frontend, E2E, mypy.
+- **Next action:** human commits backend changes; frontend F-tasks; then I-01.

@@ -48,3 +48,15 @@ Totals: 12 PASS, 1 FAIL (minor), 2 NOT RUN (frontend items 13 and 14).
 - The 55 integration tests passed on first run and were not shown to fail against a broken implementation (no mutation check was run).
 - Secure cookie over real TLS, concurrency and login brute-force protection were not tested.
 - Frontend and E2E checks remain open until those tasks exist.
+
+## X-06 Expense, category and dashboard integration tests (2026-10-30)
+
+File: `backend/tests/integration/test_expenses_http.py` (black-box over HTTP, temp SQLite DB per test, run-time generated password, injected clock 2026-03-01).
+
+Covered: 401 for all 7 expense/category/dashboard operations (anonymous and tampered cookie), reuse after logout, expired session, forged Origin 403; CRUD happy paths and shapes; 404 and bad ids; amount/category/date/description validation; money exactness; filters, sorting, pagination bounds; dashboard totals, by-category, current month, recent, empty state; persistence across app restart; no leakage of internals in errors. The existing route-guard test also passes with the new routes (auth review item 10).
+
+Results (real runs): `make lint-backend` exit 0; `make test-backend` exit 0, 283 passed, 2 xfailed; `scripts/check-all.sh` exit 0, saved as `docs/evidence/test-runs/check-20261030T165536Z.txt`; `scripts/check-ownership.sh testing` exit 0. Frontend and E2E: not run (not present).
+
+Failures: first run had 3 failures: two real (DEF-003, padded amount strings `" 5"`/`"5 "` accepted with 201; now an `xfail(strict=True)` test) and one wrong expected value in my own test (sum arithmetic), corrected. 
+
+Limits: no mutation check was run; the suite takes about 3.5 minutes (observed); concurrency not tested.

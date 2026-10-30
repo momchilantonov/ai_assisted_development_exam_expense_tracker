@@ -113,3 +113,30 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** `backend/app/schemas/expense.py`, `backend/app/services/expenses.py`, `backend/app/api/expenses.py`, `backend/app/main.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`.
 - **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0.
 - **Challenge:** first lint run failed on line length (E501) and two summary tests got 401 because the fake clock jump expired the test session (TTL is clock-based); fixed by logging in again after moving the clock.
+
+## 2026-10-30 - X-06 expense/dashboard integration tests
+
+- **Module:** Testing / backend integration
+- **Agent / AI tool (model):** GitHub Copilot testing agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** black-box HTTP tests for expenses, filters, categories, dashboard, auth guard.
+- **Files created/changed:** `backend/tests/integration/test_expenses_http.py`, `docs/defects.md` (DEF-003), `docs/test-report.md`, `docs/tasks.md`.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (283 passed, 2 xfailed); `scripts/check-all.sh` exit 0, `docs/evidence/test-runs/check-20261030T165536Z.txt`; `scripts/check-ownership.sh testing` exit 0.
+- **Challenge:** padded amount strings were accepted against the contract (DEF-003); one of my own expected sums was wrong and was corrected.
+
+## 2026-10-30 - DEF-003 padded amount strings
+
+- **Module:** Backend / validation
+- **Agent / AI tool (model):** GitHub Copilot backend agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** reject amount strings with leading/trailing whitespace with 422 per the contract.
+- **Files created/changed:** `backend/app/schemas/expense.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 2 (2 failed, 289 passed; failures are the two expected strict-xfail XPASS in integration); `scripts/check-ownership.sh backend` exit 1 (only pre-existing testing-agent changes listed).
+- **Challenge:** the explicit `.strip()` in the before-validator, not `str_strip_whitespace`, caused the acceptance.
+
+## 2026-10-30 - DEF-003 regression verification
+
+- **Module:** Testing / backend integration
+- **Agent / AI tool (model):** GitHub Copilot testing agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** remove xfail markers after the backend fix and re-verify X-01.
+- **Files created/changed:** `backend/tests/integration/test_expenses_http.py`, `docs/defects.md`, `docs/tasks.md`.
+- **Testing:** `make lint-backend` exit 0; `make test-backend` exit 0 (291 passed); `scripts/check-all.sh` exit 0, `docs/evidence/test-runs/check-20261030T170746Z.txt`; `scripts/check-ownership.sh testing` exit 1 (only uncommitted backend-agent files listed).
+- **Challenge:** ownership check cannot go green until backend changes are committed.

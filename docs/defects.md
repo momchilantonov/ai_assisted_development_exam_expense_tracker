@@ -31,3 +31,17 @@ Template: `.github/skills/automated-testing/defect-report-template.md`. IDs `DEF
 - **Fix attempts:** 1 / 3 (backend half by backend, testing half by testing)
 - **Status:** VERIFIED
 - **Verification evidence:** `grep` shows `PASSWORD`, `OTHER_PASSWORD` (integration) and `TEST_PASSWORD` (unit) use `secrets.token_urlsafe(16)`; no fixed password literals remain in `backend/tests/integration/*.py`. Suite: `docs/evidence/test-runs/check-20261030T163842Z.txt` (104 passed, exit 0). Usernames remain fixed constants (not secrets).
+
+### DEF-003 - Amount strings with surrounding spaces are accepted
+
+- **Found by / date:** testing agent, X-06, 2026-10-30
+- **Severity:** minor
+- **Owner:** backend (`backend/app/schemas/expense.py`)
+- **Requirement / contract reference:** `docs/api-contract.md` header: request `amount` strings must match `\d{1,8}(\.\d{1,2})?` (no spaces)
+- **Reproduction:** `POST /api/expenses` with `{"amount": " 5", "category": "Food", "expense_date": "2026-03-01"}` while logged in.
+- **Expected:** 422 `validation_error`.
+- **Actual:** 201 with amount `"5.00"` (observed in a `make test-backend` run on 2026-10-30).
+- **Failing test:** `backend/tests/integration/test_expenses_http.py::test_amount_string_with_surrounding_spaces_is_rejected_with_422` (failed before the fix as strict-xfail XPASS; xfail marker now removed, runs as a normal test)
+- **Fix attempts:** 1 / 3
+- **Status:** VERIFIED
+- **Verification evidence:** after the backend fix and marker removal: `make lint-backend` exit 0; `make test-backend` exit 0 (291 passed, 0 xfailed); `scripts/check-all.sh` exit 0 (291 passed), `docs/evidence/test-runs/check-20261030T170746Z.txt`. `scripts/check-ownership.sh testing` exit 1, listing only uncommitted backend-owned files (`backend/app/schemas/expense.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`) changed by the backend agent for this fix.

@@ -1,6 +1,6 @@
 # API contract v1 (frozen at Phase 2; backend maintains it)
 
-Status: all endpoints below are implemented (X-01..X-05). Deviations: a blank (whitespace-only) description is stored as null; request `amount` strings must match `\d{1,8}(\.\d{1,2})?` (no exponent, sign or spaces inside); `expense_date` must be a `YYYY-MM-DD` string; path `id` < 1 or non-integer -> 422 `validation_error`. Frontend and testing agents rely on this file only.
+Status: all endpoints below are implemented (X-01..X-05). Deviations: a blank (whitespace-only) description is stored as null; request `amount` strings must match `\d{1,8}(\.\d{1,2})?` (no exponent, sign or spaces, including leading/trailing); `expense_date` must be a `YYYY-MM-DD` string; path `id` < 1 or non-integer -> 422 `validation_error`. Frontend and testing agents rely on this file only.
 
 Base path `/api`. JSON bodies. Session cookie `expense_session` (HttpOnly, SameSite=Strict, Path=/). Unsafe methods (POST, PUT, DELETE): if an `Origin` header is present it must be in `ALLOWED_ORIGINS`, otherwise 403 `forbidden_origin`. No CORS.
 

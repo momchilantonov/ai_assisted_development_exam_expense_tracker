@@ -28,6 +28,17 @@ def create(client: TestClient, **overrides: object) -> dict:
 # --- money / schema (X-01) ---
 
 
+@pytest.mark.parametrize("amount", [" 5", "5 ", " 5.00 ", "5\n", "\t5"])
+def test_parse_amount_rejects_padded_string(amount: str) -> None:
+    with pytest.raises(ValueError):
+        parse_amount_to_cents(amount)
+
+
+def test_expense_input_rejects_padded_amount_string() -> None:
+    with pytest.raises(ValidationError):
+        ExpenseInput(amount=" 5", category="Food", expense_date=date(2026, 1, 15))
+
+
 @pytest.mark.parametrize(
     ("value", "cents"),
     [("0.01", 1), ("12.3", 1230), ("12", 1200), ("999999.99", 99_999_999), (12.5, 1250), (7, 700)],
