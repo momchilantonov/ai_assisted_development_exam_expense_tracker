@@ -233,3 +233,9 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **What happened:** The human asked for two more tasks: a UI redesign in the style of a Notion expenses template using the `premium-frontend-ui` skill, and a final Google Drive document. Before writing the prompts the agent read the skill's SKILL.md, the template page and the GitDiagram and GitIngest pages. Findings: the skill is aimed at immersive landing pages and does not fit an expense app (ADR-012); the Notion page exposed only its text, not colours or fonts; GitDiagram returned a usable Mermaid architecture diagram for the repository; GitIngest returned no readable content to the fetch tool; LibreOffice is installed, python-docx is not.
 - **Files created:** `docs/design/ui-style-guide.md`, `docs/submission/brief.md`, `.github/prompts/refine-ui.prompt.md`, `.github/prompts/create-final-document.prompt.md`; ownership guard extended for the root submission file; tasks UI-01..UI-05 and SUB-01..SUB-03; ADR-012 and ADR-013.
 - **Testing:** `scripts/validate-infra.sh` after the change (see `docs/evidence/test-runs/infra.txt`). The two new prompts have not been run yet.
+
+## 2026-11-01 - UI reference screenshot added
+
+- **Module:** Frontend / design
+- **What happened:** the human added `docs/design/reference/image.png`. The agent viewed it and rewrote `docs/design/ui-style-guide.md` around what it shows (dark theme, cover banner, two columns, view tabs, table with tag pills, "Total Expenses" card). Hex values are approximated by eye from the screenshot and Notion's dark palette; the redesign agent must compare screenshots side by side. The image is git-ignored because it is a third-party screenshot.
+- **Challenge (CHAL-05):** the first style guide was written from the template's page text only and assumed a light theme; the real reference was dark. Resolved by revising the guide before any UI code was changed.

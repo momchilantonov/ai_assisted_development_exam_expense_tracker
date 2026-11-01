@@ -45,3 +45,6 @@ docs/evidence/prompt-log.jsonl
 
 # Final submission build output
 docs/submission/build/
+
+# Third-party reference screenshots (kept locally for the UI redesign, not republished)
+docs/design/reference/*.png
