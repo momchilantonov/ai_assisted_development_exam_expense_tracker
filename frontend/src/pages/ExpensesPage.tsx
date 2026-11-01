@@ -1,56 +1,64 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ApiError } from '../api/client'
-import { deleteExpense, listCategories, listExpenses } from '../api/expenses'
-import type { Category, Expense, ExpenseList, ExpenseSort } from '../api/types'
-import { ConfirmDialog } from '../components/ConfirmDialog'
-import { useToast } from '../components/useToast'
-import { formatMoney } from '../lib/money'
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ApiError } from "../api/client";
+import { deleteExpense, listCategories, listExpenses } from "../api/expenses";
+import type { Category, Expense, ExpenseList, ExpenseSort } from "../api/types";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { useToast } from "../components/useToast";
+import { formatMoney } from "../lib/money";
 
-export const PAGE_SIZE = 20
+export const PAGE_SIZE = 20;
 
 interface Filters {
-  category: Category | ''
-  dateFrom: string
-  dateTo: string
-  sort: ExpenseSort
+  category: Category | "";
+  dateFrom: string;
+  dateTo: string;
+  sort: ExpenseSort;
 }
 
 function describe(e: Expense): string {
-  return `${e.description ?? e.category} on ${e.expense_date}`
+  return `${e.description ?? e.category} on ${e.expense_date}`;
 }
 
-const initialFilters: Filters = { category: '', dateFrom: '', dateTo: '', sort: 'date_desc' }
+const initialFilters: Filters = {
+  category: "",
+  dateFrom: "",
+  dateTo: "",
+  sort: "date_desc",
+};
 
 export function ExpensesPage() {
-  const [filters, setFilters] = useState<Filters>(initialFilters)
-  const [offset, setOffset] = useState(0)
-  const [categories, setCategories] = useState<Category[]>([])
-  const [data, setData] = useState<ExpenseList | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [reloadKey, setReloadKey] = useState(0)
-  const [toDelete, setToDelete] = useState<Expense | null>(null)
-  const [deleting, setDeleting] = useState(false)
-  const { notify } = useToast()
+  const [filters, setFilters] = useState<Filters>(initialFilters);
+  const [offset, setOffset] = useState(0);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [data, setData] = useState<ExpenseList | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [toDelete, setToDelete] = useState<Expense | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { notify } = useToast();
 
-  const rangeInvalid = filters.dateFrom !== '' && filters.dateTo !== '' && filters.dateFrom > filters.dateTo
+  const rangeInvalid =
+    filters.dateFrom !== "" &&
+    filters.dateTo !== "" &&
+    filters.dateFrom > filters.dateTo;
 
   useEffect(() => {
-    let active = true
+    let active = true;
     listCategories()
       .then((list) => active && setCategories(list))
-      .catch(() => undefined) // The filter then only offers "All categories".
+      .catch(() => undefined); // The filter then only offers "All categories".
     return () => {
-      active = false
-    }
-  }, [])
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
-    if (rangeInvalid) return
-    let active = true
-    setLoading(true)
-    setError(null)
+    if (rangeInvalid) return;
+    let active = true;
+    setLoading(true);
+    setError(null);
     listExpenses({
       category: filters.category || undefined,
       date_from: filters.dateFrom || undefined,
@@ -60,48 +68,55 @@ export function ExpensesPage() {
       offset,
     })
       .then((result) => {
-        if (!active) return
-        setData(result)
-        setLoading(false)
+        if (!active) return;
+        setData(result);
+        setLoading(false);
       })
       .catch((err: unknown) => {
-        if (!active) return
-        setError(err instanceof ApiError ? err.message : 'Could not load expenses.')
-        setLoading(false)
-      })
+        if (!active) return;
+        setError(
+          err instanceof ApiError ? err.message : "Could not load expenses.",
+        );
+        setLoading(false);
+      });
     return () => {
-      active = false
-    }
-  }, [filters, offset, rangeInvalid, reloadKey])
+      active = false;
+    };
+  }, [filters, offset, rangeInvalid, reloadKey]);
 
   function updateFilters(patch: Partial<Filters>) {
-    setFilters((current) => ({ ...current, ...patch }))
-    setOffset(0)
+    setFilters((current) => ({ ...current, ...patch }));
+    setOffset(0);
   }
 
   async function confirmDelete() {
-    if (!toDelete) return
-    setDeleting(true)
+    if (!toDelete) return;
+    setDeleting(true);
     try {
-      await deleteExpense(toDelete.id)
-      notify('Expense deleted.')
+      await deleteExpense(toDelete.id);
+      notify("Expense deleted.");
       // Step back a page when the last item of a later page was removed.
-      if (data && data.items.length === 1 && offset > 0) setOffset(Math.max(0, offset - PAGE_SIZE))
-      else setReloadKey((k) => k + 1)
+      if (data && data.items.length === 1 && offset > 0)
+        setOffset(Math.max(0, offset - PAGE_SIZE));
+      else setReloadKey((k) => k + 1);
     } catch (err) {
       // A 404 means it is already gone; refresh the list in both cases.
-      notify(err instanceof ApiError ? err.message : 'Could not delete the expense.', 'error')
-      setReloadKey((k) => k + 1)
+      notify(
+        err instanceof ApiError ? err.message : "Could not delete the expense.",
+        "error",
+      );
+      setReloadKey((k) => k + 1);
     } finally {
-      setDeleting(false)
-      setToDelete(null)
+      setDeleting(false);
+      setToDelete(null);
     }
   }
 
-  const total = data?.total ?? 0
-  const first = total === 0 ? 0 : offset + 1
-  const last = Math.min(offset + PAGE_SIZE, total)
-  const filtered = filters.category !== '' || filters.dateFrom !== '' || filters.dateTo !== ''
+  const total = data?.total ?? 0;
+  const first = total === 0 ? 0 : offset + 1;
+  const last = Math.min(offset + PAGE_SIZE, total);
+  const filtered =
+    filters.category !== "" || filters.dateFrom !== "" || filters.dateTo !== "";
 
   return (
     <main>
@@ -112,13 +127,19 @@ export function ExpensesPage() {
         </Link>
       </div>
 
-      <form className="filters" aria-label="Filter expenses" onSubmit={(e) => e.preventDefault()}>
+      <form
+        className="filters"
+        aria-label="Filter expenses"
+        onSubmit={(e) => e.preventDefault()}
+      >
         <div className="field">
           <label htmlFor="filter-category">Category</label>
           <select
             id="filter-category"
             value={filters.category}
-            onChange={(e) => updateFilters({ category: e.target.value as Category | '' })}
+            onChange={(e) =>
+              updateFilters({ category: e.target.value as Category | "" })
+            }
           >
             <option value="">All categories</option>
             {categories.map((c) => (
@@ -153,13 +174,20 @@ export function ExpensesPage() {
           <select
             id="filter-sort"
             value={filters.sort}
-            onChange={(e) => updateFilters({ sort: e.target.value as ExpenseSort })}
+            onChange={(e) =>
+              updateFilters({ sort: e.target.value as ExpenseSort })
+            }
           >
             <option value="date_desc">Newest first</option>
             <option value="date_asc">Oldest first</option>
           </select>
         </div>
-        <button type="button" onClick={() => updateFilters({ ...initialFilters, sort: filters.sort })}>
+        <button
+          type="button"
+          onClick={() =>
+            updateFilters({ ...initialFilters, sort: filters.sort })
+          }
+        >
           Clear filters
         </button>
       </form>
@@ -185,11 +213,17 @@ export function ExpensesPage() {
         </div>
       )}
 
-      {!rangeInvalid && !loading && !error && data && data.items.length === 0 && (
-        <p className="page-message">
-          {filtered ? 'No expenses match the current filters.' : 'No expenses yet.'}
-        </p>
-      )}
+      {!rangeInvalid &&
+        !loading &&
+        !error &&
+        data &&
+        data.items.length === 0 && (
+          <p className="page-message">
+            {filtered
+              ? "No expenses match the current filters."
+              : "No expenses yet."}
+          </p>
+        )}
 
       {!rangeInvalid && !loading && !error && data && data.items.length > 0 && (
         <>
@@ -212,10 +246,13 @@ export function ExpensesPage() {
                   <tr key={e.id}>
                     <td>{e.expense_date}</td>
                     <td>{e.category}</td>
-                    <td>{e.description ?? ''}</td>
+                    <td>{e.description ?? ""}</td>
                     <td className="num">{formatMoney(e.amount)}</td>
                     <td className="row-actions">
-                      <Link to={`/expenses/${e.id}/edit`} aria-label={`Edit expense ${describe(e)}`}>
+                      <Link
+                        to={`/expenses/${e.id}/edit`}
+                        aria-label={`Edit expense ${describe(e)}`}
+                      >
                         Edit
                       </Link>
                       <button
@@ -233,13 +270,21 @@ export function ExpensesPage() {
             </table>
           </div>
           <nav className="pagination" aria-label="Pagination">
-            <button type="button" onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))} disabled={offset === 0}>
+            <button
+              type="button"
+              onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
+              disabled={offset === 0}
+            >
               Previous
             </button>
             <span aria-live="polite">
               {first}–{last} of {total}
             </span>
-            <button type="button" onClick={() => setOffset(offset + PAGE_SIZE)} disabled={offset + PAGE_SIZE >= total}>
+            <button
+              type="button"
+              onClick={() => setOffset(offset + PAGE_SIZE)}
+              disabled={offset + PAGE_SIZE >= total}
+            >
               Next
             </button>
           </nav>
@@ -249,16 +294,17 @@ export function ExpensesPage() {
       {toDelete && (
         <ConfirmDialog
           title="Delete expense?"
-          confirmLabel={deleting ? 'Deleting…' : 'Delete'}
+          confirmLabel={deleting ? "Deleting…" : "Delete"}
           pending={deleting}
           onConfirm={confirmDelete}
           onCancel={() => setToDelete(null)}
         >
           <p>
-            This permanently deletes {describe(toDelete)} ({formatMoney(toDelete.amount)}). This cannot be undone.
+            This permanently deletes {describe(toDelete)} (
+            {formatMoney(toDelete.amount)}). This cannot be undone.
           </p>
         </ConfirmDialog>
       )}
     </main>
-  )
+  );
 }

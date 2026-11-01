@@ -1,10 +1,10 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { Layout } from './components/Layout'
-import { ProtectedRoute } from './components/ProtectedRoute'
-import { DashboardPage } from './pages/DashboardPage'
-import { ExpenseFormPage } from './pages/ExpenseFormPage'
-import { ExpensesPage } from './pages/ExpensesPage'
-import { LoginPage } from './pages/LoginPage'
+import { Navigate, Route, Routes } from "react-router-dom";
+import { Layout } from "./components/Layout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { DashboardPage } from "./pages/DashboardPage";
+import { ExpenseFormPage } from "./pages/ExpenseFormPage";
+import { ExpensesPage } from "./pages/ExpensesPage";
+import { LoginPage } from "./pages/LoginPage";
 
 export function App() {
   return (
@@ -20,5 +20,5 @@ export function App() {
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  )
+  );
 }

@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
-import { useAuth } from '../auth/useAuth'
-import { ToastProvider } from './ToastProvider'
+import { useState } from "react";
+import { NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
+import { ToastProvider } from "./ToastProvider";
 
 export function Layout() {
-  const { username, logout } = useAuth()
-  const [pending, setPending] = useState(false)
+  const { username, logout } = useAuth();
+  const [pending, setPending] = useState(false);
 
   async function handleLogout() {
-    setPending(true)
+    setPending(true);
     // AuthProvider clears state even if the request fails; ProtectedRoute then redirects to login.
-    await logout().catch(() => undefined)
+    await logout().catch(() => undefined);
   }
 
   return (
@@ -32,5 +32,5 @@ export function Layout() {
       </header>
       <Outlet />
     </ToastProvider>
-  )
+  );
 }

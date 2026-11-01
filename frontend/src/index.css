@@ -6,7 +6,11 @@
   --color-primary: #1d4ed8;
   --color-error: #b42318;
   --color-border: #c5ccd6;
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   color: var(--color-text);
   background: var(--color-bg);
 }
@@ -58,7 +62,7 @@ main {
   font: inherit;
 }
 
-.field input[aria-invalid='true'] {
+.field input[aria-invalid="true"] {
   border-color: var(--color-error);
 }
 
@@ -125,7 +129,7 @@ button:disabled {
   padding: 0.25rem 0;
 }
 
-.app-header nav a[aria-current='page'] {
+.app-header nav a[aria-current="page"] {
   font-weight: 700;
   text-decoration: underline;
 }
@@ -247,7 +251,7 @@ button.danger {
   font: inherit;
 }
 
-.expense-form [aria-invalid='true'] {
+.expense-form [aria-invalid="true"] {
   border-color: var(--color-error);
 }
 

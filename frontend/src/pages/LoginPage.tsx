@@ -1,47 +1,57 @@
-import { useState, type FormEvent } from 'react'
-import { Navigate, useSearchParams } from 'react-router-dom'
-import { ApiError } from '../api/client'
-import { useAuth } from '../auth/useAuth'
+import { useState, type FormEvent } from "react";
+import { Navigate, useSearchParams } from "react-router-dom";
+import { ApiError } from "../api/client";
+import { useAuth } from "../auth/useAuth";
 
 interface FieldErrors {
-  username?: string
-  password?: string
+  username?: string;
+  password?: string;
 }
 
 // Only same-origin relative paths are allowed as redirect targets.
 function safeNext(raw: string | null): string {
-  if (raw && raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\')) return raw
-  return '/'
+  if (
+    raw &&
+    raw.startsWith("/") &&
+    !raw.startsWith("//") &&
+    !raw.startsWith("/\\")
+  )
+    return raw;
+  return "/";
 }
 
 export function LoginPage() {
-  const { status, login } = useAuth()
-  const [params] = useSearchParams()
-  const next = safeNext(params.get('next'))
+  const { status, login } = useAuth();
+  const [params] = useSearchParams();
+  const next = safeNext(params.get("next"));
 
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-  const [formError, setFormError] = useState<string | null>(null)
-  const [pending, setPending] = useState(false)
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
-  if (status === 'authenticated') return <Navigate to={next} replace />
+  if (status === "authenticated") return <Navigate to={next} replace />;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const errors: FieldErrors = {}
-    if (username.trim() === '') errors.username = 'Username is required.'
-    if (password === '') errors.password = 'Password is required.'
-    setFieldErrors(errors)
-    setFormError(null)
-    if (errors.username || errors.password) return
+    event.preventDefault();
+    const errors: FieldErrors = {};
+    if (username.trim() === "") errors.username = "Username is required.";
+    if (password === "") errors.password = "Password is required.";
+    setFieldErrors(errors);
+    setFormError(null);
+    if (errors.username || errors.password) return;
 
-    setPending(true)
+    setPending(true);
     try {
-      await login(username.trim(), password)
+      await login(username.trim(), password);
     } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'Sign in failed. Please try again.')
-      setPending(false)
+      setFormError(
+        err instanceof ApiError
+          ? err.message
+          : "Sign in failed. Please try again.",
+      );
+      setPending(false);
     }
   }
 
@@ -63,7 +73,9 @@ export function LoginPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             aria-invalid={fieldErrors.username ? true : undefined}
-            aria-describedby={fieldErrors.username ? 'username-error' : undefined}
+            aria-describedby={
+              fieldErrors.username ? "username-error" : undefined
+            }
           />
           {fieldErrors.username && (
             <p id="username-error" className="field-error">
@@ -82,7 +94,9 @@ export function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             aria-invalid={fieldErrors.password ? true : undefined}
-            aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+            aria-describedby={
+              fieldErrors.password ? "password-error" : undefined
+            }
           />
           {fieldErrors.password && (
             <p id="password-error" className="field-error">
@@ -92,9 +106,9 @@ export function LoginPage() {
         </div>
 
         <button type="submit" disabled={pending}>
-          {pending ? 'Signing in…' : 'Sign in'}
+          {pending ? "Signing in…" : "Sign in"}
         </button>
       </form>
     </main>
-  )
+  );
 }

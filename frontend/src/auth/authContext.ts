@@ -1,12 +1,12 @@
-import { createContext } from 'react'
+import { createContext } from "react";
 
-export type AuthStatus = 'loading' | 'authenticated' | 'anonymous'
+export type AuthStatus = "loading" | "authenticated" | "anonymous";
 
 export interface AuthContextValue {
-  status: AuthStatus
-  username: string | null
-  login: (username: string, password: string) => Promise<void>
-  logout: () => Promise<void>
+  status: AuthStatus;
+  username: string | null;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextValue | null>(null)
+export const AuthContext = createContext<AuthContextValue | null>(null);

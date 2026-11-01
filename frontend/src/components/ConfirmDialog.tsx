@@ -1,40 +1,47 @@
-import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 
 interface Props {
-  title: string
-  children: ReactNode
-  confirmLabel: string
-  pending?: boolean
-  onConfirm: () => void
-  onCancel: () => void
+  title: string;
+  children: ReactNode;
+  confirmLabel: string;
+  pending?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
-export function ConfirmDialog({ title, children, confirmLabel, pending = false, onConfirm, onCancel }: Props) {
-  const cancelRef = useRef<HTMLButtonElement>(null)
-  const confirmRef = useRef<HTMLButtonElement>(null)
+export function ConfirmDialog({
+  title,
+  children,
+  confirmLabel,
+  pending = false,
+  onConfirm,
+  onCancel,
+}: Props) {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null
-    cancelRef.current?.focus()
-    return () => previous?.focus()
-  }, [])
+    const previous = document.activeElement as HTMLElement | null;
+    cancelRef.current?.focus();
+    return () => previous?.focus();
+  }, []);
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === 'Escape') {
-      event.stopPropagation()
-      if (!pending) onCancel()
-      return
+    if (event.key === "Escape") {
+      event.stopPropagation();
+      if (!pending) onCancel();
+      return;
     }
     // Keep Tab focus inside the two-button dialog.
-    if (event.key === 'Tab') {
-      const first = cancelRef.current
-      const last = confirmRef.current
+    if (event.key === "Tab") {
+      const first = cancelRef.current;
+      const last = confirmRef.current;
       if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault()
-        last?.focus()
+        event.preventDefault();
+        last?.focus();
       } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first?.focus()
+        event.preventDefault();
+        first?.focus();
       }
     }
   }
@@ -52,14 +59,26 @@ export function ConfirmDialog({ title, children, confirmLabel, pending = false, 
         <h2 id="confirm-title">{title}</h2>
         <div id="confirm-body">{children}</div>
         <div className="dialog-actions">
-          <button type="button" ref={cancelRef} className="secondary" onClick={onCancel} disabled={pending}>
+          <button
+            type="button"
+            ref={cancelRef}
+            className="secondary"
+            onClick={onCancel}
+            disabled={pending}
+          >
             Cancel
           </button>
-          <button type="button" ref={confirmRef} className="danger" onClick={onConfirm} disabled={pending}>
+          <button
+            type="button"
+            ref={confirmRef}
+            className="danger"
+            onClick={onConfirm}
+            disabled={pending}
+          >
             {confirmLabel}
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }

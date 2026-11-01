@@ -1,24 +1,26 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ApiError } from '../api/client'
-import { getSummary } from '../api/expenses'
-import type { Summary } from '../api/types'
-import { formatMoney, toCents } from '../lib/money'
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ApiError } from "../api/client";
+import { getSummary } from "../api/expenses";
+import type { Summary } from "../api/types";
+import { formatMoney, toCents } from "../lib/money";
 
-const BAR_HEIGHT = 22
-const BAR_GAP = 10
-const LABEL_WIDTH = 110
-const BAR_AREA = 300
-const VALUE_WIDTH = 90
+const BAR_HEIGHT = 22;
+const BAR_GAP = 10;
+const LABEL_WIDTH = 110;
+const BAR_AREA = 300;
+const VALUE_WIDTH = 90;
 
-function CategoryChart({ items }: { items: Summary['by_category'] }) {
+function CategoryChart({ items }: { items: Summary["by_category"] }) {
   const max = items.reduce((m, i) => {
-    const cents = toCents(i.total)
-    return cents > m ? cents : m
-  }, 0n)
-  const height = items.length * (BAR_HEIGHT + BAR_GAP)
-  const width = LABEL_WIDTH + BAR_AREA + VALUE_WIDTH
-  const summary = items.map((i) => `${i.category} ${formatMoney(i.total)}`).join(', ')
+    const cents = toCents(i.total);
+    return cents > m ? cents : m;
+  }, 0n);
+  const height = items.length * (BAR_HEIGHT + BAR_GAP);
+  const width = LABEL_WIDTH + BAR_AREA + VALUE_WIDTH;
+  const summary = items
+    .map((i) => `${i.category} ${formatMoney(i.total)}`)
+    .join(", ");
 
   return (
     <svg
@@ -28,50 +30,65 @@ function CategoryChart({ items }: { items: Summary['by_category'] }) {
       className="category-chart"
     >
       {items.map((item, index) => {
-        const y = index * (BAR_HEIGHT + BAR_GAP)
+        const y = index * (BAR_HEIGHT + BAR_GAP);
         // Ratio is only used for bar length; displayed amounts stay decimal strings.
-        const ratio = max === 0n ? 0 : Number((toCents(item.total) * 1000n) / max) / 1000
+        const ratio =
+          max === 0n ? 0 : Number((toCents(item.total) * 1000n) / max) / 1000;
         return (
           <g key={item.category}>
             <text x={0} y={y + BAR_HEIGHT * 0.7} className="chart-label">
               {item.category}
             </text>
-            <rect x={LABEL_WIDTH} y={y} width={BAR_AREA * ratio} height={BAR_HEIGHT} className="chart-bar" />
-            <text x={LABEL_WIDTH + BAR_AREA * ratio + 6} y={y + BAR_HEIGHT * 0.7} className="chart-value">
+            <rect
+              x={LABEL_WIDTH}
+              y={y}
+              width={BAR_AREA * ratio}
+              height={BAR_HEIGHT}
+              className="chart-bar"
+            />
+            <text
+              x={LABEL_WIDTH + BAR_AREA * ratio + 6}
+              y={y + BAR_HEIGHT * 0.7}
+              className="chart-value"
+            >
               {formatMoney(item.total)}
             </text>
           </g>
-        )
+        );
       })}
     </svg>
-  )
+  );
 }
 
 export function DashboardPage() {
-  const [summary, setSummary] = useState<Summary | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [reloadKey, setReloadKey] = useState(0)
+  const [summary, setSummary] = useState<Summary | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    let active = true
-    setLoading(true)
-    setError(null)
+    let active = true;
+    setLoading(true);
+    setError(null);
     getSummary()
       .then((result) => {
-        if (!active) return
-        setSummary(result)
-        setLoading(false)
+        if (!active) return;
+        setSummary(result);
+        setLoading(false);
       })
       .catch((err: unknown) => {
-        if (!active) return
-        setError(err instanceof ApiError ? err.message : 'Could not load the dashboard.')
-        setLoading(false)
-      })
+        if (!active) return;
+        setError(
+          err instanceof ApiError
+            ? err.message
+            : "Could not load the dashboard.",
+        );
+        setLoading(false);
+      });
     return () => {
-      active = false
-    }
-  }, [reloadKey])
+      active = false;
+    };
+  }, [reloadKey]);
 
   return (
     <main>
@@ -94,7 +111,9 @@ export function DashboardPage() {
 
       {!loading && !error && summary && summary.expense_count === 0 && (
         <p className="page-message">
-          No expenses yet. <Link to="/expenses/new">Add your first expense</Link> to see statistics.
+          No expenses yet.{" "}
+          <Link to="/expenses/new">Add your first expense</Link> to see
+          statistics.
         </p>
       )}
 
@@ -120,7 +139,9 @@ export function DashboardPage() {
             <CategoryChart items={summary.by_category} />
             <div className="table-wrap">
               <table>
-                <caption className="visually-hidden">Spending by category</caption>
+                <caption className="visually-hidden">
+                  Spending by category
+                </caption>
                 <thead>
                   <tr>
                     <th scope="col">Category</th>
@@ -165,7 +186,7 @@ export function DashboardPage() {
                     <tr key={e.id}>
                       <td>{e.expense_date}</td>
                       <td>{e.category}</td>
-                      <td>{e.description ?? ''}</td>
+                      <td>{e.description ?? ""}</td>
                       <td className="num">{formatMoney(e.amount)}</td>
                     </tr>
                   ))}
@@ -176,5 +197,5 @@ export function DashboardPage() {
         </>
       )}
     </main>
-  )
+  );
 }
