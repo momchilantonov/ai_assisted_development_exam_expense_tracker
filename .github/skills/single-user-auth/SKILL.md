@@ -14,7 +14,8 @@ Design is fixed in `docs/decisions.md` (ADR for authentication). Do not switch t
 5. **Dependency:** `require_auth` reads the cookie, hashes it, loads a non-expired session or raises 401 `not_authenticated`. Attach at router level for `expenses`, `dashboard`, `categories`.
 6. **Origin check:** middleware on POST/PUT/DELETE; if `Origin` header present and not in `ALLOWED_ORIGINS` -> 403 `forbidden_origin`. No CORS middleware.
 7. **Provisioning:** `python -m app.cli create-user` reads `INITIAL_USERNAME`/`INITIAL_PASSWORD` or prompts with `getpass`; non-interactive without password -> exit non-zero; existing user -> no-op unless `--reset-password`; never print the password.
-8. **Tests (unit):** hash round-trip and no plaintext in DB, token hashing, expiry with injected clock, provisioning idempotency, route guard test enumerating every route (anonymous -> 401 except allow-list `health`, `login`, `logout`, docs).
+8. **First-run sign-up (CR-001, ADR-010):** `GET /api/auth/setup-status` -> `{setup_required: bool}` (public); `POST /api/auth/register` `{username, password}` (public, Origin-checked) creates the single user and logs in (same cookie as login) only when no user exists, otherwise 403 `registration_closed`; username 3-64 chars, password 8-128 chars; hash with Argon2id; handle the race through the `id = 1` constraint. Both routes join the route-guard allow-list.
+9. **Tests (unit):** hash round-trip and no plaintext in DB, token hashing, expiry with injected clock, provisioning idempotency, route guard test enumerating every route (anonymous -> 401 except allow-list `health`, `login`, `logout`, docs).
 
 ## Testing/review steps (testing agent)
 Use [review-checklist.md](./review-checklist.md). Integration tests are black-box over HTTP.

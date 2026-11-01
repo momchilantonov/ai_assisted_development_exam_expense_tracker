@@ -25,7 +25,7 @@ Layout: `backend/app/{main,config,db,cli}.py`, `models/`, `schemas/`, `services/
 - Argon2id via `argon2-cffi`; verify against a dummy hash for unknown users; identical error for bad username and bad password.
 - Expense, dashboard and category routers must carry router-level `Depends(require_auth)`. The route-guard test must fail if any route outside the allow-list (`health`, `login`, `logout`, docs) is public.
 - Origin check on POST/PUT/DELETE: if `Origin` is present it must be in `ALLOWED_ORIGINS`, else 403 `forbidden_origin`. No CORS middleware.
-- Exactly one user (`users.id = 1`). No registration endpoint. Provisioning only through `python -m app.cli create-user`; idempotent; never overwrites a password without `--reset-password`.
+- Exactly one user (`users.id = 1`). The only sign-up is the first-run sign-up (CR-001, ADR-010): `GET /api/auth/setup-status` and `POST /api/auth/register` work only while no user exists; afterwards register returns 403 `registration_closed`, and a concurrent second registration must also fail (rely on the `id = 1` constraint and handle `IntegrityError`). `python -m app.cli create-user` stays as an idempotent fallback; it never overwrites a password without `--reset-password`.
 
 ## Errors
 - Every error returns `{"error": {"code", "message", "details"?}}` with codes `not_authenticated`, `invalid_credentials`, `validation_error`, `not_found`, `forbidden_origin`, `internal_error`. Register handlers for validation errors, HTTPException and unexpected exceptions; never return tracebacks.

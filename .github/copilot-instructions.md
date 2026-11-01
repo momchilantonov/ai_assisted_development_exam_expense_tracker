@@ -12,7 +12,7 @@ Single-user expense tracker built **entirely by AI agents** for the "AI-Assisted
 
 Phase 1 plan, 2 infrastructure, 3 application, 4 testing, 5 documentation. Never work ahead of the current phase. Phase 2 creates no application code.
 
-Out of scope (do not add): Redis, Celery, cloud databases, microservices, payments, public registration, multi-user roles, external auth providers, container orchestration, custom categories, Alembic migrations, MCP servers.
+Out of scope (do not add): Redis, Celery, cloud databases, microservices, payments, open or repeated registration (the only sign-up allowed is the first-run sign-up of CR-001, ADR-010), multi-user roles, external auth providers, container orchestration, custom categories, Alembic migrations, MCP servers.
 
 ## Ownership (write access)
 
