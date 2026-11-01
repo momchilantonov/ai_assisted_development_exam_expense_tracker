@@ -513,3 +513,23 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Not run:** no tests or checks by me; README commands not re-run; final `check-all` after the 360 px CSS fix pending (orchestrator).
 - **Gaps:** banner image licence/attribution (human); contrast not measured; `docs/defects.md` still shows DEF-006 OPEN (testing agent to close); screenshots need human privacy review; key prompts still missing for modules 1-5.
 - **Next action:** orchestrator runs final `scripts/check-all.sh --e2e`; SUB-01 (`/create-final-document`).
+
+---
+### HANDOFF SUB-01..SUB-03 - documentation agent - 2026-11-01
+- **Task ID(s):** SUB-01, SUB-02, SUB-03 (set to COMPLETED; SUB-03 still needs the human upload).
+- **Modified/created files:** `MCA85_ai_assisted_development_exam_expense_tracker.docx` (root), `docs/submission/submission.md`, `docs/submission/build_docx.py`, `docs/submission/images/` (`architecture-gitdiagram.png/.mmd`, `expenses-list.png`, `dashboard.png`, `new-expense.png`, `delete-confirm.png`), `docs/evidence/prompts.md` (10 verbatim prompts appended), `docs/evidence/development-log.md`, `docs/tasks.md`, this file. The four screenshots were supplied by the human in `docs/design/reference/final_documen/` (resized to 1400 px wide).
+- **Commands and results:**
+  - `uv run --with python-docx --with pillow python docs/submission/build_docx.py` exit 0.
+  - `soffice --headless --convert-to pdf --outdir docs/submission/build <docx>` then pypdf: **6 pages** (A4, 11 pt, 2 cm margins; last page about half full).
+  - python-docx reopen: 13 headings (matching the assignment sections), 5 images, 23 hyperlinks; every repository link path and every backtick-cited local path exists (script check, no misses).
+  - `scripts/check-ownership.sh documentation` exit 0 (run before the final commit).
+  - Diagram: Mermaid source taken from the GitDiagram page (HTTP 200) on 2026-11-01, `click` lines removed, rendered with `npx @mermaid-js/mermaid-cli` using the Playwright Chromium, direction changed TD to LR to fit the page.
+- **Not run:** no application tests (numbers 389/72/5 are copied from `docs/evidence/test-runs/check-20261101T150120Z.txt`, exit=0).
+- **Gaps / unverified:**
+  - GitIngest returned only the empty form (HTTP 200, no digest); the URL is listed and the failure stated.
+  - The GitDiagram image is AI-generated, predates the sign-up page and its text is small at 17 cm width (full resolution in the repository). Layout was checked on a low-resolution contact sheet only; open the docx in Word to confirm.
+  - Page count measured in LibreOffice; Word may differ slightly.
+  - Screenshots show the username `manto1`; the human should confirm there is nothing sensitive. Banner image licence still for the human.
+  - Prompts were taken from `prompt-log.jsonl`; who drafted each task prompt is not recorded. Model for planning/infrastructure not recorded.
+  - Google Drive upload and sharing not done.
+- **Next action (human):** open the docx, check images and numbers, upload to Google Drive, set "Anyone with the link can view", submit the link. Push is done by the human.

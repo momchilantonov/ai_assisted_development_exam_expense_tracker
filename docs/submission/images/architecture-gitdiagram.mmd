@@ -1,0 +1,98 @@
+flowchart TD
+
+subgraph group_client["Web client"]
+  node_appentry["App bootstrap<br/>[main.tsx]"]
+  node_routes["App routes<br/>[App.tsx]"]
+  node_authui["Auth provider<br/>[AuthProvider.tsx]"]
+  node_login["Login screen<br/>[LoginPage.tsx]"]
+  node_dashboard["Dashboard<br/>[DashboardPage.tsx]"]
+  node_expense_list["Expense list<br/>[ExpensesPage.tsx]"]
+  node_expense_form["Expense editor"]
+  node_api_client["HTTP client<br/>[client.ts]"]
+  node_auth_api["Auth API<br/>[auth.ts]"]
+  node_expense_api["Expense API<br/>[expenses.ts]"]
+end
+
+subgraph group_backend["API runtime"]
+  node_api_runtime["FastAPI app<br/>[main.py]"]
+  node_database[("SQLite database<br/>[db.py]")]
+end
+
+subgraph group_identity["Authentication"]
+  node_auth_routes["Auth routes<br/>[auth.py]"]
+  node_auth_deps["Auth dependencies<br/>[deps.py]"]
+  node_auth_service["Auth service<br/>[auth.py]"]
+  node_security["Token security<br/>[security.py]"]
+  node_user_model["User and sessions<br/>[user.py]"]
+end
+
+subgraph group_expenses["Expense domain"]
+  node_expense_routes["Expense routes<br/>[expenses.py]"]
+  node_expense_service["Expense operations<br/>[expenses.py]"]
+  node_expense_model["Expense records<br/>[expense.py]"]
+  node_expense_schema["Expense schemas<br/>[expense.py]"]
+end
+
+node_user(("User"))
+
+node_user -->|"uses"| node_appentry
+node_appentry -->|"mounts"| node_routes
+node_routes -->|"routes"| node_login
+node_routes -->|"routes"| node_dashboard
+node_routes -->|"routes"| node_expense_list
+node_routes -->|"routes"| node_expense_form
+node_appentry -->|"provides"| node_authui
+node_authui -->|"calls"| node_auth_api
+node_login -->|"calls"| node_auth_api
+node_dashboard -->|"loads summary"| node_expense_api
+node_expense_list -->|"manages expenses"| node_expense_api
+node_expense_form -->|"saves expenses"| node_expense_api
+node_auth_api -->|"sends requests"| node_api_client
+node_expense_api -->|"sends requests"| node_api_client
+node_api_client -->|"HTTP requests"| node_api_runtime
+node_api_runtime -->|"registers routes"| node_auth_routes
+node_api_runtime -->|"registers routes"| node_expense_routes
+node_auth_routes -->|"calls"| node_auth_service
+node_auth_deps -->|"validates session"| node_auth_service
+node_auth_service -->|"uses token functions"| node_security
+node_auth_service -->|"reads and writes"| node_user_model
+node_auth_routes -->|"gets database session"| node_database
+node_expense_routes -->|"calls"| node_expense_service
+node_expense_routes -->|"gets database session"| node_database
+node_expense_service -->|"reads and writes"| node_expense_model
+node_expense_service -->|"validates and shapes"| node_expense_schema
+node_api_runtime -->|"initializes"| node_database
+
+click node_appentry "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/main.tsx"
+click node_routes "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/App.tsx"
+click node_authui "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/auth/AuthProvider.tsx"
+click node_login "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/pages/LoginPage.tsx"
+click node_dashboard "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/pages/DashboardPage.tsx"
+click node_expense_list "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/pages/ExpensesPage.tsx"
+click node_expense_form "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/pages/ExpenseFormPage.tsx"
+click node_api_client "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/api/client.ts"
+click node_auth_api "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/api/auth.ts"
+click node_expense_api "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/frontend/src/api/expenses.ts"
+click node_api_runtime "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/main.py"
+click node_auth_routes "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/api/auth.py"
+click node_auth_deps "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/core/deps.py"
+click node_auth_service "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/services/auth.py"
+click node_security "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/core/security.py"
+click node_user_model "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/models/user.py"
+click node_expense_routes "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/api/expenses.py"
+click node_expense_service "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/services/expenses.py"
+click node_expense_model "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/models/expense.py"
+click node_expense_schema "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/schemas/expense.py"
+click node_database "https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker/blob/main/backend/app/db.py"
+
+classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
+classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+classDef toneIndigo fill:#e0e7ff,stroke:#4f46e5,stroke-width:1.5px,color:#312e81
+classDef toneTeal fill:#ccfbf1,stroke:#0f766e,stroke-width:1.5px,color:#134e4a
+class node_appentry,node_routes,node_authui,node_login,node_dashboard,node_expense_list,node_expense_form,node_api_client,node_auth_api,node_expense_api,node_user toneBlue
+class node_api_runtime,node_database toneAmber
+class node_auth_routes,node_auth_deps,node_auth_service,node_security,node_user_model toneMint
+class node_expense_routes,node_expense_service,node_expense_model,node_expense_schema toneRose

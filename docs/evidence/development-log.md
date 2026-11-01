@@ -341,3 +341,11 @@ Capped the description cell at `max-width: 4.5rem` (<= 480px), set the Expenses 
   - CHAL-08: a hook-run test failed because the Dashboard truncation test expected 249 characters instead of 250; the test was corrected (code was right); the truncation itself was later removed in round 16.
   - CHAL-09: E2E was blocked twice by the user's dev servers on ports 8000 and 5173; the human stopped them and the runs were repeated.
 - **Not verified:** contrast, pixel diff against the reference, licence of the banner image, final `check-all` after the last CSS fix, whether DEF-006 is closed in `docs/defects.md` (testing agent).
+
+## 2026-11-01 - documentation - SUB-01..SUB-03 final submission document
+
+- **Module/tool:** documentation agent (GitHub Copilot, `/create-final-document` with the argument that the human prepared E2E screenshots in `docs/design/reference/final_documen/`).
+- **Steps:** read `project_assignment.md`, `docs/submission/brief.md`, final report, prompts, tasks and the latest test run; selected 10 verbatim prompts from `docs/evidence/prompt-log.jsonl` (2 per module) and appended them to `docs/evidence/prompts.md`; resized four of the human's screenshots to `docs/submission/images/`; fetched the GitDiagram Mermaid source and rendered it with mermaid-cli; tried GitIngest; wrote `docs/submission/submission.md` and `build_docx.py`; built the docx; converted to PDF with LibreOffice.
+- **Real results:** build exit 0; PDF 6 pages; docx has 13 headings, 5 images, 23 hyperlinks; no missing cited paths.
+- **Challenges:** my first extraction of the Mermaid source included page payload after the diagram, which caused a mermaid parse error at line 77; fixed by cutting at the last `class` line. mermaid-cli rejected `-w`/`--width` options, so the default size was used. The top-down diagram was 784x1699 px and did not fit a page, so it was rendered left-to-right, which makes its text small.
+- **Not verified:** Word rendering, GitIngest content (not readable), Google Drive upload.
