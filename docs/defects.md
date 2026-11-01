@@ -45,3 +45,31 @@ Template: `.github/skills/automated-testing/defect-report-template.md`. IDs `DEF
 - **Fix attempts:** 1 / 3
 - **Status:** VERIFIED
 - **Verification evidence:** after the backend fix and marker removal: `make lint-backend` exit 0; `make test-backend` exit 0 (291 passed, 0 xfailed); `scripts/check-all.sh` exit 0 (291 passed), `docs/evidence/test-runs/check-20261030T170746Z.txt`. `scripts/check-ownership.sh testing` exit 1, listing only uncommitted backend-owned files (`backend/app/schemas/expense.py`, `backend/tests/unit/test_expenses.py`, `docs/api-contract.md`) changed by the backend agent for this fix.
+
+### DEF-004 - Frontend flow tests are not type-checked
+
+- **Found by / date:** testing agent, architecture review, 2026-11-01
+- **Severity:** minor
+- **Owner:** frontend (`frontend/tsconfig.app.json`)
+- **Requirement / contract reference:** `.github/instructions/frontend.instructions.md` (TypeScript strict); Definition of Done (`make typecheck`)
+- **Reproduction:** read `frontend/tsconfig.app.json`: `"include": ["src"]`; `frontend/tests/flows.test.tsx` is outside it, so `npm --prefix frontend run typecheck` (`tsc -b`) never checks it. Derived from configuration; not demonstrated with a deliberately wrong type.
+- **Expected:** `tests/` is part of a tsconfig project.
+- **Actual:** only ESLint and Vitest (no type check) see the file.
+- **Failing test:** not applicable
+- **Fix attempts:** 1 / 3
+- **Status:** VERIFIED
+- **Verification evidence:** `frontend/tsconfig.app.json` now has `"include": ["src", "tests"]`; `npm --prefix frontend run typecheck` exit 0; `tsc --listFilesOnly` lists `frontend/tests/flows.test.tsx`; a temporary `const x: number = "x"` appended to it made typecheck fail (exit 2, TS2322) and was reverted (typecheck exit 0 again). `docs/evidence/test-runs/def-004-verify.txt`.
+
+### DEF-005 - Integration test depended on the developer's root `.env`
+
+- **Found by / date:** testing agent, full run, 2026-11-01
+- **Severity:** minor
+- **Owner:** testing (`backend/tests/integration/test_auth_http.py`)
+- **Requirement / contract reference:** testing instructions, Isolation ("nothing touches a real `.env`")
+- **Reproduction:** with a root `.env` that sets `INITIAL_USERNAME` and `INITIAL_PASSWORD` (the CLI now reads it since the DEF-001 fix), run `make test-backend`.
+- **Expected:** `test_provisioning_without_credentials_fails_and_creates_no_user` passes on any machine.
+- **Actual:** `assert 0 != 0` (CLI printed "User created." because the empty env values fell back to `.env`); `1 failed, 290 passed`, `docs/evidence/test-runs/check-20261101T004130Z.txt`.
+- **Failing test:** `backend/tests/integration/test_auth_http.py::test_provisioning_without_credentials_fails_and_creates_no_user`
+- **Fix attempts:** 1 / 3
+- **Status:** VERIFIED
+- **Verification evidence:** test now runs the CLI in a scratch repo layout (no `.env`, no INITIAL_* variables); `scripts/check-all.sh --e2e` exit 0 (backend 291 passed), `docs/evidence/test-runs/check-20261101T005014Z.txt`. The test was not run against the old behaviour again after the fix beyond the failing first run above.

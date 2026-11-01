@@ -179,3 +179,15 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Testing strategy and actual results:** orchestrator-run `scripts/check-all.sh` exit 0 (backend 291 passed, frontend 55 passed, `docs/evidence/test-runs/check-20261101T001953Z.txt`); live HTTP checks all as expected. Browser-level checks: not run.
 - **Challenge (CHAL-nn):** none; the persistence output summary line is truncated and create status codes were not captured, noted in the report.
 - **Solution applied:** n/a
+
+## 2026-11-01 - E2E scaffold, workflow, persistence, flow tests, screenshots, review (T-01..T-05)
+
+- **Module:** Testing layer
+- **Agent / AI tool (model):** GitHub Copilot testing agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** Real-browser coverage of the 16-step workflow and a backend-restart persistence scenario, frontend flow tests, real screenshots, and a read-only architecture review.
+- **Implementation steps:** created `e2e/` (Playwright, global setup starting uvicorn and Vite against a temp SQLite file, run-time generated password), three specs, `frontend/tests/flows.test.tsx` (MSW), ran `scripts/check-all.sh --e2e` three times, inspected the screenshots, wrote the report and defects.
+- **Key prompt:** none recorded verbatim (task assignment for T-01..T-05 plus review).
+- **Files created/changed:** `e2e/**`, `frontend/tests/flows.test.tsx`, `backend/tests/integration/test_auth_http.py` (one test made hermetic), `docs/evidence/screenshots/*.png`, `docs/evidence/test-runs/check-20261101T004130Z.txt`, `...T004540Z.txt`, `...T005014Z.txt`, `docs/test-report.md`, `docs/defects.md`, `docs/tasks.md`, `docs/agent-handoffs.md`.
+- **Testing strategy and actual results:** final `scripts/check-all.sh --e2e` exit 0: backend 291 passed, frontend 62 passed, E2E 3 passed. Earlier runs exit 2 (see challenges).
+- **Challenge (CHAL-nn):** (1) first run failed: an integration test depended on the developer's root `.env` (DEF-005); (2) second run failed on a race in my new frontend flow test; (3) first screenshots had a toast covering the table.
+- **Solution applied:** (1) run that CLI test in a scratch repo layout; (2) wait for the list heading and use cell roles; (3) wait for the toast to disappear before capturing.

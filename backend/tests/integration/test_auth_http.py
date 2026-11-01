@@ -391,8 +391,25 @@ def test_reset_password_replaces_the_credentials(provision, make_client):
     assert_error(login(app_client), 401, "invalid_credentials")
 
 
-def test_provisioning_without_credentials_fails_and_creates_no_user(provision, make_client):
-    result = provision("", "")
+def test_provisioning_without_credentials_fails_and_creates_no_user(tmp_path, db_path, make_client):
+    # Scratch repo layout: a developer's real repo-root .env must not leak into this test.
+    scratch = tmp_path / "scratch_repo"
+    shutil.copytree(
+        BACKEND_DIR / "app",
+        scratch / "backend" / "app",
+        ignore=shutil.ignore_patterns("__pycache__"),
+    )
+    env = {k: v for k, v in os.environ.items() if not k.startswith("INITIAL_")}
+    env["DATABASE_URL"] = f"sqlite:///{db_path}"
+    result = subprocess.run(
+        [sys.executable, "-m", "app.cli", "create-user"],
+        cwd=scratch / "backend",
+        env=env,
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     assert result.returncode != 0
     assert_error(login(make_client()), 401, "invalid_credentials")
 

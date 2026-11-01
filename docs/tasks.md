@@ -50,12 +50,12 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 
 | ID | Task | Agent | Depends | State | Evidence |
 |---|---|---|---|---|---|
-| T-01 | E2E scaffold (runtime credentials, temp DB, server helper) | testing | I-01 | TODO | |
-| T-02 | 16-step E2E workflow | testing | T-01 | TODO | |
-| T-03 | Persistence scenario (backend restart) | testing | T-01 | TODO | |
-| T-04 | Frontend integration tests | testing | F-06 | TODO | |
-| T-05 | Screenshot capture (>= 2 real PNGs) | testing | T-02 | TODO | |
-| T-06 | Full validation and test report (HC4) | orchestrator + testing | T-02..T-05 | TODO | |
+| T-01 | E2E scaffold (runtime credentials, temp DB, server helper) | testing | I-01 | VERIFIED | e2e/ (support/servers.ts); orchestrator re-ran `make validate` exit 0: docs/evidence/test-runs/check-20261101T005613Z.txt (backend 291, frontend 62, E2E 3 passed) |
+| T-02 | 16-step E2E workflow | testing | T-01 | VERIFIED | workflow.spec.ts passed in orchestrator re-run check-20261101T005613Z.txt; results in docs/test-report.md |
+| T-03 | Persistence scenario (backend restart) | testing | T-01 | VERIFIED | persistence.spec.ts passed in orchestrator re-run check-20261101T005613Z.txt |
+| T-04 | Frontend integration tests | testing | F-06 | VERIFIED | frontend/tests/flows.test.tsx 7 passed; full frontend 62 passed in orchestrator re-run check-20261101T005613Z.txt; DEF-004 fixed and VERIFIED |
+| T-05 | Screenshot capture (>= 2 real PNGs) | testing | T-02 | VERIFIED | docs/evidence/screenshots/{login,expenses,dashboard}.png (PNG verified with `file`) |
+| T-06 | Full validation and test report (HC4) | orchestrator + testing | T-02..T-05 | COMPLETED | `make validate` exit 0 (docs/evidence/test-runs/check-20261101T005613Z.txt); DEF-004 VERIFIED (def-004-verify.txt); awaiting HC4 human approval |
 | D-nn | Defect fixes (tracked in docs/defects.md) | owners | T-06 | TODO | |
 
 ## Phase 5 - documentation

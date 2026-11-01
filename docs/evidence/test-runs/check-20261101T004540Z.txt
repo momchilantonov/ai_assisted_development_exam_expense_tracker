@@ -1,0 +1,93 @@
+# command: make check + make test-e2e
+# started: 2026-11-01T00:45:40Z
+All checks passed!
+34 files already formatted
+
+> expense-tracker-frontend@0.1.0 lint
+> eslint .
+
+backend typecheck skipped (no backend/app or mypy not installed)
+
+> expense-tracker-frontend@0.1.0 typecheck
+> tsc -b
+
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/backend/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+291 passed, 1 warning in 215.35s (0:03:35)
+
+> expense-tracker-frontend@0.1.0 test
+> vitest --run
+
+
+ RUN  v3.2.7 /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/frontend
+
+ ✓ src/components/ProtectedRoute.test.tsx (4 tests) 681ms
+   ✓ protected route > redirects anonymous users to login with the requested path  422ms
+ ✓ src/components/Layout.test.tsx (4 tests) 929ms
+   ✓ layout > shows navigation and the signed-in user, and navigates between pages  490ms
+ ✓ src/pages/DashboardPage.test.tsx (5 tests) 1214ms
+   ✓ dashboard page > shows a loading status, then statistics from decimal strings  523ms
+   ✓ dashboard page > renders an SVG chart with a text alternative and a table of category totals  357ms
+ ✓ src/pages/ExpensesPage.test.tsx (7 tests) 2417ms
+   ✓ expenses page > shows a loading status, then expenses with decimal-string amounts  334ms
+   ✓ expenses page > shows an error with retry that recovers  341ms
+   ✓ expenses page > filters by category and shows a filtered empty state  305ms
+   ✓ expenses page > filters by date range and rejects an inverted range without calling the API  493ms
+   ✓ expenses page > paginates with previous and next  613ms
+ ✓ src/pages/LoginPage.test.tsx (8 tests) 2791ms
+   ✓ login page > signs in and shows the protected home page when credentials are valid  836ms
+   ✓ login page > returns to the requested page after login  412ms
+   ✓ login page > disables the button and shows progress while signing in  457ms
+ ✓ src/api/client.test.ts (8 tests) 154ms
+ ❯ tests/flows.test.tsx (7 tests | 1 failed) 3088ms
+   ✓ authentication flow > redirects an anonymous deep link to login and returns to it after signing in  812ms
+   ✓ authentication flow > shows the server error for a wrong password and stays on login  388ms
+   ✓ authentication flow > redirects to login when the session expires during use 259ms
+   × expense lifecycle flow > creates, edits, summarises and deletes an expense, then logs out 664ms
+     → Expected container to be an Element, a Document or a DocumentFragment but got null.
+   ✓ expense lifecycle flow > keeps the expense when the delete confirmation is cancelled 266ms
+   ✓ expense lifecycle flow > filters the list by category and date range  305ms
+   ✓ expense form validation flow > blocks an invalid amount client-side and maps a server 422 to the field  383ms
+ ✓ src/lib/money.test.ts (5 tests) 15ms
+ ✓ src/pages/ExpenseFormPage.test.tsx (14 tests) 3713ms
+   ✓ new expense form > shows field-level errors and sends nothing when invalid  796ms
+   ✓ new expense form > rejects amounts above the maximum  408ms
+   ✓ new expense form > creates an expense with a decimal-string amount, shows a toast and returns to the list  767ms
+   ✓ edit expense form > loads the expense, saves changes and shows a toast  366ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/flows.test.tsx > expense lifecycle flow > creates, edits, summarises and deletes an expense, then logs out
+TypeError: Expected container to be an Element, a Document or a DocumentFragment but got null.
+ ❯ checkContainerType node_modules/@testing-library/dom/dist/helpers.js:61:11
+ ❯ queryAllByText node_modules/@testing-library/dom/dist/queries/text.js:18:35
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:74:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/flows.test.tsx:93:24
+     91| 
+     92|     const row = (await screen.findByText("Dentist")).closest("tr")!;
+     93|     expect(within(row).getByText("25.00")).toBeInTheDocument();
+       |                        ^
+     94| 
+     95|     await user.click(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  1 failed | 61 passed (62)
+   Start at  02:49:23
+   Duration  6.55s (transform 747ms, setup 5.98s, collect 3.37s, tests 15.00s, environment 9.62s, prepare 2.06s)
+
+make: *** [Makefile:72: test-frontend] Error 1
+# finished: 2026-11-01T00:49:30Z exit=2

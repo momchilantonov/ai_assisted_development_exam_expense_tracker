@@ -1,0 +1,26 @@
+# DEF-004 verification 2026-11-01T01:02:08Z
+## git diff tsconfig
+21:  "include": ["src", "tests"]
+## typecheck
+
+> expense-tracker-frontend@0.1.0 typecheck
+> tsc -b
+
+EXIT=0
+## listFilesOnly
+/home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/frontend/tests/flows.test.tsx
+EXIT=0
+## injected type error (temporary copy)
+
+> expense-tracker-frontend@0.1.0 typecheck
+> tsc -b
+
+tests/flows.test.tsx(222,7): error TS2322: Type 'string' is not assignable to type 'number'.
+tests/flows.test.tsx(222,7): error TS6133: '__def004' is declared but its value is never read.
+EXIT=2
+## after revert
+
+> expense-tracker-frontend@0.1.0 typecheck
+> tsc -b
+
+EXIT=0

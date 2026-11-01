@@ -1,0 +1,78 @@
+# command: make check + make test-e2e
+# started: 2026-11-01T00:56:13Z
+make[1]: Entering directory '/home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker'
+All checks passed!
+34 files already formatted
+
+> expense-tracker-frontend@0.1.0 lint
+> eslint .
+
+backend typecheck skipped (no backend/app or mypy not installed)
+
+> expense-tracker-frontend@0.1.0 typecheck
+> tsc -b
+
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/backend/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+291 passed, 1 warning in 229.87s (0:03:49)
+
+> expense-tracker-frontend@0.1.0 test
+> vitest --run
+
+
+ RUN  v3.2.7 /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/frontend
+
+ ✓ src/components/ProtectedRoute.test.tsx (4 tests) 611ms
+ ✓ src/components/Layout.test.tsx (4 tests) 1034ms
+   ✓ layout > shows navigation and the signed-in user, and navigates between pages  670ms
+ ✓ src/pages/DashboardPage.test.tsx (5 tests) 1106ms
+   ✓ dashboard page > shows a loading status, then statistics from decimal strings  350ms
+   ✓ dashboard page > renders an SVG chart with a text alternative and a table of category totals  392ms
+ ✓ src/pages/ExpensesPage.test.tsx (7 tests) 2079ms
+   ✓ expenses page > shows a loading status, then expenses with decimal-string amounts  344ms
+   ✓ expenses page > shows an error with retry that recovers  303ms
+   ✓ expenses page > filters by date range and rejects an inverted range without calling the API  389ms
+   ✓ expenses page > paginates with previous and next  400ms
+ ✓ src/pages/LoginPage.test.tsx (8 tests) 2276ms
+   ✓ login page > signs in and shows the protected home page when credentials are valid  839ms
+   ✓ login page > returns to the requested page after login  352ms
+ ✓ src/api/client.test.ts (8 tests) 96ms
+ ✓ src/lib/money.test.ts (5 tests) 15ms
+ ✓ tests/flows.test.tsx (7 tests) 3051ms
+   ✓ authentication flow > redirects an anonymous deep link to login and returns to it after signing in  793ms
+   ✓ authentication flow > shows the server error for a wrong password and stays on login  374ms
+   ✓ expense lifecycle flow > creates, edits, summarises and deletes an expense, then logs out  1121ms
+ ✓ src/pages/ExpenseFormPage.test.tsx (14 tests) 3286ms
+   ✓ new expense form > shows field-level errors and sends nothing when invalid  1090ms
+   ✓ new expense form > creates an expense with a decimal-string amount, shows a toast and returns to the list  548ms
+
+ Test Files  9 passed (9)
+      Tests  62 passed (62)
+   Start at  03:00:10
+   Duration  5.97s (transform 670ms, setup 5.61s, collect 2.88s, tests 13.55s, environment 8.60s, prepare 2.03s)
+
+make[1]: Leaving directory '/home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker'
+make[1]: Entering directory '/home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker'
+
+> expense-tracker-e2e@0.1.0 test
+> playwright test
+
+
+Running 3 tests using 1 worker
+
+  ✓  1 [chromium] › tests/persistence.spec.ts:10:1 › expense survives a backend restart (4.1s)
+  ✓  2 [chromium] › tests/screenshots.spec.ts:6:1 › capture screenshots of the running application (8.2s)
+  ✓  3 [chromium] › tests/workflow.spec.ts:10:1 › full expense workflow (16 steps) (3.8s)
+
+  3 passed (19.1s)
+make[1]: Leaving directory '/home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker'
+# finished: 2026-11-01T01:00:37Z exit=0

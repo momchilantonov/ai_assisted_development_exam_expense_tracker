@@ -218,3 +218,40 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Test results (Node 22):** `make lint-frontend` exit 0; `make typecheck-frontend` exit 0; `make test-frontend` exit 0 (8 files, 55 tests passed); `scripts/check-ownership.sh frontend` exit 0. Not run: browser, E2E, 360 px visual check, real backend.
 - **Known issues / contract notes (proposals for backend):** (1) Contract header allows request amounts `\d{1,8}(\.\d{1,2})?` while the range is 0.01..999999.99; the frontend uses the stricter `\d{1,6}` pattern. (2) Contract does not say whether the `Location` header after create is used; the frontend ignores it. (3) 422 `details[].loc` shape is assumed to be `["body", "<field>"]` (as FastAPI emits); the contract does not specify it, so unmapped errors show the generic message. (4) No currency in the contract, amounts show without a symbol. (5) Single-expense GET is used for editing; no ETag/concurrency control exists, so concurrent edits are last-write-wins. (6) `npm audit` dev-tooling findings from F-02 remain.
 - **Next action:** a non-implementing agent verifies F-01..F-06; then I-01 and T-04.
+
+---
+
+### HANDOFF T-01..T-05 + architecture review - testing agent - 2026-11-01
+
+- **Task ID(s):** T-01, T-02, T-03, T-04, T-05, architecture/complexity review
+- **State set:** T-01..T-05 COMPLETED (implemented by testing; not VERIFIED by a second agent). T-06 untouched.
+- **Modified files:** `e2e/package.json`, `e2e/package-lock.json`, `e2e/playwright.config.ts`, `e2e/support/{servers,global-setup,helpers}.ts`, `e2e/tests/{workflow,persistence,screenshots}.spec.ts`, `frontend/tests/flows.test.tsx`, `backend/tests/integration/test_auth_http.py` (DEF-005), `docs/evidence/screenshots/{login,expenses,dashboard}.png`, `docs/evidence/test-runs/check-20261101T004130Z.txt`, `check-20261101T004540Z.txt`, `check-20261101T005014Z.txt`, `docs/test-report.md`, `docs/defects.md`, `docs/tasks.md`, `docs/evidence/development-log.md`. No production code changed.
+- **Commands run:** `npm install` + `npx playwright install chromium` in `e2e/` exit 0; `make test-e2e` exit 0 (3 passed); `scripts/check-all.sh --e2e` exit 2 (DEF-005, 290 passed 1 failed), exit 2 (flaky own flow test), final exit 0 (backend 291 passed, frontend 62 passed, E2E 3 passed); `scripts/check-ownership.sh testing` exit 0.
+- **Results:** 16-step workflow PASS; persistence (backend restart, re-login) PASS; 3 real PNG screenshots; review: contract, complexity, out-of-scope and secrets PASS.
+- **Defects:** DEF-004 (minor, owner frontend, OPEN): `tsc -b` does not cover `frontend/tests`. DEF-005 (minor, testing, VERIFIED): test depended on root `.env`.
+- **Known issues / limits:** E2E needs ports 8000 and 5173 free (Vite proxy is fixed to 8000) and `make setup-e2e` (Chromium download); Chromium only; mypy and 360 px not run; npm audit not re-run. `make test-e2e` does not source nvm, so it needs Node 22 on PATH.
+- **Next action:** frontend agent fixes DEF-004; orchestrator + testing run T-06 (`make validate`, HC4); an independent agent may verify T-01..T-05.
+
+---
+
+### HANDOFF DEF-004 - frontend agent - 2026-11-01
+
+- **Task ID(s):** DEF-004 (defect; no task row changed)
+- **Responsible agent:** frontend
+- **State set:** DEF-004 FIXED (not VERIFIED; needs a non-implementing agent).
+- **Completed work:** `frontend/tsconfig.app.json` `include` changed from `["src"]` to `["src", "tests"]`, so `tsc -b` type-checks `frontend/tests/flows.test.tsx`. No test files edited; no type errors surfaced.
+- **Modified files:** `frontend/tsconfig.app.json`, `docs/agent-handoffs.md`. `docs/defects.md` NOT edited (testing-owned; edit blocked by the ownership guard): testing agent should set DEF-004 to FIXED (fix attempts 1/3) with this evidence.
+- **Test results (Node 22):** `make typecheck-frontend` exit 0; `tsc -p tsconfig.app.json --listFilesOnly` lists `tests/flows.test.tsx`; `make lint` exit 0; `make test-frontend` exit 0 (9 files, 62 tests passed); `scripts/check-ownership.sh frontend` exit 1, listing only pre-existing uncommitted files of the testing agent (`e2e/**`, `frontend/tests/flows.test.tsx`, `docs/evidence/**`, `docs/test-report.md`, `backend/tests/integration/test_auth_http.py`).
+- **Known issues:** not demonstrated with a deliberately wrong type; E2E not run.
+- **Next action:** testing agent verifies DEF-004 and sets VERIFIED; orchestrator proceeds with T-06.
+
+### HANDOFF DEF-004 verification - testing agent - 2026-11-01
+
+- **Task ID(s):** DEF-004
+- **Responsible agent:** testing (did not implement the fix)
+- **State set:** DEF-004 VERIFIED.
+- **Completed work:** independent check of the `frontend/tsconfig.app.json` change.
+- **Modified files:** `docs/defects.md`, `docs/test-report.md`, `docs/evidence/test-runs/def-004-verify.txt`, `docs/agent-handoffs.md`. No production code changed; the temporary type error in `frontend/tests/flows.test.tsx` was reverted.
+- **Test results (Node 22):** `npm --prefix frontend run typecheck` exit 0; `--listFilesOnly` lists `tests/flows.test.tsx`; injected `number = "x"` gave TS2322, exit 2; after revert exit 0.
+- **Known issues:** none for DEF-004.
+- **Next action:** orchestrator proceeds with T-06.
