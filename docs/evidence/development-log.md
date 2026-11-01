@@ -239,3 +239,16 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Module:** Frontend / design
 - **What happened:** the human added `docs/design/reference/image.png`. The agent viewed it and rewrote `docs/design/ui-style-guide.md` around what it shows (dark theme, cover banner, two columns, view tabs, table with tag pills, "Total Expenses" card). Hex values are approximated by eye from the screenshot and Notion's dark palette; the redesign agent must compare screenshots side by side. The image is git-ignored because it is a third-party screenshot.
 - **Challenge (CHAL-05):** the first style guide was written from the template's page text only and assumed a light theme; the real reference was dark. Resolved by revising the guide before any UI code was changed.
+
+## 2026-11-01 - UI-01..UI-03 restyle (frontend agent)
+
+- **Module:** Frontend
+- **What:** dark Notion-style tokens and shell, tag pills with decorative icons, view tabs (date filters only), dashboard cards and tag-coloured bars, restyled forms, dialog and toasts, 360 px and reduced-motion rules. No dependencies added, no behaviour change.
+- **Results (real):** `make lint` exit 0; `make typecheck` exit 0; `make test-frontend` exit 0 (70 passed); `scripts/check-ownership.sh frontend` exit 0. E2E, screenshots and browser checks not run.
+- **Challenge:** tests assert unique text per row, so the Name column was merged into the description cell and the header icon kept outside the h1 and outside any `<header>` element (E2E selects the app `header`).
+
+## 2026-11-01 - UI restyle defect fix: tag icon as CSS (frontend agent)
+
+- **Module:** Frontend
+- **What:** `Tag` icon moved from a text node to `data-icon` + CSS `::before`, so cell text equals the plain category name (E2E `innerText` key).
+- **Results (real):** `make lint`, `make typecheck`, `make test-frontend` (70 passed) exit 0; `npx playwright test tests/workflow.spec.ts` exit 0 (1 passed); `check-ownership.sh frontend` exit 1 (only check-all evidence files).

@@ -4,7 +4,10 @@ import { ApiError } from "../api/client";
 import { deleteExpense, listCategories, listExpenses } from "../api/expenses";
 import type { Category, Expense, ExpenseList, ExpenseSort } from "../api/types";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { PageHeader } from "../components/PageHeader";
+import { Tag } from "../components/Tag";
 import { useToast } from "../components/useToast";
+import { CATEGORY_ICON, monthRange } from "../lib/categories";
 import { formatMoney } from "../lib/money";
 
 export const PAGE_SIZE = 20;
@@ -118,13 +121,46 @@ export function ExpensesPage() {
   const filtered =
     filters.category !== "" || filters.dateFrom !== "" || filters.dateTo !== "";
 
+  const thisMonth = monthRange(0);
+  const pastMonth = monthRange(1);
+  const views = [
+    { label: "All", dateFrom: "", dateTo: "" },
+    { label: "This month", ...thisMonth },
+    { label: "Past month", ...pastMonth },
+  ];
+
   return (
     <main>
+      <PageHeader icon="💸" title="Expenses">
+        <p className="callout">
+          Use the tabs to switch between all expenses, this month and the past
+          month.
+        </p>
+      </PageHeader>
       <div className="page-heading">
-        <h1>Expenses</h1>
         <Link to="/expenses/new" className="button-link primary">
           New expense
         </Link>
+      </div>
+
+      <div className="view-tabs" role="group" aria-label="View">
+        {views.map((v) => {
+          const active =
+            filters.dateFrom === v.dateFrom && filters.dateTo === v.dateTo;
+          return (
+            <button
+              key={v.label}
+              type="button"
+              className="tab"
+              aria-pressed={active}
+              onClick={() =>
+                updateFilters({ dateFrom: v.dateFrom, dateTo: v.dateTo })
+              }
+            >
+              {v.label}
+            </button>
+          );
+        })}
       </div>
 
       <form
@@ -184,6 +220,7 @@ export function ExpensesPage() {
         </div>
         <button
           type="button"
+          className="secondary"
           onClick={() =>
             updateFilters({ ...initialFilters, sort: filters.sort })
           }
@@ -244,9 +281,16 @@ export function ExpensesPage() {
               <tbody>
                 {data.items.map((e) => (
                   <tr key={e.id}>
-                    <td>{e.expense_date}</td>
-                    <td>{e.category}</td>
-                    <td>{e.description ?? ""}</td>
+                    <td className="nowrap">{e.expense_date}</td>
+                    <td>
+                      <Tag category={e.category} />
+                    </td>
+                    <td>
+                      <span className="row-icon" aria-hidden="true">
+                        {CATEGORY_ICON[e.category]}
+                      </span>
+                      {e.description ?? ""}
+                    </td>
                     <td className="num">{formatMoney(e.amount)}</td>
                     <td className="row-actions">
                       <Link
@@ -269,6 +313,7 @@ export function ExpensesPage() {
               </tbody>
             </table>
           </div>
+          <p className="table-footer">VALUES {total}</p>
           <nav className="pagination" aria-label="Pagination">
             <button
               type="button"

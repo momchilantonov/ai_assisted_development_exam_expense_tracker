@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { getSummary } from "../api/expenses";
 import type { Summary } from "../api/types";
+import { PageHeader } from "../components/PageHeader";
+import { Tag } from "../components/Tag";
+import { CATEGORY_ICON, categoryClass } from "../lib/categories";
 import { formatMoney, toCents } from "../lib/money";
 
 const BAR_HEIGHT = 22;
@@ -44,7 +47,7 @@ function CategoryChart({ items }: { items: Summary["by_category"] }) {
               y={y}
               width={BAR_AREA * ratio}
               height={BAR_HEIGHT}
-              className="chart-bar"
+              className={`chart-bar ${categoryClass(item.category)}`}
             />
             <text
               x={LABEL_WIDTH + BAR_AREA * ratio + 6}
@@ -92,7 +95,7 @@ export function DashboardPage() {
 
   return (
     <main>
-      <h1>Dashboard</h1>
+      <PageHeader icon="📊" title="Dashboard" />
 
       {loading && (
         <p role="status" className="page-message">
@@ -156,7 +159,9 @@ export function DashboardPage() {
                 <tbody>
                   {summary.by_category.map((c) => (
                     <tr key={c.category}>
-                      <th scope="row">{c.category}</th>
+                      <th scope="row">
+                        <Tag category={c.category} />
+                      </th>
                       <td className="num">{c.count}</td>
                       <td className="num">{formatMoney(c.total)}</td>
                     </tr>
@@ -184,9 +189,16 @@ export function DashboardPage() {
                 <tbody>
                   {summary.recent.map((e) => (
                     <tr key={e.id}>
-                      <td>{e.expense_date}</td>
-                      <td>{e.category}</td>
-                      <td>{e.description ?? ""}</td>
+                      <td className="nowrap">{e.expense_date}</td>
+                      <td>
+                        <Tag category={e.category} />
+                      </td>
+                      <td>
+                        <span className="row-icon" aria-hidden="true">
+                          {CATEGORY_ICON[e.category]}
+                        </span>
+                        {e.description ?? ""}
+                      </td>
                       <td className="num">{formatMoney(e.amount)}</td>
                     </tr>
                   ))}

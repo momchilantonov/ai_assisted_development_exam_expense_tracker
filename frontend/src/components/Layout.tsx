@@ -16,7 +16,9 @@ export function Layout() {
   return (
     <ToastProvider>
       <header className="app-header">
-        <span className="app-title">Expense Tracker</span>
+        <span className="app-title">
+          <span aria-hidden="true">💸</span> Expense Tracker
+        </span>
         <nav aria-label="Main">
           <NavLink to="/" end>
             Dashboard

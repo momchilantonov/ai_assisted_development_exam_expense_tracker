@@ -1,0 +1,121 @@
+# command: make check + make test-e2e
+# started: 2026-11-01T12:46:18Z
+All checks passed!
+37 files already formatted
+
+> expense-tracker-frontend@0.1.0 lint
+> eslint .
+
+backend typecheck skipped (no backend/app or mypy not installed)
+
+> expense-tracker-frontend@0.1.0 typecheck
+> tsc -b
+
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 92%]
+.............................                                            [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/backend/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+389 passed, 1 warning in 303.58s (0:05:03)
+
+> expense-tracker-frontend@0.1.0 test
+> vitest --run
+
+
+ RUN  v3.2.7 /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/frontend
+
+ ✓ src/pages/DashboardPage.test.tsx (5 tests) 887ms
+   ✓ dashboard page > shows a loading status, then statistics from decimal strings  328ms
+ ✓ src/components/Layout.test.tsx (4 tests) 904ms
+   ✓ layout > shows navigation and the signed-in user, and navigates between pages  560ms
+ ✓ src/pages/ExpensesPage.test.tsx (7 tests) 2267ms
+   ✓ expenses page > shows an error with retry that recovers  320ms
+   ✓ expenses page > filters by category and shows a filtered empty state  313ms
+   ✓ expenses page > filters by date range and rejects an inverted range without calling the API  452ms
+   ✓ expenses page > paginates with previous and next  528ms
+ ✓ src/pages/LoginPage.test.tsx (8 tests) 2542ms
+   ✓ login page > signs in and shows the protected home page when credentials are valid  728ms
+   ✓ login page > returns to the requested page after login  332ms
+   ✓ login page > disables the button and shows progress while signing in  424ms
+   ✓ login page > ignores an external next target  324ms
+ ✓ src/api/client.test.ts (8 tests) 176ms
+ ✓ src/pages/SignupPage.test.tsx (8 tests) 3716ms
+   ✓ sign-up page > signs up, logs in and shows the dashboard with the new username  916ms
+   ✓ sign-up page > honours the next target after sign-up  624ms
+   ✓ sign-up page > shows field-level errors and sends no request for invalid input  342ms
+   ✓ sign-up page > shows an error when the passwords do not match  534ms
+   ✓ sign-up page > shows a username-level message when the username is taken  439ms
+   ✓ sign-up page > shows a form error when the server returns 422  333ms
+   ✓ sign-up page > disables the button while signing up  416ms
+ ✓ tests/flows.test.tsx (7 tests) 3805ms
+   ✓ authentication flow > redirects an anonymous deep link to login and returns to it after signing in  779ms
+   ✓ authentication flow > shows the server error for a wrong password and stays on login  333ms
+   ✓ expense lifecycle flow > creates, edits, summarises and deletes an expense, then logs out  1555ms
+   ✓ expense lifecycle flow > filters the list by category and date range  314ms
+   ✓ expense form validation flow > blocks an invalid amount client-side and maps a server 422 to the field  336ms
+ ✓ src/components/ProtectedRoute.test.tsx (4 tests) 538ms
+   ✓ protected route > redirects anonymous users to login with the requested path  303ms
+ ✓ src/pages/ExpenseFormPage.test.tsx (14 tests) 4070ms
+   ✓ new expense form > shows field-level errors and sends nothing when invalid  851ms
+   ✓ new expense form > creates an expense with a decimal-string amount, shows a toast and returns to the list  719ms
+   ✓ edit expense form > loads the expense, saves changes and shows a toast  421ms
+   ✓ delete expense > asks for confirmation, focuses Cancel, and cancel keeps the expense  306ms
+ ✓ src/lib/money.test.ts (5 tests) 14ms
+
+ Test Files  10 passed (10)
+      Tests  70 passed (70)
+   Start at  14:51:30
+   Duration  7.09s (transform 746ms, setup 7.13s, collect 3.99s, tests 18.92s, environment 10.51s, prepare 2.24s)
+
+
+> expense-tracker-e2e@0.1.0 test
+> playwright test
+
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › tests/multi-user.spec.ts:11:1 › two users sign up in separate browser contexts and see only their own data (6.0s)
+  ✓  2 [chromium] › tests/persistence.spec.ts:10:1 › expense survives a backend restart (3.7s)
+  ✓  3 [chromium] › tests/screenshots.spec.ts:6:1 › capture screenshots of the running application (8.4s)
+  ✘  4 [chromium] › tests/workflow.spec.ts:10:1 › full expense workflow (16 steps) (3.2s)
+
+
+  1) [chromium] › tests/workflow.spec.ts:10:1 › full expense workflow (16 steps) › 12. dashboard totals include the expense 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    Expected: {"count": 1, "total": 4050}
+    Received: undefined
+
+      108 |     expect(after.month).toBe(before.month + 4050);
+      109 |     const h0 = before.byCategory.Healthcare ?? { count: 0, total: 0 };
+    > 110 |     expect(after.byCategory.Healthcare).toEqual({
+          |                                         ^
+      111 |       count: h0.count + 1,
+      112 |       total: h0.total + 4050,
+      113 |     });
+        at /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/e2e/tests/workflow.spec.ts:110:41
+        at /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/e2e/tests/workflow.spec.ts:104:3
+
+    Error Context: test-results/workflow-full-expense-workflow-16-steps--chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/workflow-full-expense-workflow-16-steps--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/workflow-full-expense-workflow-16-steps--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/workflow.spec.ts:10:1 › full expense workflow (16 steps) ────────────────────
+  3 passed (24.9s)
+make: *** [Makefile:75: test-e2e] Error 1
+# finished: 2026-11-01T12:52:03Z exit=2

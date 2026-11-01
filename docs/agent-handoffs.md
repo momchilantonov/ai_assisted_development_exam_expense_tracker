@@ -336,3 +336,21 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Results:** (1) `scripts/check-all.sh --e2e` exit 0: ruff clean, backend 389 passed, frontend 70 passed, E2E 4 passed, `docs/evidence/test-runs/check-20261101T111722Z.txt`: PASS. A first run (`check-20261101T111105Z.txt`, exit 2) failed only because dev servers held ports 8000/5173; the human stopped them. (2) 4 real screenshots (`login`, `signup`, `expenses`, `dashboard`): PASS. (3) secrets scan: no `.env`, `*.db` or credential files tracked; `.env.example` placeholders only; grep hits only skill docs and test fixtures: PASS. (4) `check-ownership.sh` backend/frontend/testing/documentation/orchestrator exit 0 before the validation runs; `git status` NOT clean afterwards (regenerated `dashboard.png`, `expenses.png`; new `check-20261101T111105Z.txt`, `check-20261101T111722Z.txt`): FAIL until the human reviews and commits. README `make setup`/`seed-user`/dev servers not re-run.
 - **Still open:** key prompts for modules 1-5 not recorded (PARTIAL); page and half-page lengths not measured.
 - **Human must do (HC5/HC6):** review regenerated screenshots, commit evidence, upload report to Google Drive (anyone with link can view), push. Nothing pushed.
+
+---
+### HANDOFF UI-01, UI-02, UI-03 - frontend agent - 2026-11-01
+- **Task ID(s):** UI-01, UI-02, UI-03 (set to COMPLETED; not VERIFIED by me)
+- **Modified files:** rewritten `frontend/src/index.css` (dark tokens from the style guide, base styles, top bar, buttons, inputs, tables, tag pills, tabs, dialog, toasts, 360 px rules, reduced-motion); new `frontend/src/lib/categories.ts` (icon map, month ranges), `frontend/src/components/Tag.tsx`, `frontend/src/components/PageHeader.tsx` (gradient cover, icon, h1, no photo); changed `Layout.tsx` (decorative brand icon), `pages/ExpensesPage.tsx`, `pages/DashboardPage.tsx`. No test files edited.
+- **Behaviour:** unchanged. New "All / This month / Past month" buttons (`aria-pressed`) only set `date_from`/`date_to` through the existing filter state. Category tags and row icons are decorative (`aria-hidden`); category stays as text. Dashboard bars use the tag colours; stat labels kept ("Total spent", "This month", "Expenses").
+- **Deviations from the guide (to keep tests/contract):** no right-hand "Total Expenses" panel (would need an extra summary call on the Expenses page), no "Past year" tab, no toolbar icons (filters stay a labelled form), footer shows "VALUES n" as a paragraph (a table footer row would change row counts), no light theme, no separate Name column (description column carries the icon, avoiding duplicate text). Primary button uses `#1a6fc9` instead of `#2383e2` for white-text contrast; muted alpha raised to 0.58.
+- **Results:** `make lint` exit 0; `make typecheck` exit 0; `make test-frontend` exit 0 (10 files, 70 tests passed, incl. `frontend/tests/flows.test.tsx`); `scripts/check-ownership.sh frontend` exit 0 ("ownership OK for frontend").
+- **Not run:** E2E, regenerated screenshots, 360 px visual check in a browser, contrast measurement (UI-04 owns these).
+- **Next action:** testing agent runs UI-04 (screenshots, 360 px no-scroll check) and compares against the reference image.
+
+---
+### HANDOFF UI-01..UI-03 defect fix (attempt 1/3) - frontend agent - 2026-11-01
+- **Defect:** E2E `workflow.spec.ts` step 12: `readDashboard` read "🩺 Healthcare" via `innerText()` instead of "Healthcare".
+- **Fix:** `frontend/src/components/Tag.tsx` now renders only the category text and exposes the icon as `data-icon`; `frontend/src/index.css` draws it with `.tag[data-icon]::before { content: attr(data-icon) " "; }`. Visuals unchanged, no behaviour/API change. Other E2E assumptions checked (`Total spent`/`This month`/`Expenses` dd siblings, "No expenses yet."): untouched by the restyle.
+- **Results:** `make lint` exit 0; `make typecheck` exit 0; `make test-frontend` exit 0 (10 files, 70 passed); `cd e2e && npx playwright test tests/workflow.spec.ts` exit 0 (1 passed). `scripts/check-ownership.sh frontend` exit 1: only docs/evidence/test-runs files from check-all (7 violations), none of mine.
+- **Not run:** full E2E suite, screenshots.
+- **Next action:** testing agent re-runs the full E2E suite and UI-04.
