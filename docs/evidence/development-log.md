@@ -225,3 +225,11 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** see handoff CR2-T.
 - **Testing:** integration subset exit 0, 123 passed; `scripts/check-all.sh --e2e` exit 2 (backend 389 passed, frontend 70 passed, E2E not started): `docs/evidence/test-runs/check-20261101T021658Z.txt`.
 - **Challenge:** E2E uses fixed ports 8000/5173 and refuses to start while the developer's dev servers run; I did not stop them, so E2E and screenshots remain NOT RUN. First full run also failed on `ruff format` of my own new test.
+
+## 2026-11-01 - UI redesign and submission document preparation (before running the agents)
+
+- **Module:** Frontend / Documentation
+- **Agent / AI tool (model):** GitHub Copilot Agent Mode (Local harness), model: not recorded
+- **What happened:** The human asked for two more tasks: a UI redesign in the style of a Notion expenses template using the `premium-frontend-ui` skill, and a final Google Drive document. Before writing the prompts the agent read the skill's SKILL.md, the template page and the GitDiagram and GitIngest pages. Findings: the skill is aimed at immersive landing pages and does not fit an expense app (ADR-012); the Notion page exposed only its text, not colours or fonts; GitDiagram returned a usable Mermaid architecture diagram for the repository; GitIngest returned no readable content to the fetch tool; LibreOffice is installed, python-docx is not.
+- **Files created:** `docs/design/ui-style-guide.md`, `docs/submission/brief.md`, `.github/prompts/refine-ui.prompt.md`, `.github/prompts/create-final-document.prompt.md`; ownership guard extended for the root submission file; tasks UI-01..UI-05 and SUB-01..SUB-03; ADR-012 and ADR-013.
+- **Testing:** `scripts/validate-infra.sh` after the change (see `docs/evidence/test-runs/infra.txt`). The two new prompts have not been run yet.

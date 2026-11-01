@@ -21,7 +21,7 @@ Out of scope (do not add): Redis, Celery, cloud databases, microservices, paymen
 | `backend` | `backend/**` except `backend/tests/integration/**`; `docs/api-contract.md`; backend lines of `Makefile` and `.env.example` |
 | `frontend` | `frontend/**` except `frontend/tests/**` |
 | `testing` | `backend/tests/integration/**`, `frontend/tests/**`, `e2e/**`, `docs/test-report.md`, `docs/defects.md`, `docs/evidence/test-runs/**`, `docs/evidence/screenshots/**` |
-| `documentation` | `docs/**` not owned above, `README.md` |
+| `documentation` | `docs/**` not owned above, `README.md`, `MCA85_ai_assisted_development_exam_expense_tracker.docx` (and `.txt`) in the repository root |
 | `orchestrator` | `docs/tasks.md`, `docs/agent-handoffs.md`, `docs/decisions.md` only |
 
 `.github/**`, `scripts/**`, `project_assignment.md` and `plan.prompt.md` are frozen after Phase 2; changing them needs human approval. `Makefile` and `.env.example` may only get minimal diffs for your own domain's targets/variables, noted in your handoff. Any agent may append to `docs/agent-handoffs.md`, `docs/decisions.md` and `docs/evidence/development-log.md`, and update only its own rows in `docs/tasks.md`. If you need a change outside your ownership, record it in your handoff instead of making it. Run `scripts/check-ownership.sh <agent>` before handing off.

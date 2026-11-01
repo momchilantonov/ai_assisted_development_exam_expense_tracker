@@ -21,6 +21,7 @@ Layout: `frontend/src/{api,auth,pages,components,lib,test}`; routes `/login`, `/
 - Amounts are strings. Validate with `^\d{1,6}(\.\d{1,2})?$` and range 0.01..999999.99 in `lib/money.ts`; format with `Intl.NumberFormat`; never add amounts as floats. Dates are `YYYY-MM-DD`.
 
 ## UX
+- Visual design (tokens, tags, layout, motion limits) follows `docs/design/ui-style-guide.md` (ADR-012); do not add animation, icon or UI libraries.
 - Every data view has loading, empty and error states; actions give success feedback (toast); delete requires confirmation.
 - Accessibility: semantic elements, labels bound to inputs, `aria-live` for errors/toasts, keyboard-operable dialogs with focus management, visible focus. Responsive layout (usable at 360 px width).
 - Form validation mirrors backend rules and shows field-level messages.

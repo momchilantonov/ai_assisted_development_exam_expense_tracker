@@ -1,5 +1,5 @@
-# command: scripts/validate-infra.sh (after skill rename)
-# started: 2026-11-01T11:09:04Z
+# command: scripts/validate-infra.sh (after UI and submission prompts)
+# started: 2026-11-01T12:18:22Z
 
 == toolchain
 python     Python 3.12.12 (/home/manto/.local/bin/python3.12)
@@ -34,6 +34,8 @@ PASS prompt validate-application: description and valid agent
 PASS prompt fix-defects: description and valid agent
 PASS prompt generate-exam-documentation: description and valid agent
 PASS prompt final-audit: description and valid agent
+PASS prompt refine-ui: description and valid agent
+PASS prompt create-final-document: description and valid agent
 PASS skill fastapi-feature-development: name matches directory, description <= 1024
 PASS skill session-auth: name matches directory, description <= 1024
 PASS skill react-feature-development: name matches directory, description <= 1024
@@ -72,7 +74,7 @@ structure: all checks passed
 == hook fixtures
 PASS session context emits additionalContext
 PASS format hook is a no-op for reads
-33/33 hook cases passed
+35/35 hook cases passed
 
 == make targets parse
 make -n check OK
@@ -89,11 +91,11 @@ OK no .agents/ directory
 == manual prerequisites (cannot be verified by script)
  1. VS Code setting chat.useHooks is enabled and the workspace is trusted.
  2. Local harness selected in the Chat view (prompt files and handoffs need it).
- 3. Chat > right-click > Diagnostics lists 5 agents, 12 prompts, 5 instruction files,
+ 3. Chat > right-click > Diagnostics lists 5 agents, 14 prompts, 5 instruction files,
     10 skills and 4 hook files without errors.
  4. UNVERIFIED until observed: applyTo comma-separated globs; tool aliases
     (read/search/edit/execute/agent/todo); agent-scoped PreToolUse hooks firing in Local;
     parallel write-capable subagents.
 
 validate-infra: PASS
-# finished: 2026-11-01T11:09:06Z exit=0
+# finished: 2026-11-01T12:18:24Z exit=0

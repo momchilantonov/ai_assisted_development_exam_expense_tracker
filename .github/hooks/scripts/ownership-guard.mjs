@@ -41,6 +41,7 @@ const RULES = {
   documentation: [
     /^docs\/(?!api-contract\.md$|test-report\.md$|defects\.md$|evidence\/(?:test-runs|screenshots)\/)/,
     /^README\.md$/,
+    /^MCA85_ai_assisted_development_exam_expense_tracker\.(?:docx|txt)$/,
   ],
 };
 

@@ -266,6 +266,30 @@
     "exit": 0
   },
   {
+    "name": "ownership documentation may write the submission file",
+    "script": "ownership-guard.mjs",
+    "args": ["documentation"],
+    "input": {
+      "tool_name": "create_file",
+      "tool_input": {
+        "filePath": "MCA85_ai_assisted_development_exam_expense_tracker.docx"
+      }
+    },
+    "exit": 0
+  },
+  {
+    "name": "ownership backend may not write the submission file",
+    "script": "ownership-guard.mjs",
+    "args": ["backend"],
+    "input": {
+      "tool_name": "create_file",
+      "tool_input": {
+        "filePath": "MCA85_ai_assisted_development_exam_expense_tracker.docx"
+      }
+    },
+    "exit": 2
+  },
+  {
     "name": "ownership documentation may not write test-report",
     "script": "ownership-guard.mjs",
     "args": ["documentation"],

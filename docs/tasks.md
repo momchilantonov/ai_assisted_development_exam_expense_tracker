@@ -76,3 +76,16 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | DOC-04 | Assignment compliance matrix | documentation | DOC-03 | COMPLETED | docs/agent-handoffs.md (handoff DOC-01..DOC-04); files in docs/ and README.md |
 | DOC-05 | Final audit (HC5) | orchestrator | DOC-04 | COMPLETED | `make validate` exit 0, check-20261101T012350Z.txt; handoff DOC-05; tree not clean (regenerated screenshots, new test-run files) |
 | DOC-06 | Human publishes: GitHub push, Drive upload and sharing (HC6) | human | DOC-05 | TODO | |
+
+## Extra work requested after the final audit (ADR-012, ADR-013)
+
+| ID | Task | Agent | Depends | State | Evidence |
+|---|---|---|---|---|---|
+| UI-01 | Design tokens, base styles and page shell per docs/design/ui-style-guide.md | frontend | CR2-T | TODO | run `/refine-ui` |
+| UI-02 | Restyle Expenses page and Dashboard (tags, icons, view tabs, cards) | frontend | UI-01 | TODO | |
+| UI-03 | Restyle login, sign-up, forms, dialog, toasts, states; 360 px layout | frontend | UI-01 | TODO | |
+| UI-04 | Regenerate screenshots (incl. expenses-mobile.png), 360 px no-scroll check, test report | testing | UI-02, UI-03 | TODO | |
+| UI-05 | Update all documentation after human UI approval | documentation | UI-04 | TODO | |
+| SUB-01 | Collect evidence, key prompts and images (screenshots, GitDiagram, GitIngest resource) | documentation | UI-05 | TODO | run `/create-final-document` |
+| SUB-02 | Write submission.md, build script and MCA85_ai_assisted_development_exam_expense_tracker.docx in the repository root | documentation | SUB-01 | TODO | |
+| SUB-03 | Verify (page count, headings, images, links) and hand off; human uploads to Google Drive | documentation + human | SUB-02 | TODO | |

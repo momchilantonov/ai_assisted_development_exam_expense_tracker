@@ -42,3 +42,6 @@ docs/evidence/prompt-log.jsonl
 .github/hooks/*.log
 .github/hooks/.last-stop-gate
 .agents/
+
+# Final submission build output
+docs/submission/build/

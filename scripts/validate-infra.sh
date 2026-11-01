@@ -38,7 +38,7 @@ step "manual prerequisites (cannot be verified by script)"
 cat <<'EOF'
  1. VS Code setting chat.useHooks is enabled and the workspace is trusted.
  2. Local harness selected in the Chat view (prompt files and handoffs need it).
- 3. Chat > right-click > Diagnostics lists 5 agents, 12 prompts, 5 instruction files,
+ 3. Chat > right-click > Diagnostics lists 5 agents, 14 prompts, 5 instruction files,
     10 skills and 4 hook files without errors.
  4. UNVERIFIED until observed: applyTo comma-separated globs; tool aliases
     (read/search/edit/execute/agent/todo); agent-scoped PreToolUse hooks firing in Local;

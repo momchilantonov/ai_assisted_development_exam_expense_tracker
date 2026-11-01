@@ -91,6 +91,8 @@ const prompts = [
   "fix-defects",
   "generate-exam-documentation",
   "final-audit",
+  "refine-ui",
+  "create-final-document",
 ];
 for (const p of prompts) {
   const path = resolve(root, `.github/prompts/${p}.prompt.md`);
