@@ -235,7 +235,12 @@ export const handlers = [
     };
     const name = typeof body.username === "string" ? body.username.trim() : "";
     const pw = typeof body.password === "string" ? body.password : "";
-    if (name.length < 3 || name.length > 64 || pw.length < 8 || pw.length > 128) {
+    if (
+      name.length < 3 ||
+      name.length > 64 ||
+      pw.length < 8 ||
+      pw.length > 128
+    ) {
       return HttpResponse.json(
         errorBody("validation_error", "Invalid request.", [
           { loc: ["body"], msg: "Invalid value" },

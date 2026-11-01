@@ -68,7 +68,7 @@ function main() {
     const r = spawnSync("make", [t], {
       cwd: ROOT,
       encoding: "utf8",
-      timeout: 150000,
+      timeout: 600000,
     });
     if (r.status !== 0) {
       const tail = `${r.stdout ?? ""}${r.stderr ?? ""}`

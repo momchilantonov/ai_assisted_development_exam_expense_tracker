@@ -43,7 +43,9 @@ test("two users sign up in separate browser contexts and see only their own data
         date,
         description: aliceText,
       });
-      await expect(a.getByRole("row").filter({ hasText: aliceText })).toBeVisible();
+      await expect(
+        a.getByRole("row").filter({ hasText: aliceText }),
+      ).toBeVisible();
     });
 
     await test.step("bob signs up in a separate context and sees nothing of alice", async () => {
@@ -69,14 +71,18 @@ test("two users sign up in separate browser contexts and see only their own data
         date,
         description: bobText,
       });
-      await expect(b.getByRole("row").filter({ hasText: bobText })).toBeVisible();
+      await expect(
+        b.getByRole("row").filter({ hasText: bobText }),
+      ).toBeVisible();
       await expect(b.getByText(aliceText)).toHaveCount(0);
       const bobDash = await readDashboard(b);
       expect(bobDash.count).toBe(1);
       expect(bobDash.total).toBe(750);
 
       await a.goto("/expenses");
-      await expect(a.getByRole("row").filter({ hasText: aliceText })).toBeVisible();
+      await expect(
+        a.getByRole("row").filter({ hasText: aliceText }),
+      ).toBeVisible();
       await expect(a.getByText(bobText)).toHaveCount(0);
       const aliceDash = await readDashboard(a);
       expect(aliceDash.count).toBe(1);
@@ -97,7 +103,10 @@ test("two users sign up in separate browser contexts and see only their own data
       await expect(c.locator("#username-error")).toContainText(
         "Username is already taken.",
       );
-      await expect(c.getByLabel("Username")).toHaveAttribute("aria-invalid", "true");
+      await expect(c.getByLabel("Username")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
       await expect(c.locator("header")).toHaveCount(0);
       const me = await c.request.get("/api/auth/me");
       expect(me.status()).toBe(401);
@@ -107,7 +116,9 @@ test("two users sign up in separate browser contexts and see only their own data
       await b.getByRole("button", { name: "Log out" }).click();
       await expect(b).toHaveURL(/\/login/);
       await a.reload();
-      await expect(a.getByRole("row").filter({ hasText: aliceText })).toBeVisible();
+      await expect(
+        a.getByRole("row").filter({ hasText: aliceText }),
+      ).toBeVisible();
     });
 
     await test.step("bob logs in again with different letter case and keeps only his data", async () => {
@@ -116,7 +127,9 @@ test("two users sign up in separate browser contexts and see only their own data
       await b.getByRole("button", { name: "Sign in" }).click();
       await expect(b.getByRole("heading", { name: "Dashboard" })).toBeVisible();
       await b.goto("/expenses");
-      await expect(b.getByRole("row").filter({ hasText: bobText })).toBeVisible();
+      await expect(
+        b.getByRole("row").filter({ hasText: bobText }),
+      ).toBeVisible();
       await expect(b.getByText(aliceText)).toHaveCount(0);
     });
   } finally {
