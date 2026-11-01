@@ -327,3 +327,12 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Blocker / human action:** stop the dev servers on ports 8000 and 5173 (I did not kill your processes), then run `scripts/check-all.sh --e2e`. That regenerates `login.png`, `expenses.png`, `dashboard.png`, new `signup.png` and executes `multi-user.spec.ts`; the new spec has never run and may need adjustment. Then update CR2-F/CR2-T rows.
 - **Not run:** E2E, screenshots, mypy, mutation check, concurrency (see `docs/test-report.md`).
 - **Next action:** testing agent re-run after the ports are free.
+
+---
+
+### HANDOFF DOC-05 re-audit - orchestrator - 2026-11-01
+
+- **Task ID(s):** DOC-05 (re-run after CR-002; row stays COMPLETED)
+- **Results:** (1) `scripts/check-all.sh --e2e` exit 0: ruff clean, backend 389 passed, frontend 70 passed, E2E 4 passed, `docs/evidence/test-runs/check-20261101T111722Z.txt`: PASS. A first run (`check-20261101T111105Z.txt`, exit 2) failed only because dev servers held ports 8000/5173; the human stopped them. (2) 4 real screenshots (`login`, `signup`, `expenses`, `dashboard`): PASS. (3) secrets scan: no `.env`, `*.db` or credential files tracked; `.env.example` placeholders only; grep hits only skill docs and test fixtures: PASS. (4) `check-ownership.sh` backend/frontend/testing/documentation/orchestrator exit 0 before the validation runs; `git status` NOT clean afterwards (regenerated `dashboard.png`, `expenses.png`; new `check-20261101T111105Z.txt`, `check-20261101T111722Z.txt`): FAIL until the human reviews and commits. README `make setup`/`seed-user`/dev servers not re-run.
+- **Still open:** key prompts for modules 1-5 not recorded (PARTIAL); page and half-page lengths not measured.
+- **Human must do (HC5/HC6):** review regenerated screenshots, commit evidence, upload report to Google Drive (anyone with link can view), push. Nothing pushed.
