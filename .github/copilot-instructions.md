@@ -1,6 +1,6 @@
 # AI-Driven Expense Tracker - repository instructions
 
-Single-user expense tracker built **entirely by AI agents** for the "AI-Assisted Development" exam (`project_assignment.md`). Stack: FastAPI + Pydantic v2 + SQLAlchemy 2.x + SQLite + pytest (backend); React + TypeScript (strict) + Vite + Vitest + React Testing Library (frontend); Playwright (E2E). Approved plan: [docs/plan/master-plan.md](../docs/plan/master-plan.md). Architecture: [docs/architecture.md](../docs/architecture.md). API contract (authoritative for frontend and backend): [docs/api-contract.md](../docs/api-contract.md).
+Multi-user expense tracker (each user sees only their own expenses; CR-002, ADR-011) built **entirely by AI agents** for the "AI-Assisted Development" exam (`project_assignment.md`). Stack: FastAPI + Pydantic v2 + SQLAlchemy 2.x + SQLite + pytest (backend); React + TypeScript (strict) + Vite + Vitest + React Testing Library (frontend); Playwright (E2E). Approved plan: [docs/plan/master-plan.md](../docs/plan/master-plan.md). Architecture: [docs/architecture.md](../docs/architecture.md). API contract (authoritative for frontend and backend): [docs/api-contract.md](../docs/api-contract.md).
 
 ## Start of every task
 
@@ -12,7 +12,7 @@ Single-user expense tracker built **entirely by AI agents** for the "AI-Assisted
 
 Phase 1 plan, 2 infrastructure, 3 application, 4 testing, 5 documentation. Never work ahead of the current phase. Phase 2 creates no application code.
 
-Out of scope (do not add): Redis, Celery, cloud databases, microservices, payments, open or repeated registration (the only sign-up allowed is the first-run sign-up of CR-001, ADR-010), multi-user roles, external auth providers, container orchestration, custom categories, Alembic migrations, MCP servers.
+Out of scope (do not add): Redis, Celery, cloud databases, microservices, payments, user roles or admin accounts, email verification, password reset by email, external auth providers, container orchestration, custom categories, Alembic migrations, MCP servers.
 
 ## Ownership (write access)
 

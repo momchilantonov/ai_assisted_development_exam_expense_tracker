@@ -16,7 +16,7 @@ applyTo: 'backend/tests/**,frontend/**/*.test.ts,frontend/**/*.test.tsx,frontend
 
 ## Auth fixtures
 - Integration tests log in through `POST /api/auth/login` and reuse the cookie; every expense/dashboard test also has an anonymous counterpart asserting 401.
-- Required auth coverage: success, wrong user, wrong password, empty credentials, missing/invalid/expired/tampered cookie, logout then reuse of old cookie, cookie flags, forged Origin 403, hash-only password storage, provisioning and repeated provisioning, route guard over every route.
+- Required auth coverage: success, wrong user, wrong password, empty credentials, missing/invalid/expired/tampered cookie, logout then reuse of old cookie, cookie flags, forged Origin 403, hash-only password storage, provisioning and repeated provisioning, registration (success, duplicate username including different letter case, validation limits), route guard over every route, and user isolation (user B gets 404 for user A's expense id on read, update and delete, never sees A's expenses in lists, dashboard totals are per user).
 
 ## Mocking
 - Backend: do not mock the database or the service layer in integration tests. Frontend: mock only the network boundary (MSW) according to the contract.
