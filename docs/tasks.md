@@ -46,6 +46,14 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | F-06 | Dashboard page and SVG chart | frontend | F-03 | VERIFIED | Orchestrator re-ran lint/typecheck/test (55 passed)/ownership: all exit 0; owner: handoff F-05/F-06 |
 | I-01 | Integration run and checklist | orchestrator | X-06, F-06 | COMPLETED | Real HTTP checks via Vite proxy, 22 PASS: docs/evidence/test-runs/i01-http-checks.txt, i01-persistence.txt; checklist in docs/test-report.md; browser UI checks NOT RUN (covered by T-01..T-03); no defects found |
 
+## Change request CR-002 - multi-user (ADR-011)
+
+| ID | Task | Agent | Depends | State | Evidence |
+|---|---|---|---|---|---|
+| CR2-B | Backend: register endpoint, per-user scoping, contract, unit tests | backend | ADR-011 | VERIFIED | testing agent: integration 123 passed (registration, isolation), check-all backend 389 passed: docs/evidence/test-runs/check-20261101T021658Z.txt |
+| CR2-F | Frontend: /signup page, links, username in header, component tests | frontend | CR2-B | VERIFIED | handoff CR2-F; orchestrator re-ran `scripts/check-all.sh --e2e` exit 0 (frontend 70 passed, E2E 4 passed incl. multi-user.spec.ts): docs/evidence/test-runs/check-20261101T103505Z.txt |
+| CR2-T | Integration tests, two-user E2E, security review, evidence, screenshots | testing | CR2-F | VERIFIED | handoff CR2-T; orchestrator re-ran `scripts/check-all.sh --e2e` exit 0 (backend 389 passed in 302 s, frontend 70, E2E 4 passed), screenshots incl. signup.png regenerated: docs/evidence/test-runs/check-20261101T103505Z.txt |
+
 ## Phase 4 - testing
 
 | ID | Task | Agent | Depends | State | Evidence |

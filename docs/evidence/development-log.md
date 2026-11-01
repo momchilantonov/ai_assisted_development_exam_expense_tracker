@@ -201,3 +201,27 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** `README.md`, `docs/architecture.md`, `docs/report/final-report.md`, `docs/assignment-evidence.md`.
 - **Testing:** `make check-env` exit 2 (Node 22.13.1 below 22.20 in this shell, nvm not active); no other command re-run (counts quoted from `docs/evidence/test-runs/check-20261101T005613Z.txt`, exit 0).
 - **Challenge:** key prompts for the build modules were never recorded verbatim; listed as a gap, not invented.
+
+## 2026-11-01 - CR2-B multi-user backend
+
+- **Module:** Backend API / Authentication
+- **Agent / AI tool (model):** GitHub Copilot backend agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** open sign-up (`POST /api/auth/register`), case-insensitive unique usernames, per-user scoping of expenses and dashboard (ADR-011).
+- **Key prompt:** "Task CR2-B (change request CR-002, ADR-011 ...) Implement multi-user with open sign-up and per-user data, nothing else" (full text in `docs/evidence/prompt-log.jsonl`).
+- **Files created/changed:** see handoff CR2-B.
+- **Testing:** `make lint-backend` exit 0; `pytest tests/unit` 140 passed; `make test-backend` 321 passed, 1 failed (integration route-guard allow-list lacks register).
+- **Challenge:** a functional unique index on `lower(username)` must be declared after the class (column reference, not a string).
+
+### CR2-F - frontend sign-up (2026-11-01)
+- **Technical objective:** `/signup` page, login/sign-up links, auto-login after register, username in header (ADR-011).
+- **Key prompt:** "Task CR2-F (change request CR-002, ADR-011 ...) /signup page ... nothing else" (full text in `docs/evidence/prompt-log.jsonl`).
+- **Files created/changed:** see handoff CR2-F.
+- **Testing:** `make lint` exit 0; `make typecheck` exit 0; `make test-frontend` exit 0, 70 passed.
+- **Challenge:** `safeNext` was private to LoginPage; extracted to `lib/redirect.ts` so both pages share it.
+
+### CR2-T - multi-user verification (2026-11-01)
+- **Technical objective:** independent black-box tests for sign-up and per-user isolation, two-user E2E, auth review update (ADR-011).
+- **Key prompt:** "Task CR2-T (change request CR-002, ADR-011 ...) Verify CR2-B and CR2-F independently" (verbatim text not copied here; see `docs/evidence/prompt-log.jsonl` if logged).
+- **Files created/changed:** see handoff CR2-T.
+- **Testing:** integration subset exit 0, 123 passed; `scripts/check-all.sh --e2e` exit 2 (backend 389 passed, frontend 70 passed, E2E not started): `docs/evidence/test-runs/check-20261101T021658Z.txt`.
+- **Challenge:** E2E uses fixed ports 8000/5173 and refuses to start while the developer's dev servers run; I did not stop them, so E2E and screenshots remain NOT RUN. First full run also failed on `ruff format` of my own new test.

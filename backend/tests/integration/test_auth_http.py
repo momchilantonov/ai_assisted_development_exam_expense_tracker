@@ -13,6 +13,7 @@ from .conftest import BACKEND_DIR, COOKIE, ORIGIN, OTHER_PASSWORD, PASSWORD, USE
 
 LOGIN = "/api/auth/login"
 LOGOUT = "/api/auth/logout"
+REGISTER = "/api/auth/register"
 ME = "/api/auth/me"
 
 
@@ -190,7 +191,7 @@ def test_health_is_public(client: TestClient):
 
 
 def test_every_non_public_route_in_openapi_requires_auth(client: TestClient):
-    public = {"/api/health", LOGIN, LOGOUT}
+    public = {"/api/health", LOGIN, LOGOUT, REGISTER}
     paths = client.get("/api/openapi.json").json()["paths"]
     for path, methods in paths.items():
         if path in public:

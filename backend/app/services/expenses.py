@@ -30,8 +30,9 @@ def to_out(expense: Expense) -> ExpenseOut:
     )
 
 
-def create_expense(db: Session, data: ExpenseInput) -> Expense:
+def create_expense(db: Session, user_id: int, data: ExpenseInput) -> Expense:
     expense = Expense(
+        user_id=user_id,
         amount_cents=data.amount_cents,
         category=data.category.value,
         description=data.description,
@@ -42,8 +43,8 @@ def create_expense(db: Session, data: ExpenseInput) -> Expense:
     return expense
 
 
-def get_expense(db: Session, expense_id: int) -> Expense | None:
-    return db.get(Expense, expense_id)
+def get_expense(db: Session, user_id: int, expense_id: int) -> Expense | None:
+    return db.scalar(select(Expense).where(Expense.id == expense_id, Expense.user_id == user_id))
 
 
 def update_expense(db: Session, expense: Expense, data: ExpenseInput) -> Expense:
@@ -62,6 +63,7 @@ def delete_expense(db: Session, expense: Expense) -> None:
 
 def list_expenses(
     db: Session,
+    user_id: int,
     *,
     category: Category | None,
     date_from: date | None,
@@ -70,7 +72,7 @@ def list_expenses(
     limit: int,
     offset: int,
 ) -> ExpenseList:
-    conditions = []
+    conditions = [Expense.user_id == user_id]
     if category is not None:
         conditions.append(Expense.category == category.value)
     if date_from is not None:
@@ -90,7 +92,7 @@ def list_expenses(
     return ExpenseList(items=[to_out(r) for r in rows], total=total, limit=limit, offset=offset)
 
 
-def build_summary(db: Session, now: datetime, timezone_name: str) -> Summary:
+def build_summary(db: Session, user_id: int, now: datetime, timezone_name: str) -> Summary:
     # `now` is naive UTC (see models.user.utcnow); convert to the configured zone.
     zone = ZoneInfo(timezone_name)
     local_today = now.replace(tzinfo=ZoneInfo("UTC")).astimezone(zone).date()
@@ -101,22 +103,26 @@ def build_summary(db: Session, now: datetime, timezone_name: str) -> Summary:
         else month_start.replace(month=month_start.month + 1)
     )
 
+    mine = Expense.user_id == user_id
     total_cents, count = db.execute(
-        select(func.coalesce(func.sum(Expense.amount_cents), 0), func.count(Expense.id))
+        select(func.coalesce(func.sum(Expense.amount_cents), 0), func.count(Expense.id)).where(mine)
     ).one()
     month_cents = db.scalar(
         select(func.coalesce(func.sum(Expense.amount_cents), 0)).where(
-            Expense.expense_date >= month_start, Expense.expense_date < next_month
+            mine, Expense.expense_date >= month_start, Expense.expense_date < next_month
         )
     )
     per_category_rows = db.execute(
-        select(Expense.category, func.sum(Expense.amount_cents), func.count(Expense.id)).group_by(
-            Expense.category
-        )
+        select(Expense.category, func.sum(Expense.amount_cents), func.count(Expense.id))
+        .where(mine)
+        .group_by(Expense.category)
     )
     per_category = {cat: (cents, n) for cat, cents, n in per_category_rows}
     recent = db.scalars(
-        select(Expense).order_by(Expense.expense_date.desc(), Expense.id.desc()).limit(5)
+        select(Expense)
+        .where(mine)
+        .order_by(Expense.expense_date.desc(), Expense.id.desc())
+        .limit(5)
     ).all()
 
     return Summary(

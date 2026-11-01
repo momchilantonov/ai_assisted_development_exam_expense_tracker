@@ -1,0 +1,31 @@
+# command: make check + make test-e2e
+# started: 2026-11-01T02:16:48Z
+All checks passed!
+unformatted: File would be reformatted
+   --> backend/tests/integration/test_registration_http.py:98:32
+    |
+97  |
+    -     login_cookie = client.post(
+    -         LOGIN, json={"username": USERNAME, "password": PASSWORD}
+    -     ).headers["set-cookie"]
+    -     flags = lambda header: sorted(  # noqa: E731
+    -         p.strip().lower().split("=")[0] for p in header.split(";")[1:]
+98  +     login_cookie = client.post(LOGIN, json={"username": USERNAME, "password": PASSWORD}).headers[
+99  +         "set-cookie"
+100 +     ]
+101 +     flags = (
+102 +         lambda header: sorted(  # noqa: E731
+103 +             p.strip().lower().split("=")[0] for p in header.split(";")[1:]
+104 +         )
+105 |     )
+--------------------------------------------------------------------------------
+187 |     assert (
+    -         client.post(LOGIN, json={"username": "keeper", "password": NEW_PASSWORD}).status_code
+    -         == 200
+188 +         client.post(LOGIN, json={"username": "keeper", "password": NEW_PASSWORD}).status_code == 200
+189 |     )
+    |
+
+1 file would be reformatted, 36 files already formatted
+make: *** [Makefile:50: lint-backend] Error 1
+# finished: 2026-11-01T02:16:48Z exit=2

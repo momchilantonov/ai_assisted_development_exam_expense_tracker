@@ -22,11 +22,14 @@ def engine(tmp_path: Path) -> Iterator[Engine]:
 @pytest.fixture
 def db(engine: Engine) -> Iterator[DbSession]:
     with create_session_factory(engine)() as session:
+        session.add(_user(username="base"))
+        session.commit()
         yield session
 
 
 def _expense(**overrides: object) -> Expense:
     values: dict[str, object] = {
+        "user_id": 1,
         "amount_cents": 1234,
         "category": Category.FOOD.value,
         "expense_date": date(2026, 1, 15),
@@ -74,29 +77,44 @@ def test_expense_accepts_every_contract_category(db: DbSession, category: str) -
     db.commit()
 
 
-def test_user_rejected_when_username_duplicate(db: DbSession) -> None:
-    db.add(_user())
+def test_user_rejected_when_username_duplicate_ignoring_case(db: DbSession) -> None:
+    db.add(_user(username="Owner"))
     db.commit()
-    db.add(_user(id=1))
+    db.add(_user(username="oWNER"))
     with pytest.raises(IntegrityError):
         db.commit()
 
 
-def test_user_rejected_when_id_not_one(db: DbSession) -> None:
-    db.add(_user(id=2))
+def test_users_get_distinct_autoincrement_ids(db: DbSession) -> None:
+    db.add(_user(username="second"))
+    db.commit()
+    assert sorted(u.id for u in db.query(User)) == [1, 2]
+
+
+def test_expense_rejected_when_user_missing(db: DbSession) -> None:
+    db.add(_expense(user_id=99))
     with pytest.raises(IntegrityError):
         db.commit()
+
+
+def test_expense_rejected_when_user_id_null(db: DbSession) -> None:
+    db.add(_expense(user_id=None))
+    with pytest.raises(IntegrityError):
+        db.commit()
+
+
+def test_expense_user_id_is_indexed(engine: Engine) -> None:
+    columns = [i["column_names"] for i in inspect(engine).get_indexes("expenses")]
+    assert ["user_id"] in columns
 
 
 def test_session_rejected_when_user_missing(db: DbSession) -> None:
-    db.add(Session(token_hash="a" * 64, user_id=1, expires_at=datetime(2030, 1, 1)))
+    db.add(Session(token_hash="a" * 64, user_id=99, expires_at=datetime(2030, 1, 1)))
     with pytest.raises(IntegrityError):
         db.commit()
 
 
 def test_session_persists_for_existing_user(db: DbSession) -> None:
-    db.add(_user())
-    db.commit()
     expires = datetime(2030, 1, 1) + timedelta(minutes=5)
     db.add(Session(token_hash="b" * 64, user_id=1, expires_at=expires))
     db.commit()
@@ -106,8 +124,6 @@ def test_session_persists_for_existing_user(db: DbSession) -> None:
 
 
 def test_session_token_hash_unique(db: DbSession) -> None:
-    db.add(_user())
-    db.commit()
     db.add(Session(token_hash="c" * 64, user_id=1, expires_at=datetime(2030, 1, 1)))
     db.commit()
     db.add(Session(token_hash="c" * 64, user_id=1, expires_at=datetime(2030, 1, 1)))

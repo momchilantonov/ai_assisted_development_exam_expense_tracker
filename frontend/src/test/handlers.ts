@@ -41,10 +41,16 @@ export function makeExpense(
   };
 }
 
-const state = { loggedIn: false, expenses: [] as MockExpense[], nextId: 1000 };
+const state = {
+  loggedIn: false,
+  username: TEST_USERNAME,
+  expenses: [] as MockExpense[],
+  nextId: 1000,
+};
 
 export function resetMockState(): void {
   state.loggedIn = false;
+  state.username = TEST_USERNAME;
   state.expenses = [];
   state.nextId = 1000;
 }
@@ -222,6 +228,35 @@ export const handlers = [
     });
   }),
 
+  http.post("/api/auth/register", async ({ request }) => {
+    const body = (await request.json()) as {
+      username?: unknown;
+      password?: unknown;
+    };
+    const name = typeof body.username === "string" ? body.username.trim() : "";
+    const pw = typeof body.password === "string" ? body.password : "";
+    if (name.length < 3 || name.length > 64 || pw.length < 8 || pw.length > 128) {
+      return HttpResponse.json(
+        errorBody("validation_error", "Invalid request.", [
+          { loc: ["body"], msg: "Invalid value" },
+        ]),
+        { status: 422 },
+      );
+    }
+    if (name.toLowerCase() === TEST_USERNAME) {
+      return HttpResponse.json(
+        errorBody("username_taken", "Username is already taken."),
+        { status: 409 },
+      );
+    }
+    state.loggedIn = true;
+    state.username = name;
+    return HttpResponse.json(
+      { username: name, expires_at: EXPIRES_AT },
+      { status: 201 },
+    );
+  }),
+
   http.post("/api/auth/logout", () => {
     state.loggedIn = false;
     return new HttpResponse(null, { status: 204 });
@@ -229,7 +264,7 @@ export const handlers = [
 
   http.get("/api/auth/me", () =>
     state.loggedIn
-      ? HttpResponse.json({ username: TEST_USERNAME, expires_at: EXPIRES_AT })
+      ? HttpResponse.json({ username: state.username, expires_at: EXPIRES_AT })
       : notAuthenticated(),
   ),
 

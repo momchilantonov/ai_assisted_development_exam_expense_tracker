@@ -9,6 +9,10 @@ test("capture screenshots of the running application", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
   await page.screenshot({ path: `${SHOTS}/login.png` });
 
+  await page.goto("/signup");
+  await expect(page.getByRole("heading", { name: "Sign up" })).toBeVisible();
+  await page.screenshot({ path: `${SHOTS}/signup.png` });
+
   await login(page);
   const date = todayUtc();
   const items = [

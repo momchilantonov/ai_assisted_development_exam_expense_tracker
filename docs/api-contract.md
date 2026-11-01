@@ -7,7 +7,7 @@ Base path `/api`. JSON bodies. Session cookie `expense_session` (HttpOnly, SameS
 ## Error envelope (all errors)
 
 `{"error": {"code": "<code>", "message": "<text>", "details": [...optional...]}}`
-Codes: `not_authenticated` (401), `invalid_credentials` (401), `validation_error` (422), `not_found` (404), `forbidden_origin` (403), `internal_error` (500). No stack traces or internals.
+Codes: `not_authenticated` (401), `invalid_credentials` (401), `validation_error` (422), `not_found` (404), `forbidden_origin` (403), `username_taken` (409), `internal_error` (500). No stack traces or internals.
 
 ## Types
 
@@ -21,7 +21,8 @@ Codes: `not_authenticated` (401), `invalid_credentials` (401), `validation_error
 | Method and path | Purpose | Auth | Request | Success | Errors | Status |
 |---|---|---|---|---|---|---|
 | GET `/api/health` | Liveness | No | - | 200 `{status:"ok"}` | - | implemented |
-| POST `/api/auth/login` | Start session | No | `{username, password}` (both non-empty) | 200 `{username, expires_at}` + Set-Cookie | 401 `invalid_credentials` (same for unknown user and bad password), 422, 403 | implemented |
+| POST `/api/auth/register` | Sign up and start session (CR-002) | No | `{username (3-64, trimmed), password (8-128)}` | 201 `{username, expires_at}` + Set-Cookie (same cookie as login) | 409 `username_taken` (case-insensitive), 422, 403 | implemented |
+| POST `/api/auth/login` | Start session | No | `{username, password}` (both non-empty; username matched case-insensitively) | 200 `{username, expires_at}` + Set-Cookie | 401 `invalid_credentials` (same for unknown user and bad password), 422, 403 | implemented |
 | POST `/api/auth/logout` | Delete session row, clear cookie | No (idempotent) | - | 204 | 403 | implemented |
 | GET `/api/auth/me` | Auth status | Yes | - | 200 `{username, expires_at}` | 401 | implemented |
 | GET `/api/categories` | Category list | Yes | - | 200 `Category[]` | 401 | implemented |
@@ -40,16 +41,18 @@ OpenAPI UI at `/api/docs`.
 
 ### Summary
 
-`{total_amount: string, current_month_amount: string, expense_count: int, by_category: [{category, total: string, count: int}] (all 7 categories, zero-filled), recent: Expense[] (latest 5 by date, then id)}`. Dashboard ignores list filters. "Current month" uses `APP_TIMEZONE` (default UTC).
+`{total_amount: string, current_month_amount: string, expense_count: int, by_category: [{category, total: string, count: int}] (all 7 categories, zero-filled), recent: Expense[] (latest 5 by date, then id)}`. Dashboard ignores list filters and covers only the current user's expenses. "Current month" uses `APP_TIMEZONE` (default UTC).
 
 ## Validation rules
 
 - Login: `username` and `password` non-empty strings.
+- Registration: `username` 3-64 characters after trimming, unique ignoring letter case (the typed case is kept for display); `password` 8-128 characters.
 - Expense: amount > 0, <= 999999.99, at most 2 decimals; category in enum; description optional, trimmed, <= 500 characters; `expense_date` a valid ISO date.
 - Path `id` must be a positive integer; unknown id -> 404 `not_found`.
 
 ## Authentication behaviour
 
-- Every endpoint except `health`, `login`, `logout` and the docs requires a valid, unexpired session cookie, otherwise 401 `not_authenticated`.
+- Every endpoint except `health`, `register`, `login`, `logout` and the docs requires a valid, unexpired session cookie, otherwise 401 `not_authenticated`.
+- Per-user data (CR-002): every expense, list total, dashboard figure is scoped to the session user. Another user's expense id returns 404 `not_found` (never 403) on read, update and delete. The user id is taken from the session, never from the request.
 - Session lifetime is absolute (`SESSION_TTL_MINUTES`, default 480). After logout the old cookie value yields 401.
 - A page reload keeps the user logged in until expiry; the frontend checks `GET /api/auth/me` at start.

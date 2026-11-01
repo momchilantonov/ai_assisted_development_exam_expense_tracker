@@ -18,6 +18,7 @@ from tests.conftest import TEST_PASSWORD, TEST_USERNAME, FakeClock
 PUBLIC = {
     ("GET", "/api/health"),
     ("POST", "/api/auth/login"),
+    ("POST", "/api/auth/register"),
     ("POST", "/api/auth/logout"),
 }
 
@@ -170,22 +171,132 @@ def test_allowed_origin_and_missing_origin_pass(client: TestClient, user: str) -
     assert client.post("/api/auth/login", json=body).status_code == 200
 
 
-def test_provision_creates_once_and_does_not_overwrite(app, client: TestClient) -> None:
+def test_provision_creates_if_absent_and_does_not_overwrite(app, client: TestClient) -> None:
     with app.state.session_factory() as db:
         assert provision_user(db, "a", "pw-one") == "created"
         before = db.get(User, 1).password_hash
-        assert provision_user(db, "b", "pw-two") == "exists"
-        user = db.get(User, 1)
-        assert (user.username, user.password_hash) == ("a", before)
-        assert provision_user(db, "b", "pw-two", reset_password=True) == "reset"
-        assert db.get(User, 1).username == "b"
+        assert provision_user(db, "A", "pw-two") == "exists"
+        assert db.get(User, 1).password_hash == before
+        assert provision_user(db, "b", "pw-two") == "created"
+        assert db.get(User, 2).username == "b"
+        assert provision_user(db, "b", "pw-three", reset_password=True) == "reset"
+        assert db.get(User, 1).password_hash == before
 
 
-def test_reset_password_invalidates_existing_sessions(auth_client: TestClient, app) -> None:
+def test_reset_password_invalidates_only_that_users_sessions(auth_client: TestClient, app) -> None:
     with app.state.session_factory() as db:
+        provision_user(db, "other", "other-password")
         provision_user(db, TEST_USERNAME, "new-password", reset_password=True)
 
     assert auth_client.get("/api/auth/me").status_code == 401
+
+
+# --- registration (CR-002) ---
+
+
+def register(client: TestClient, username: str = "alice", password: str = "alice-password"):
+    return client.post("/api/auth/register", json={"username": username, "password": password})
+
+
+def test_register_creates_user_and_logs_in(client: TestClient, app) -> None:
+    response = register(client)
+
+    cookie = response.headers["set-cookie"]
+    assert response.status_code == 201
+    assert response.json() == {"username": "alice", "expires_at": "2026-01-01T20:00:00Z"}
+    assert "HttpOnly" in cookie and "SameSite=strict" in cookie and "Max-Age=28800" in cookie
+    assert client.get("/api/auth/me").json()["username"] == "alice"
+    with app.state.session_factory() as db:
+        stored = db.scalar(select(User))
+    assert stored is not None and stored.password_hash.startswith("$argon2id$")
+    assert "alice-password" not in stored.password_hash
+
+
+def test_register_allows_login_afterwards(client: TestClient) -> None:
+    register(client)
+    client.post("/api/auth/logout")
+
+    response = client.post(
+        "/api/auth/login", json={"username": "alice", "password": "alice-password"}
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize("name", ["alice", "ALICE", "Alice", "  alice  "])
+def test_register_duplicate_username_any_case_returns_409(client: TestClient, name: str) -> None:
+    register(client)
+
+    response = register(client, name, "another-password")
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "username_taken"
+    assert "another-password" not in response.text
+
+
+def test_register_race_on_unique_index_returns_409(client: TestClient, monkeypatch) -> None:
+    # Simulate the lookup missing a row that another request inserted meanwhile.
+    register(client)
+    monkeypatch.setattr("app.services.auth._find_user", lambda db, username: None)
+
+    response = register(client, "ALICE")
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "username_taken"
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {},
+        {"username": "ab", "password": "long-enough"},
+        {"username": "a" * 65, "password": "long-enough"},
+        {"username": "   ", "password": "long-enough"},
+        {"username": "alice", "password": "short"},
+        {"username": "alice", "password": "x" * 129},
+    ],
+)
+def test_register_validation_returns_422(client: TestClient, body: dict) -> None:
+    response = client.post("/api/auth/register", json=body)
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "validation_error"
+    assert "set-cookie" not in response.headers
+
+
+def test_register_accepts_boundary_lengths(client: TestClient) -> None:
+    assert register(client, "abc", "x" * 8).status_code == 201
+    assert register(client, "b" * 64, "x" * 128).status_code == 201
+
+
+def test_register_rejects_foreign_origin(client: TestClient, app) -> None:
+    response = client.post(
+        "/api/auth/register",
+        json={"username": "alice", "password": "alice-password"},
+        headers={"Origin": "http://evil.example"},
+    )
+
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "forbidden_origin"
+    with app.state.session_factory() as db:
+        assert db.scalars(select(User)).all() == []
+
+
+def test_two_users_have_independent_sessions(client: TestClient) -> None:
+    register(client, "alice")
+    client.cookies.clear()
+    register(client, "bob")
+
+    assert client.get("/api/auth/me").json()["username"] == "bob"
+    assert client.post("/api/auth/logout").status_code == 204
+    assert client.get("/api/auth/me").status_code == 401
+
+
+def test_login_username_is_case_insensitive(client: TestClient, user: str) -> None:
+    response = client.post(
+        "/api/auth/login", json={"username": user.upper(), "password": TEST_PASSWORD}
+    )
+    assert response.status_code == 200
+    assert response.json()["username"] == user
 
 
 def test_cli_creates_user_from_env_without_printing_password(

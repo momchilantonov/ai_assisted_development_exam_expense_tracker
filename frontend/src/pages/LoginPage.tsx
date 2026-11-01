@@ -1,23 +1,12 @@
 import { useState, type FormEvent } from "react";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { ApiError } from "../api/client";
 import { useAuth } from "../auth/useAuth";
+import { safeNext } from "../lib/redirect";
 
 interface FieldErrors {
   username?: string;
   password?: string;
-}
-
-// Only same-origin relative paths are allowed as redirect targets.
-function safeNext(raw: string | null): string {
-  if (
-    raw &&
-    raw.startsWith("/") &&
-    !raw.startsWith("//") &&
-    !raw.startsWith("/\\")
-  )
-    return raw;
-  return "/";
 }
 
 export function LoginPage() {
@@ -109,6 +98,18 @@ export function LoginPage() {
           {pending ? "Signing in…" : "Sign in"}
         </button>
       </form>
+      <p>
+        No account yet?{" "}
+        <Link
+          to={
+            params.get("next")
+              ? `/signup?next=${encodeURIComponent(next)}`
+              : "/signup"
+          }
+        >
+          Sign up
+        </Link>
+      </p>
     </main>
   );
 }

@@ -17,6 +17,24 @@ export async function login(page: Page): Promise<void> {
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 }
 
+/** Fills and submits the real /signup form; does not assert the outcome. */
+export async function submitSignup(
+  page: Page,
+  username: string,
+  password: string,
+): Promise<void> {
+  await page.goto("/signup");
+  await page.getByLabel("Username").fill(username);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByLabel("Confirm password").fill(password);
+  await page.getByRole("button", { name: "Sign up" }).click();
+}
+
+/** Password generated at run time; never committed or printed. */
+export function randomPassword(): string {
+  return `Pw-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+}
+
 export function todayUtc(): string {
   return new Date().toISOString().slice(0, 10);
 }

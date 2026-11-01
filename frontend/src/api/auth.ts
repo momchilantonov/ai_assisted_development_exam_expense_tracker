@@ -9,6 +9,14 @@ export function login(credentials: LoginRequest): Promise<Session> {
   });
 }
 
+export function register(credentials: LoginRequest): Promise<Session> {
+  return request<Session>("/auth/register", {
+    method: "POST",
+    body: credentials,
+    skipUnauthorizedHandler: true,
+  });
+}
+
 export function logout(): Promise<void> {
   return request<void>("/auth/logout", {
     method: "POST",

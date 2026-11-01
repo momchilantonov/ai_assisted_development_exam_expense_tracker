@@ -1,7 +1,7 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import CheckConstraint, Date, DateTime, Integer, String
+from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -29,6 +29,7 @@ class Expense(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     amount_cents: Mapped[int] = mapped_column(Integer)
     category: Mapped[str] = mapped_column(String(32))
     description: Mapped[str | None] = mapped_column(String(500), default=None)

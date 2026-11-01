@@ -9,6 +9,11 @@ class LoginInput(BaseModel):
     password: Annotated[str, Field(min_length=1, max_length=1024)]
 
 
+class RegisterInput(BaseModel):
+    username: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=64)]
+    password: Annotated[str, Field(min_length=8, max_length=128)]
+
+
 class SessionInfo(BaseModel):
     username: str
     expires_at: datetime

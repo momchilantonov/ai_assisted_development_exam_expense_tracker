@@ -153,3 +153,49 @@ Deep link to login and return, wrong password, session expiry (401) redirect, fu
 | Test isolation | FAIL, fixed | DEF-005: a root `.env` made one integration test depend on the developer machine |
 
 Limits: review is by reading and grep, not a full audit; `npm audit` findings noted by the frontend agent in dev tooling were not re-run.
+
+## CR2-T multi-user (CR-002, ADR-011) verification and auth review update (2026-11-01)
+
+The A-06 review above is superseded where it assumed one user (item 1 "No registration endpoint; one user only", items 10 and 13/14 scope). Re-reviewed below against ADR-011 and `docs/api-contract.md`. Tests were written from the contract, black-box over HTTP.
+
+### Commands run (fresh)
+
+| Command | Exit | Result | Evidence |
+|---|---|---|---|
+| `pytest tests/integration/test_registration_http.py tests/integration/test_isolation_http.py tests/integration/test_auth_http.py` (in `backend/`) | 0 | 123 passed | terminal only |
+| `scripts/check-all.sh --e2e` (first) | 2 | `make lint-backend` failed: ruff format on my new test file; nothing else ran | `docs/evidence/test-runs/check-20261101T021648Z.txt` |
+| `scripts/check-all.sh --e2e` (second, after `ruff format`) | 2 | lint, typecheck OK; backend 389 passed (303.09 s); frontend 10 files, 70 passed; E2E did not start: `http://127.0.0.1:8000/api/health is already in use` (the user's own `uvicorn --reload` and `vite` dev servers were running, PIDs not stopped by me) | `docs/evidence/test-runs/check-20261101T021658Z.txt` |
+| `npx playwright test --list` (in `e2e/`) | 0 | 4 specs parse, incl. new `multi-user.spec.ts` | terminal only |
+
+E2E (all 4 specs including the new two-user scenario), the new `signup.png` screenshot and refreshed screenshots: NOT RUN. The dev servers on ports 8000/5173 must be stopped, then `scripts/check-all.sh --e2e` re-run. mypy not run.
+
+### New tests
+
+- `backend/tests/integration/test_registration_http.py` (success 201 and body shape, auto-login via `/me`, cookie name/flags equal to login incl. Secure when configured, opaque unique token, token and password stored only hashed, expiry, duplicate username incl. other letter case and whitespace -> 409 `username_taken` with no cookie, existing password untouched, username 2/3/64/65 and password 7/8/128/129 limits, missing/wrong-typed fields, forged and inexact Origin -> 403 and no user created).
+- `backend/tests/integration/test_isolation_http.py` (user B read/update/delete of A's id -> 404 `not_found`, never 403, identical to a nonexistent id, A's data unchanged; lists, filters and pagination exclude other users; dashboard totals, by-category and recent per user; B's failed delete leaves A's dashboard unchanged; client-supplied `user_id` ignored; sessions separate; logout of B keeps A; anonymous 401).
+- `backend/tests/integration/test_auth_http.py`: route-guard allow-list now includes `/api/auth/register`.
+- `e2e/tests/multi-user.spec.ts` (two users in separate browser contexts via the real `/signup` UI, own data only, username in header, duplicate username in other case shows "Username is already taken.", logout of one keeps the other, case-insensitive login), `e2e/support/helpers.ts` (`submitSignup`, run-time `randomPassword`), `e2e/tests/screenshots.spec.ts` (adds `signup.png`). Written but not executed.
+- No other single-user assumption found in `backend/tests/integration/**`, `frontend/tests/flows.test.tsx` or the other E2E specs (the E2E seed user still comes from `create-user`, which the CLI still supports; the existing specs are unaffected by isolation).
+
+### Checklist (CR-002)
+
+| # | Item | Result | Evidence |
+|---|---|---|---|
+| R1 | Registration success: 201, `{username, expires_at}`, user can log in later | PASS | `test_register_creates_user_and_returns_201_with_username_and_expiry`, `test_registered_user_can_log_in_again_after_logout` |
+| R2 | Auto-login cookie: HttpOnly, SameSite=Strict, Path=/, Max-Age, same name and attribute set as login, Secure when configured | PASS | `test_register_cookie_has_same_name_and_flags_as_login`, `test_register_cookie_is_secure_when_configured` |
+| R3 | Origin check on register (forged, inexact, `null` -> 403, no user created, no cookie) | PASS | `test_register_with_forged_origin_is_forbidden_and_creates_nothing`, `test_register_origin_must_match_exactly` |
+| R4 | Validation limits 2/3/64/65 and 7/8/128/129, trimming, wrong types, no password echo | PASS | `test_username_length_limits`, `test_password_length_limits`, `test_register_rejects_missing_or_wrong_typed_fields` |
+| R5 | Duplicate username case-insensitive -> 409, no cookie, existing account untouched, no internals in error | PASS | `test_duplicate_username_in_different_letter_case_returns_409`, `test_duplicate_attempt_does_not_change_existing_password`, `test_duplicate_error_does_not_leak_internals_or_password` |
+| R6 | Enumeration | ACCEPTED RISK (by design) | Sign-up must tell the user that a name is taken (409 `username_taken`), so usernames can be enumerated through register; login stays identical for unknown user and wrong password (`test_wrong_username_and_wrong_password_give_identical_response`). No rate limiting exists (out of scope, not tested) |
+| R7 | Passwords Argon2id-hashed, tokens SHA-256 only, no secrets in responses | PASS | `test_registered_password_is_stored_only_as_argon2_hash`, `test_register_session_token_is_not_stored_in_plaintext`, `test_register_response_has_no_secrets` |
+| R8 | Isolation: foreign id read/update/delete -> 404 `not_found`, never 403, same body as a nonexistent id; A's data unchanged | PASS | `test_user_b_cannot_*`, `test_foreign_id_gives_the_same_response_as_a_nonexistent_id`, `test_foreign_expense_access_is_never_403` |
+| R9 | Lists, filters, pagination and dashboard (total, by category, recent) scoped per user; B's actions do not change A's figures | PASS | `test_list_excludes_other_users_expenses`, `test_filters_and_pagination_never_expose_other_users_rows`, `test_dashboard_totals_are_per_user`, `test_user_b_failed_delete_does_not_change_user_a_dashboard` |
+| R10 | User id comes from the session, not the request | PASS (black-box) | `test_client_supplied_user_id_in_body_is_ignored`, `test_user_id_query_parameter_does_not_widen_the_list` |
+| R11 | Session separation: each cookie resolves to its own user; logout of B keeps A; old B cookie -> 401 | PASS | `test_each_session_resolves_to_its_own_user`, `test_logging_out_user_b_does_not_end_user_a_session`, `test_user_b_cookie_after_logout_cannot_reach_data` |
+| R12 | Route guard over every OpenAPI route with `register` in the allow-list | PASS | `test_every_non_public_route_in_openapi_requires_auth` |
+| R13 | `GET /api/auth/setup-status` removed | PASS | `test_setup_status_endpoint_no_longer_exists` (accepts 401 or 404) |
+| R14 | Real-browser two-user isolation, header username, duplicate error in UI | NOT RUN | `multi-user.spec.ts` not executed (port conflict); only MSW component tests (`SignupPage.test.tsx`, 70 frontend tests passed) |
+| R15 | Schema: DB-level per-user constraints (`lower(username)` unique index, `expenses.user_id` NOT NULL), concurrent registration race | NOT RUN | not tested black-box; concurrency not tested |
+| R16 | Fresh-DB requirement (no migrations, ADR-005): old `backend/data/*.db` incompatible | NOT RUN | tests use temp DBs only; the user's existing dev database was not inspected or touched |
+
+Limits: all new tests passed on first execution and were not shown to fail against a broken implementation (no mutation check). `test_client_supplied_user_id_in_body_is_ignored` and `test_user_id_query_parameter_does_not_widen_the_list` accept 422 or success, so they assert only that no cross-user effect occurs. Secure cookie over real TLS and login brute force remain untested. No defects found in this run.

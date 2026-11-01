@@ -289,3 +289,41 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Task ID(s):** DOC-05 (follow-up; row state not changed by this agent)
 - **Modified files:** `docs/report/final-report.md` (placeholder replaced with the human-confirmed URL), `docs/assignment-evidence.md` (row "Link to GitHub repository" set to DONE; Google Drive stays HUMAN), `docs/agent-handoffs.md`.
 - **Notes:** `README.md` already contained the URL, no change. Nothing committed or pushed; whether the repository is published is not verified.
+
+---
+
+### HANDOFF CR2-B - backend agent - 2026-11-01
+
+- **Task ID(s):** CR2-B (state set to IN_REVIEW; not VERIFIED by me)
+- **Modified files:** `backend/app/models/{user,expense}.py`, `backend/app/schemas/auth.py`, `backend/app/services/{auth,expenses}.py`, `backend/app/api/{auth,expenses}.py`, `backend/app/cli.py`, `backend/tests/unit/{test_auth,test_models}.py`, new `backend/tests/unit/test_isolation.py`, `docs/api-contract.md`.
+- **Decisions:** username keeps typed case; uniqueness via functional unique index `uq_users_username_lower` on `lower(username)`; login also matches case-insensitively. `expenses.user_id` NOT NULL FK (ON DELETE CASCADE) with index. `register_user` pre-checks, then falls back to `IntegrityError` -> 409 `username_taken`. `provision_user` creates if the username is absent; `--reset-password` resets only that user's password and sessions. `GET /api/categories` is a static list (auth only).
+- **Contract:** new `POST /api/auth/register` (201, 409 `username_taken`, 422, 403), per-user behaviour, 404 for foreign ids; noted in `docs/api-contract.md`.
+- **Fresh database required:** no migrations (ADR-005). Delete the existing `backend/data/*.db` (schema changed: users id/index, expenses.user_id).
+- **Results:** `make lint-backend` exit 0 ("All checks passed!", 35 files already formatted). `pytest tests/unit`: 140 passed, exit 0. `make test-backend` (unit + integration): 321 passed, 1 failed, exit 2. `scripts/check-ownership.sh backend` exit 1 only because `frontend/tsconfig.app.json` is modified in the working tree (not by this task; no backend violation reported).
+- **Integration failure for the testing agent (not edited):** `tests/integration/test_auth_http.py::test_every_non_public_route_in_openapi_requires_auth` - its public set lacks `/api/auth/register` (got 422 instead of 401). Other single-user assumptions in `backend/tests/integration/**` were not triggered by this run, but should be reviewed for CR2-T.
+- **Next action:** CR2-F (frontend `/signup`), then CR2-T.
+---
+### HANDOFF CR2-F - frontend agent - 2026-11-01
+- **Task ID(s):** CR2-F (set to IN_REVIEW; not VERIFIED by me)
+- **Modified files:** new `frontend/src/pages/SignupPage.tsx`, `SignupPage.test.tsx`, `frontend/src/lib/redirect.ts` (`safeNext` moved out of LoginPage, shared); changed `frontend/src/{App.tsx,api/auth.ts,auth/authContext.ts,auth/AuthProvider.tsx,pages/LoginPage.tsx,test/handlers.ts}`.
+- **Behaviour:** public `/signup` (username 3-64 trimmed, password 8-128, confirm must match; per-field `aria-invalid`/`aria-describedby`, `aria-live` error regions, `role="alert"` form error, disabled button while pending). 409 `username_taken` -> field message on username; 422/other -> form-level alert. Success calls `AuthContext.register` (state from response, no storage) and navigates to `?next` (same `safeNext` as login). Login and sign-up link to each other, preserving `next`. Header already showed the username (`Layout`); now covered by a test through the sign-up flow.
+- **MSW:** added `POST /api/auth/register` (201/409/422); `/api/auth/me` returns the registered username. Existing login tests unchanged.
+- **Results:** `make lint` exit 0 (backend ruff passed; `eslint .` clean). `make typecheck` exit 0 (`tsc -b`; backend part skipped by the Makefile). `make test-frontend` exit 0: 10 files, 70 tests passed (incl. 8 new sign-up tests and existing `frontend/tests/flows.test.tsx`, 7 passed).
+- **Ownership check:** `scripts/check-ownership.sh frontend` exit 1 only because of uncommitted CR2-B backend/docs changes in the working tree; no frontend violation. `frontend/tsconfig.app.json` not touched.
+- **Known issues / notes:** none for frontend. Username-in-header is not covered by a Layout.test.tsx change; sign-up test asserts it.
+- **Next action:** testing agent (CR2-T) verifies; a two-user E2E should use `/signup`.
+---
+### HANDOFF CR2-T - testing agent - 2026-11-01
+- **Task ID(s):** CR2-T (BLOCKED on E2E execution); CR2-B set to VERIFIED; CR2-F left IN_REVIEW.
+- **Modified files:** new `backend/tests/integration/test_registration_http.py`, `test_isolation_http.py`; `backend/tests/integration/test_auth_http.py` (allow-list + `REGISTER` constant); new `e2e/tests/multi-user.spec.ts`; `e2e/support/helpers.ts` (`submitSignup`, `randomPassword`); `e2e/tests/screenshots.spec.ts` (signup.png); `docs/test-report.md` (CR2-T section); `docs/tasks.md`; this file; `docs/evidence/development-log.md`. No production code changed.
+- **Commands and results:**
+  - `pytest tests/integration/test_registration_http.py tests/integration/test_isolation_http.py tests/integration/test_auth_http.py` (in `backend/`): exit 0, 123 passed.
+  - `scripts/check-all.sh --e2e`: exit 2, ruff format failure in my new test (fixed with `ruff format`): `docs/evidence/test-runs/check-20261101T021648Z.txt`.
+  - `scripts/check-all.sh --e2e`: exit 2; lint and typecheck OK, backend 389 passed, frontend 70 passed, E2E not started because 127.0.0.1:8000 and :5173 were in use by the user's running `uvicorn --reload` / `vite`: `docs/evidence/test-runs/check-20261101T021658Z.txt`.
+  - `npx playwright test --list` (in `e2e/`): exit 0, 4 specs listed.
+  - `scripts/check-ownership.sh testing`: exit 1, listing only other agents' uncommitted CR-002 files and `frontend/tsconfig.app.json`; none of my files are listed.
+- **Verdicts:** CR2-B VERIFIED (backend black-box registration and isolation tests plus 389 passed). CR2-F stays IN_REVIEW: only MSW component tests are green; real-browser E2E and screenshots NOT RUN.
+- **Defects:** none filed (no failing behaviour observed).
+- **Blocker / human action:** stop the dev servers on ports 8000 and 5173 (I did not kill your processes), then run `scripts/check-all.sh --e2e`. That regenerates `login.png`, `expenses.png`, `dashboard.png`, new `signup.png` and executes `multi-user.spec.ts`; the new spec has never run and may need adjustment. Then update CR2-F/CR2-T rows.
+- **Not run:** E2E, screenshots, mypy, mutation check, concurrency (see `docs/test-report.md`).
+- **Next action:** testing agent re-run after the ports are free.

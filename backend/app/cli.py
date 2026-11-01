@@ -60,7 +60,7 @@ def create_user(reset_password: bool) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
-    create = sub.add_parser("create-user", help="Provision the single user")
+    create = sub.add_parser("create-user", help="Create a user if the username is absent")
     create.add_argument("--reset-password", action="store_true")
     args = parser.parse_args(argv)
     return create_user(args.reset_password)
