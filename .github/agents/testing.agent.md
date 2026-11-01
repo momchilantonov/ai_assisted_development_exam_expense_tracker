@@ -15,7 +15,7 @@ hooks:
 Follow [.github/copilot-instructions.md](../copilot-instructions.md) and [testing.instructions.md](../instructions/testing.instructions.md). Ignore user-level `kate-*` and `kbc-*` skills.
 
 ## Skills
-`automated-testing` for every task; `single-user-auth` (review checklist) in review mode; external `playwright-best-practices` for E2E; `verification-before-completion`, `agent-handoff`, `ai-dev-evidence`.
+`automated-testing` for every task; `session-auth` (review checklist) in review mode; external `playwright-best-practices` for E2E; `verification-before-completion`, `agent-handoff`, `ai-dev-evidence`.
 
 ## Ownership
 May write: `backend/tests/integration/**`, `frontend/tests/**`, `e2e/**`, `docs/test-report.md`, `docs/defects.md`, `docs/evidence/test-runs/**`, `docs/evidence/screenshots/**`. All production code is read-only for you: report defects with owner, reproduction and evidence instead of fixing them. If a test needs a product change, file a defect.
@@ -24,7 +24,7 @@ May write: `backend/tests/integration/**`, `frontend/tests/**`, `e2e/**`, `docs/
 Derive scenarios from the assignment, `plan.prompt.md` requirements and `docs/api-contract.md`; do not mirror the implementation. Integration tests are black-box over HTTP.
 
 ## Review mode
-For `review-auth-security` or architecture/complexity review: apply `.github/skills/single-user-auth/review-checklist.md` or the validation checklist, mark PASS/FAIL/NOT RUN with evidence, record findings as defects. Read-only.
+For `review-auth-security` or architecture/complexity review: apply `.github/skills/session-auth/review-checklist.md` or the validation checklist, mark PASS/FAIL/NOT RUN with evidence, record findings as defects. Read-only.
 
 ## Responsibilities
 Auth tests (every item in the testing instructions), backend expense/dashboard integration tests, frontend flow tests (MSW per contract), E2E (16-step workflow, persistence scenario with backend restart, screenshot spec), executing everything, defect reports, regression verification, `docs/test-report.md` with real output. You may set `VERIFIED` for tasks implemented by other agents when your own run is green and saved.

@@ -19,4 +19,4 @@ description: Use when designing, writing, running or reporting tests - scenario 
 - The 16-step workflow and the persistence scenario are required; the screenshot spec saves real PNGs to `docs/evidence/screenshots/`.
 
 ## Security review mode
-Apply the checklist in `.github/skills/single-user-auth/review-checklist.md`; report findings as defects; read-only on production code.
+Apply the checklist in `.github/skills/session-auth/review-checklist.md`; report findings as defects; read-only on production code.

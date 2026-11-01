@@ -1,5 +1,5 @@
-# command: scripts/validate-infra.sh (after CR-002 rule change)
-# started: 2026-11-01T01:59:10Z
+# command: scripts/validate-infra.sh (after skill rename)
+# started: 2026-11-01T11:09:04Z
 
 == toolchain
 python     Python 3.12.12 (/home/manto/.local/bin/python3.12)
@@ -35,7 +35,7 @@ PASS prompt fix-defects: description and valid agent
 PASS prompt generate-exam-documentation: description and valid agent
 PASS prompt final-audit: description and valid agent
 PASS skill fastapi-feature-development: name matches directory, description <= 1024
-PASS skill single-user-auth: name matches directory, description <= 1024
+PASS skill session-auth: name matches directory, description <= 1024
 PASS skill react-feature-development: name matches directory, description <= 1024
 PASS skill automated-testing: name matches directory, description <= 1024
 PASS skill ai-dev-evidence: name matches directory, description <= 1024
@@ -96,4 +96,4 @@ OK no .agents/ directory
     parallel write-capable subagents.
 
 validate-infra: PASS
-# finished: 2026-11-01T01:59:12Z exit=0
+# finished: 2026-11-01T11:09:06Z exit=0

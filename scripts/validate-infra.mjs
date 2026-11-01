@@ -104,7 +104,7 @@ for (const p of prompts) {
 // skills
 const skills = [
   "fastapi-feature-development",
-  "single-user-auth",
+  "session-auth",
   "react-feature-development",
   "automated-testing",
   "ai-dev-evidence",

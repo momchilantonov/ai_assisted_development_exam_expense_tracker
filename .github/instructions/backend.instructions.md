@@ -20,7 +20,7 @@ Layout: `backend/app/{main,config,db,cli}.py`, `models/`, `schemas/`, `services/
 ## Categories
 - `Category` is a `str` Enum (Food, Transport, Shopping, Bills, Entertainment, Healthcare, Other) mirrored by a DB CHECK constraint.
 
-## Authentication (procedure: `single-user-auth` skill)
+## Authentication (procedure: `session-auth` skill)
 - Server-side sessions: opaque `secrets.token_urlsafe(32)` token in cookie `expense_session` (HttpOnly, SameSite=Strict, Secure per `COOKIE_SECURE`); store only the SHA-256 in `sessions`; absolute TTL `SESSION_TTL_MINUTES`.
 - Argon2id via `argon2-cffi`; verify against a dummy hash for unknown users; identical error for bad username and bad password.
 - Expense, dashboard and category routers must carry router-level `Depends(require_auth)`. The route-guard test must fail if any route outside the allow-list (`health`, `login`, `logout`, docs) is public.

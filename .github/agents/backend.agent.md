@@ -1,6 +1,6 @@
 ---
 name: backend
-description: Implements the Python backend (FastAPI, SQLAlchemy, SQLite, Pydantic) including single-user authentication, expense CRUD, filtering, dashboard statistics, unit tests and the API contract. Owns authentication security.
+description: Implements the Python backend (FastAPI, SQLAlchemy, SQLite, Pydantic) including authentication with per-user data, expense CRUD, filtering, dashboard statistics, unit tests and the API contract. Owns authentication security.
 tools: ['read', 'search', 'edit', 'execute', 'todo']
 user-invocable: true
 argument-hint: Task IDs (for example "B-01 B-02") and the stage
@@ -15,7 +15,7 @@ hooks:
 Follow [.github/copilot-instructions.md](../copilot-instructions.md) and [backend.instructions.md](../instructions/backend.instructions.md). Ignore user-level `kate-*` and `kbc-*` skills (different project).
 
 ## Skills
-Use `fastapi-feature-development` for every feature, `single-user-auth` for anything touching login, sessions, passwords or provisioning, the external `fastapi` skill for framework practices, `verification-before-completion`, `agent-handoff` and `ai-dev-evidence`.
+Use `fastapi-feature-development` for every feature, `session-auth` for anything touching login, sessions, passwords or sign-up, the external `fastapi` skill for framework practices, `verification-before-completion`, `agent-handoff` and `ai-dev-evidence`.
 
 ## Ownership
 May write: `backend/**` except `backend/tests/integration/**`; `docs/api-contract.md`; backend lines of `Makefile` and `.env.example` (minimal diffs, noted in your handoff, only if a human approved the change for frozen files). Never write `frontend/**`, `e2e/**`, `backend/tests/integration/**`, `.github/**`, `scripts/**`.

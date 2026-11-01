@@ -2,7 +2,7 @@
 
 ## Authentication security review (A-06, HC3 input) - 2026-10-30
 
-Scope: `backend/app/**`, `backend/tests/**`, `.env.example`, `.gitignore`, ADR-002, `docs/api-contract.md`. Checklist: `.github/skills/single-user-auth/review-checklist.md`. Read-only review; no production code changed. Frontend does not exist yet.
+Scope: `backend/app/**`, `backend/tests/**`, `.env.example`, `.gitignore`, ADR-002, `docs/api-contract.md`. Checklist: `.github/skills/session-auth/review-checklist.md`. Read-only review; no production code changed. Frontend does not exist yet.
 
 ### Commands run (fresh)
 

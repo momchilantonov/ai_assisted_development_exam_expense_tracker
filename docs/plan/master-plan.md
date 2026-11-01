@@ -1,6 +1,7 @@
 # Master Plan (approved) - AI-Driven Expense Tracker
 
 Phase 1 output (GitHub Copilot Plan Mode, 2026-10-30), approved by the user. This file is a condensed copy of the approved plan (tables for per-prompt, per-task and per-test detail were shortened and are realised in `.github/` and `docs/tasks.md`); the full text lives in the Phase 1 chat transcript.
+Note: the authentication scope of this plan (one user, no registration) was later changed to multi-user with open sign-up and per-user data; see ADR-011 in `docs/decisions.md`. The rest of the plan stands.
 Decisions at approval: Local harness; all MAD tools in `.github/`; no MCP; external skills moved from `.agents/skills/` into `.github/skills/`; Python 3.12 via uv and Node 22.x via nvm (preflight outcome, see `docs/evidence/development-log.md`).
 
 ---
