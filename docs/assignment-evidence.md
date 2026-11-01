@@ -16,7 +16,7 @@ Maps each requirement of `project_assignment.md` to files. Status: DONE (evidenc
 | Which tool helped most and why | report section 4 (single tool; no comparison possible) | DONE (honest limit) |
 | What to improve | report section 6 | DONE |
 | At least two screenshots / proof the system works | `docs/evidence/screenshots/{login,expenses,dashboard}.png`; `docs/evidence/test-runs/check-20261101T005613Z.txt` | DONE; human review of screenshots pending (HUMAN) |
-| Link to GitHub repository | placeholder `<GITHUB_URL_TO_BE_ADDED_BY_HUMAN>` in the report; URL recorded in the development log and README | HUMAN |
+| Link to GitHub repository | URL confirmed by the human, present in `docs/report/final-report.md` and `README.md` (push status not verified) | DONE |
 | Google Drive document, anyone with the link can view | not done by agents | HUMAN |
 | 3-6 pages total | `docs/report/final-report.md` (page count not measured; check after export) | NOT VERIFIED |
 

@@ -281,3 +281,11 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **State set:** COMPLETED with one FAIL (clean tree) and gaps below.
 - **Results:** (1) requirements vs `docs/assignment-evidence.md`: cited files exist; PARTIAL on key prompts for modules 1-5, NOT VERIFIED on page/half-page lengths. (2) `make validate` exit 0, backend 291, frontend 62, E2E 3 passed, `docs/evidence/test-runs/check-20261101T012350Z.txt`; 3 real PNG screenshots exist: PASS. (3) secrets scan: no `.env`, `*.db` or credential files tracked; `.env.example` placeholders only; grep hits only in skill docs/test fixtures: PASS. (4) `git status` NOT clean: the audit runs rewrote `docs/evidence/screenshots/{dashboard,expenses}.png` and added `check-20261101T011956Z.txt`, `check-20261101T012350Z.txt`; `check-ownership.sh` backend/frontend/documentation exit 1 only because of these files, testing exit 0: FAIL until the human reviews and commits them. README commands: `make validate` run; `make setup`/`seed-user`/dev servers not re-run.
 - **Human must do (HC5/HC6):** review regenerated screenshots, commit evidence, replace `<GITHUB_URL_TO_BE_ADDED_BY_HUMAN>`, upload report to Google Drive (anyone with link can view), push. Nothing pushed.
+
+---
+
+### HANDOFF DOC-05 follow-up - documentation agent - 2026-11-01
+
+- **Task ID(s):** DOC-05 (follow-up; row state not changed by this agent)
+- **Modified files:** `docs/report/final-report.md` (placeholder replaced with the human-confirmed URL), `docs/assignment-evidence.md` (row "Link to GitHub repository" set to DONE; Google Drive stays HUMAN), `docs/agent-handoffs.md`.
+- **Notes:** `README.md` already contained the URL, no change. Nothing committed or pushed; whether the repository is published is not verified.

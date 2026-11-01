@@ -1,6 +1,6 @@
 # AI-Assisted Development Exam - AI-Driven Expense Tracker
 
-Repository: `<GITHUB_URL_TO_BE_ADDED_BY_HUMAN>` (the development log records https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker as provided by the human; the human confirms the final link).
+Repository: https://github.com/momchilantonov/ai_assisted_development_exam_expense_tracker (URL confirmed by the human).
 
 Source of every claim below: files under `docs/evidence/`, `docs/test-report.md`, `docs/defects.md`, `docs/decisions.md`, `docs/agent-handoffs.md` and git history.
 
