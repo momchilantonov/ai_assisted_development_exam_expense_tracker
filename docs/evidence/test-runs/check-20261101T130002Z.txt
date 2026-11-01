@@ -1,0 +1,90 @@
+# command: make check + make test-e2e
+# started: 2026-11-01T13:00:02Z
+All checks passed!
+37 files already formatted
+
+> expense-tracker-frontend@0.1.0 lint
+> eslint .
+
+backend typecheck skipped (no backend/app or mypy not installed)
+
+> expense-tracker-frontend@0.1.0 typecheck
+> tsc -b
+
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 92%]
+.............................                                            [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/backend/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+389 passed, 1 warning in 306.20s (0:05:06)
+
+> expense-tracker-frontend@0.1.0 test
+> vitest --run
+
+
+ RUN  v3.2.7 /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/frontend
+
+ ✓ src/components/Layout.test.tsx (4 tests) 786ms
+   ✓ layout > shows navigation and the signed-in user, and navigates between pages  409ms
+ ✓ src/pages/DashboardPage.test.tsx (5 tests) 1121ms
+   ✓ dashboard page > shows a loading status, then statistics from decimal strings  412ms
+   ✓ dashboard page > renders an SVG chart with a text alternative and a table of category totals  313ms
+ ✓ src/pages/ExpensesPage.test.tsx (7 tests) 2512ms
+   ✓ expenses page > shows an error with retry that recovers  412ms
+   ✓ expenses page > filters by category and shows a filtered empty state  339ms
+   ✓ expenses page > filters by date range and rejects an inverted range without calling the API  472ms
+   ✓ expenses page > paginates with previous and next  588ms
+ ✓ src/pages/LoginPage.test.tsx (8 tests) 2598ms
+   ✓ login page > signs in and shows the protected home page when credentials are valid  728ms
+   ✓ login page > returns to the requested page after login  386ms
+   ✓ login page > disables the button and shows progress while signing in  458ms
+ ✓ src/api/client.test.ts (8 tests) 141ms
+ ✓ src/pages/SignupPage.test.tsx (8 tests) 3741ms
+   ✓ sign-up page > signs up, logs in and shows the dashboard with the new username  1065ms
+   ✓ sign-up page > honours the next target after sign-up  541ms
+   ✓ sign-up page > shows field-level errors and sends no request for invalid input  338ms
+   ✓ sign-up page > shows an error when the passwords do not match  504ms
+   ✓ sign-up page > shows a username-level message when the username is taken  450ms
+   ✓ sign-up page > shows a form error when the server returns 422  351ms
+   ✓ sign-up page > disables the button while signing up  377ms
+ ✓ tests/flows.test.tsx (7 tests) 3742ms
+   ✓ authentication flow > redirects an anonymous deep link to login and returns to it after signing in  723ms
+   ✓ authentication flow > shows the server error for a wrong password and stays on login  378ms
+   ✓ expense lifecycle flow > creates, edits, summarises and deletes an expense, then logs out  1521ms
+   ✓ expense form validation flow > blocks an invalid amount client-side and maps a server 422 to the field  337ms
+ ✓ src/components/ProtectedRoute.test.tsx (4 tests) 535ms
+   ✓ protected route > redirects anonymous users to login with the requested path  305ms
+ ✓ src/pages/ExpenseFormPage.test.tsx (14 tests) 4090ms
+   ✓ new expense form > shows field-level errors and sends nothing when invalid  937ms
+   ✓ new expense form > rejects a description over 500 characters  305ms
+   ✓ new expense form > creates an expense with a decimal-string amount, shows a toast and returns to the list  719ms
+   ✓ edit expense form > loads the expense, saves changes and shows a toast  403ms
+ ✓ src/lib/money.test.ts (5 tests) 10ms
+
+ Test Files  10 passed (10)
+      Tests  70 passed (70)
+   Start at  15:05:17
+   Duration  7.55s (transform 778ms, setup 7.65s, collect 4.46s, tests 19.28s, environment 11.04s, prepare 2.40s)
+
+
+> expense-tracker-e2e@0.1.0 test
+> playwright test
+
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › tests/mobile.spec.ts:14:1 › expenses and dashboard fit a 360 px viewport without page scroll (7.8s)
+  ✓  2 [chromium] › tests/multi-user.spec.ts:11:1 › two users sign up in separate browser contexts and see only their own data (6.2s)
+  ✓  3 [chromium] › tests/persistence.spec.ts:10:1 › expense survives a backend restart (3.7s)
+  ✓  4 [chromium] › tests/screenshots.spec.ts:6:1 › capture screenshots of the running application (8.7s)
+  ✓  5 [chromium] › tests/workflow.spec.ts:10:1 › full expense workflow (16 steps) (4.2s)
+
+  5 passed (34.4s)
+# finished: 2026-11-01T13:06:00Z exit=0

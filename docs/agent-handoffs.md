@@ -354,3 +354,21 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Results:** `make lint` exit 0; `make typecheck` exit 0; `make test-frontend` exit 0 (10 files, 70 passed); `cd e2e && npx playwright test tests/workflow.spec.ts` exit 0 (1 passed). `scripts/check-ownership.sh frontend` exit 1: only docs/evidence/test-runs files from check-all (7 violations), none of mine.
 - **Not run:** full E2E suite, screenshots.
 - **Next action:** testing agent re-runs the full E2E suite and UI-04.
+
+---
+### HANDOFF UI-04 - testing agent - 2026-11-01
+- **Task ID(s):** UI-04 (set to COMPLETED; DEF-006 open, owner frontend)
+- **Modified files:** new `e2e/tests/mobile.spec.ts` (360 px no page-scroll check for Expenses and Dashboard, writes `expenses-mobile.png`); regenerated `docs/evidence/screenshots/{login,signup,expenses,dashboard}.png`, new `expenses-mobile.png`; `docs/test-report.md`, `docs/defects.md` (DEF-006), `docs/evidence/test-runs/check-20261101T130002Z.txt`. No production code edited.
+- **Results:** `scripts/check-all.sh --e2e` exit 0 (ruff clean, backend 389 passed, frontend 70 passed, E2E 5 passed), `docs/evidence/test-runs/check-20261101T130002Z.txt`. Earlier run `check-20261101T124618Z.txt` exit 2: `workflow.spec.ts` step 12 failed on the tag-icon `innerText`; fixed by frontend, now passing. 360 px page-scroll check: PASS. `scripts/check-ownership.sh testing` exit 0.
+- **Visual review:** all five screenshots exist and were regenerated (mtime 15:05 local). Dark theme, banner, callout, tabs, tag pills and dashboard cards match the reference in spirit; known deviations (gradient banner, no right panel, no Past year tab) are in the UI-01..03 handoff. Screenshots contain rows from other specs (shared DB).
+- **Defect:** DEF-006 (minor, OPEN, frontend): Amount column clipped inside the table at 360 px.
+- **Not run:** mypy, pixel diff, contrast measurement, test for in-table clipping.
+- **Next action:** frontend fixes DEF-006 (optional); documentation runs UI-05 after human UI approval. Only a non-implementer may set VERIFIED.
+---
+### HANDOFF DEF-006 fix - frontend agent - 2026-11-01
+- **Task ID(s):** DEF-006 (UI-04 follow-up; not marked VERIFIED, `docs/defects.md` untouched)
+- **Modified files:** `frontend/src/index.css` only (new `@media (width <= 480px)` block: smaller table font/padding, hidden duplicate `.row-icon`, wrapping smaller tags, stacked Edit/Delete with smaller padding). No markup, behaviour or API change.
+- **Results:** `make lint`, `make typecheck`, `make test-frontend`, `cd e2e && npx playwright test` all exit 0. Regenerated `docs/evidence/screenshots/expenses-mobile.png` viewed: Amount ("1,120.99") and Edit/Delete fully visible at 360 px, no in-table clipping.
+- **Not run:** ownership script, automated in-table clipping test.
+- **Known issue:** last-row border on the actions cell is shorter (pre-existing `.row-actions` is `display:flex` on a `td`).
+- **Next action:** testing agent re-verifies DEF-006 and may close it.

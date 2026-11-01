@@ -73,3 +73,16 @@ Template: `.github/skills/automated-testing/defect-report-template.md`. IDs `DEF
 - **Fix attempts:** 1 / 3
 - **Status:** VERIFIED
 - **Verification evidence:** test now runs the CLI in a scratch repo layout (no `.env`, no INITIAL_* variables); `scripts/check-all.sh --e2e` exit 0 (backend 291 passed), `docs/evidence/test-runs/check-20261101T005014Z.txt`. The test was not run against the old behaviour again after the fix beyond the failing first run above.
+
+### DEF-006 - Amount column clipped in the Expenses table at 360 px
+
+- **Found by / date:** testing agent, UI-04, 2026-11-01
+- **Severity:** minor
+- **Owner:** frontend (`frontend/src/index.css`, `ExpensesPage.tsx`)
+- **Requirement / contract reference:** `docs/design/ui-style-guide.md` (360 px layout); UI-04 no-page-scroll check
+- **Reproduction:** log in, open `/expenses` at 360 px width with an expense of 1,120.99 (spec `e2e/tests/mobile.spec.ts`, image `docs/evidence/screenshots/expenses-mobile.png`).
+- **Expected:** amount and Actions columns reachable without losing the value.
+- **Actual:** the page itself does not scroll (check passes), but the table scrolls inside its container and the Amount column is cut off ("1,120.9", "18.4", "52.0" visible); Edit/Delete are off-screen until the table is scrolled sideways. Observed in the screenshot only; the in-table scroll was not exercised by a test.
+- **Failing test:** none (visual finding, the 360 px test checks page scroll only)
+- **Fix attempts:** 0 / 3
+- **Status:** OPEN

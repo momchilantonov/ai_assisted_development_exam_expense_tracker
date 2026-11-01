@@ -84,7 +84,7 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | UI-01 | Design tokens, base styles and page shell per docs/design/ui-style-guide.md | frontend | CR2-T | VERIFIED | Orchestrator re-ran `scripts/check-all.sh --e2e` exit 0 (backend 389, frontend 70, E2E 4 passed): docs/evidence/test-runs/check-20261101T125323Z.txt; earlier run check-20261101T124618Z.txt failed (tag icon text), fixed |
 | UI-02 | Restyle Expenses page and Dashboard (tags, icons, view tabs, cards) | frontend | UI-01 | VERIFIED | check-all --e2e exit 0: docs/evidence/test-runs/check-20261101T125323Z.txt |
 | UI-03 | Restyle login, sign-up, forms, dialog, toasts, states; 360 px layout | frontend | UI-01 | VERIFIED | check-all --e2e exit 0: docs/evidence/test-runs/check-20261101T125323Z.txt |
-| UI-04 | Regenerate screenshots (incl. expenses-mobile.png), 360 px no-scroll check, test report | testing | UI-02, UI-03 | IN_PROGRESS | |
+| UI-04 | Regenerate screenshots (incl. expenses-mobile.png), 360 px no-scroll check, test report | testing | UI-02, UI-03 | VERIFIED | check-20261101T130002Z.txt (exit 0); after DEF-006 CSS fix orchestrator re-ran check-all --e2e exit 0, 5 E2E passed: check-20261101T131119Z.txt; expenses-mobile.png viewed (amount and actions visible). DEF-006 in docs/defects.md still says OPEN; testing agent to close |
 | UI-05 | Update all documentation after human UI approval | documentation | UI-04 | TODO | |
 | SUB-01 | Collect evidence, key prompts and images (screenshots, GitDiagram, GitIngest resource) | documentation | UI-05 | TODO | run `/create-final-document` |
 | SUB-02 | Write submission.md, build script and MCA85_ai_assisted_development_exam_expense_tracker.docx in the repository root | documentation | SUB-01 | TODO | |

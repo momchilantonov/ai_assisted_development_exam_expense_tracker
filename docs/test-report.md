@@ -199,3 +199,28 @@ E2E (all 4 specs including the new two-user scenario), the new `signup.png` scre
 | R16 | Fresh-DB requirement (no migrations, ADR-005): old `backend/data/*.db` incompatible | NOT RUN | tests use temp DBs only; the user's existing dev database was not inspected or touched |
 
 Limits: all new tests passed on first execution and were not shown to fail against a broken implementation (no mutation check). `test_client_supplied_user_id_in_body_is_ignored` and `test_user_id_query_parameter_does_not_widen_the_list` accept 422 or success, so they assert only that no cross-user effect occurs. Secure cookie over real TLS and login brute force remain untested. No defects found in this run.
+
+## UI-04 Restyle verification: screenshots and 360 px check (2026-11-01)
+
+### Commands run (fresh)
+
+| Command | Exit | Result | Evidence |
+|---|---|---|---|
+| `scripts/check-all.sh --e2e` (first) | 2 | ruff clean; backend 389 passed; frontend 10 files, 70 passed; E2E 3 passed, 1 failed: `workflow.spec.ts` step 12, dashboard category read as "🩺 Healthcare" (`innerText` included the tag icon) instead of "Healthcare" | `docs/evidence/test-runs/check-20261101T124618Z.txt` |
+| `scripts/check-all.sh --e2e` (second, after the frontend fix in `Tag.tsx`/`index.css`) | 0 | ruff clean; backend 389 passed (306.20 s); frontend 10 files, 70 passed; E2E 5 passed (34.4 s) | `docs/evidence/test-runs/check-20261101T130002Z.txt` |
+
+The regression was fixed by the frontend agent (icon now drawn by CSS `data-icon`); the workflow spec was not changed. mypy not run.
+
+### New spec
+
+`e2e/tests/mobile.spec.ts`: at 360 px, Expenses and Dashboard have no page-level horizontal scroll (`scrollWidth <= clientWidth`); also writes `expenses-mobile.png`. Result: PASS (7.8 s). It does not check clipping inside the table (see DEF-006).
+
+### Screenshots (regenerated in the 13:00 run, mtimes 15:05 local; all five exist)
+
+`login.png`, `signup.png`, `expenses.png`, `dashboard.png`, `expenses-mobile.png` in `docs/evidence/screenshots/`.
+
+Visual comparison with `docs/design/reference/image.png` (by eye, no pixel diff):
+- Matches: dark background, light text, banner strip with large emoji icon, yellow-brown callout bar, tab row (All / This month / Past month) with active tab highlighted, table with coloured category tag pills, "VALUES n" footer, dashboard cards and tag-coloured bars.
+- Differs (known, listed in the frontend handoff): banner is a blue gradient, not a photo; no right-hand "Total Expenses" panel; no "Past year" tab; no toolbar icons; no separate Name column; table is full width; login/signup are plain centred cards with no cover (not in the reference).
+- Observations: the Expenses/Dashboard screenshots show rows left by other specs ("e2e persist ...", "Mobile ...") because the specs share one database, so the images are real but not a clean demo dataset. Dashboard "Total spent" 1,490.03 equals the "This month" figure and 8 expenses, consistent with the list.
+- 360 px (`expenses-mobile.png`): no page scroll; Amount column clipped inside the table, filed as DEF-006 (OPEN). Contrast was not measured.

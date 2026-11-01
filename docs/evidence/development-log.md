@@ -252,3 +252,13 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Module:** Frontend
 - **What:** `Tag` icon moved from a text node to `data-icon` + CSS `::before`, so cell text equals the plain category name (E2E `innerText` key).
 - **Results (real):** `make lint`, `make typecheck`, `make test-frontend` (70 passed) exit 0; `npx playwright test tests/workflow.spec.ts` exit 0 (1 passed); `check-ownership.sh frontend` exit 1 (only check-all evidence files).
+
+## 2026-11-01 - UI-04 screenshots and 360 px check (testing agent)
+
+- **Module:** Testing
+- **What:** added `e2e/tests/mobile.spec.ts`, regenerated screenshots, compared them with `docs/design/reference/image.png` by eye, updated `docs/test-report.md`.
+- **Results (real):** first `scripts/check-all.sh --e2e` exit 2 (`check-20261101T124618Z.txt`, workflow step 12 failed on the tag icon in `innerText`); after the frontend fix exit 0, 5 E2E passed (`check-20261101T130002Z.txt`). `scripts/check-ownership.sh testing` exit 0.
+- **Challenge:** the 360 px test passes (no page scroll) while the screenshot shows the Amount column clipped inside the table; filed as DEF-006 instead of hiding it.
+
+## 2026-11-01 - DEF-006 mobile table fix (frontend)
+CSS-only change in `frontend/src/index.css` for widths <= 480 px so the Expenses table fits 360 px. Lint, typecheck, frontend tests and Playwright exit 0; screenshot `expenses-mobile.png` checked visually.
