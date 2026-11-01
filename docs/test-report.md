@@ -60,3 +60,41 @@ Results (real runs): `make lint-backend` exit 0; `make test-backend` exit 0, 283
 Failures: first run had 3 failures: two real (DEF-003, padded amount strings `" 5"`/`"5 "` accepted with 201; now an `xfail(strict=True)` test) and one wrong expected value in my own test (sum arithmetic), corrected. 
 
 Limits: no mutation check was run; the suite takes about 3.5 minutes (observed); concurrency not tested.
+
+## I-01 integration checklist (2026-11-01)
+
+Real HTTP checks were run by the orchestrator against the live app through the Vite proxy (`http://localhost:5173` -> FastAPI) with a throwaway user. Raw output (wrapped at 80 columns, no password or cookie values; verified by grep): `docs/evidence/test-runs/i01-http-checks.txt`, `docs/evidence/test-runs/i01-persistence.txt` (shell prompt line removed; the summary line is truncated in the source output). The testing agent did not run servers and did not re-run these checks; it only recorded and reviewed the output. Status codes of the create calls were not captured in the output (only response bodies). Fresh `scripts/check-all.sh` exit 0: `docs/evidence/test-runs/check-20261101T001953Z.txt` (backend 291 passed, frontend 55 passed).
+
+Known data: Food 10.50 (edited to 11.00) and 20.00, Bills 100.25, Transport 5.05 (deleted). Expected total 131.25, Food 31.00 x2, Bills 100.25 x1, current month 0.00 (data dated Feb/Mar 2026, run date Nov 2026).
+
+| Check | Command / method | Expected | Actual | Result |
+|---|---|---|---|---|
+| Login ok | POST login via proxy, then `GET me` | 200, session cookie, username returned | login `[200]`; `me` `[200]` `{"username":"owner",...}` | PASS |
+| Invalid login: wrong password | POST login | 401 `invalid_credentials` | 401 `invalid_credentials` | PASS |
+| Invalid login: unknown user | POST login | 401, same message as wrong password | 401, identical body | PASS |
+| Invalid login: empty fields | POST login with empty strings | 422 `validation_error` | 422 `validation_error` (username, password too short) | PASS |
+| Bad Origin | POST login and POST create with disallowed Origin | 403 `forbidden_origin` | 403 `forbidden_origin` (both) | PASS |
+| Protected endpoints anonymous | `GET me`, `GET` expense list without cookie | 401 `not_authenticated` | 401 `not_authenticated` (both) | PASS |
+| Categories | `GET` categories | 200, 7 fixed categories | 200, Food, Transport, Shopping, Bills, Entertainment, Healthcare, Other | PASS |
+| Create | POST 4 expenses | bodies with ids 1-4, decimal-string amounts | ids 1-4 with `"10.50"`, `"20.00"`, `"100.25"`, `"5.05"`; status codes not captured | PASS (bodies only) |
+| Validation 422 | POST bad amount, category, date | 422 with details | 422 `validation_error`, three detail entries | PASS |
+| List, default sort | `GET` list | 4 items, newest date first | total 4, order 4, 2, 1, 3 | PASS |
+| Category filter | list `category=Food` | only Food | total 2 (ids 2, 1) | PASS |
+| Date-range filter | list `date_from=2026-03-01&date_to=2026-03-15` | ids 1 and 2, inclusive | total 2 (ids 2, 1) | PASS |
+| Sort ascending | list ascending by date | oldest first | order 3, 1, 2, 4 | PASS |
+| Invalid range | `date_from` after `date_to` | 422 | 422 `validation_error`, "date_from must not be after date_to." | PASS |
+| Edit | PUT/PATCH expense 1 (11.00, "a2") | 200, updated values, `updated_at` changed | 200, `"11.00"`, `a2`, `updated_at` later than `created_at` | PASS |
+| Get | `GET` expense 1 | edited values | 200, edited values | PASS |
+| Not found | `GET` unknown id | 404 `not_found` | 404 `not_found` | PASS |
+| Delete | DELETE expense 4, then `GET` it | 204, then 404 | 204, then 404 | PASS |
+| Dashboard figures | `GET` summary | total 131.25, count 3, Food 31.00 x2, Bills 100.25 x1, current month 0.00 | `total_amount` `"131.25"`, `current_month_amount` `"0.00"`, count 3, Food `"31.00"` x2, Bills `"100.25"` x1, Transport 0.00 x0, recent ids 2, 1, 3 | PASS |
+| Logout, old cookie | POST logout, then `GET me` with old cookie | 204, then 401 | 204, then 401 `not_authenticated` | PASS |
+| Persistence after restart | kill backend, restart, via proxy | proxy error while down, login ok, 3 expenses, same summary | proxy 500 while down; login 200; total 3, ids 2, 1, 3; summary starts `total_amount` `"131.25"`, `current_month_amount` `"0.00"` (output truncated after that); old cookie 401 | PASS (summary only partly captured) |
+| Protected-route redirect in real browser | not run | redirect to login | not run | NOT RUN |
+| UI error handling in real browser | not run | inline/toast errors | not run | NOT RUN |
+| UI create/edit/delete in real browser | not run | forms, confirm dialog, list update | not run | NOT RUN |
+| UI filters and sort in real browser | not run | list updates | not run | NOT RUN |
+
+Browser-level checks are NOT RUN in a real browser. The only evidence is the Vitest and React Testing Library component tests with MSW (jsdom, `make test-frontend`, 55 passed in `check-20261101T001953Z.txt`), which do not exercise a real browser, the proxy or the real backend. Real browser coverage is planned in Playwright tasks T-01 to T-03 (not started).
+
+Limits: single run, one throwaway user; no concurrency, expiry or 360 px checks; the `Set-Cookie` attributes were not inspected in this run.

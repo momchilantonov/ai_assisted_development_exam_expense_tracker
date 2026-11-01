@@ -1,0 +1,53 @@
+--- anon me
+{"error":{"code":"not_authenticated","message":"Authentication required."}} [401]
+--- anon list
+{"error":{"code":"not_authenticated","message":"Authentication required."}} [401]
+--- bad login
+{"error":{"code":"invalid_credentials","message":"Invalid username or password."}} [401]
+--- unknown user
+{"error":{"code":"invalid_credentials","message":"Invalid username or password."}} [401]
+--- empty login
+{"error":{"code":"validation_error","message":"Request validation failed.","details":[{"loc":["body","username"],"msg":"String should have at least 1 character","type":"string_too_short"},{"loc":["body","password"],"msg":"String should have at least 1 character","type":"string_too_short"}]}} [422]
+--- bad origin login
+{"error":{"code":"forbidden_origin","message":"Origin not allowed."}} [403]
+--- login
+[200]
+1
+--- me
+{"username":"owner","expires_at":"2026-11-01T08:24:16.612401Z"} [200]
+--- categories
+["Food","Transport","Shopping","Bills","Entertainment","Healthcare","Other"] [200]
+{"id":1,"amount":"10.50","category":"Food","description":"a","expense_date":"2026-03-01","created_at":"2026-11-01T00:24:16.782078Z","updated_at":"2026-11-01T00:24:16.782088Z"}
+{"id":2,"amount":"20.00","category":"Food","description":"b","expense_date":"2026-03-15","created_at":"2026-11-01T00:24:16.811158Z","updated_at":"2026-11-01T00:24:16.811167Z"}
+{"id":3,"amount":"100.25","category":"Bills","description":"c","expense_date":"2026-02-10","created_at":"2026-11-01T00:24:16.843799Z","updated_at":"2026-11-01T00:24:16.843805Z"}
+{"id":4,"amount":"5.05","category":"Transport","description":"d","expense_date":"2026-03-20","created_at":"2026-11-01T00:24:16.869771Z","updated_at":"2026-11-01T00:24:16.869777Z"}
+--- invalid create
+{"error":{"code":"validation_error","message":"Request validation failed.","details":[{"loc":["body","amount"],"msg":"Value error, amount must have at most 2 decimals and be 0.01..999999.99","type":"value_error"},{"loc":["body","category"],"msg":"Input should be 'Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Healthcare' or 'Other'","type":"enum"},{"loc":["body","expense_date"],"msg":"Input should be a valid date or datetime, month value is outside expected range of 1-12","type":"date_from_datetime_parsing"}]}} [422]
+--- create no origin-header check bad
+{"error":{"code":"forbidden_origin","message":"Origin not allowed."}} [403]
+--- list all desc
+{"items":[{"id":4,"amount":"5.05","category":"Transport","description":"d","expense_date":"2026-03-20","created_at":"2026-11-01T00:24:16.869771Z","updated_at":"2026-11-01T00:24:16.869777Z"},{"id":2,"amount":"20.00","category":"Food","description":"b","expense_date":"2026-03-15","created_at":"2026-11-01T00:24:16.811158Z","updated_at":"2026-11-01T00:24:16.811167Z"},{"id":1,"amount":"10.50","category":"Food","description":"a","expense_date":"2026-03-01","created_at":"2026-11-01T00:24:16.782078Z","updated_at":"2026-11-01T00:24:16.782088Z"},{"id":3,"amount":"100.25","category":"Bills","description":"c","expense_date":"2026-02-10","created_at":"2026-11-01T00:24:16.843799Z","updated_at":"2026-11-01T00:24:16.843805Z"}],"total":4,"limit":50,"offset":0} [200]
+--- filter Food
+{"items":[{"id":2,"amount":"20.00","category":"Food","description":"b","expense_date":"2026-03-15","created_at":"2026-11-01T00:24:16.811158Z","updated_at":"2026-11-01T00:24:16.811167Z"},{"id":1,"amount":"10.50","category":"Food","description":"a","expense_date":"2026-03-01","created_at":"2026-11-01T00:24:16.782078Z","updated_at":"2026-11-01T00:24:16.782088Z"}],"total":2,"limit":50,"offset":0} [200]
+--- range 03-01..03-15
+{"items":[{"id":2,"amount":"20.00","category":"Food","description":"b","expense_date":"2026-03-15","created_at":"2026-11-01T00:24:16.811158Z","updated_at":"2026-11-01T00:24:16.811167Z"},{"id":1,"amount":"10.50","category":"Food","description":"a","expense_date":"2026-03-01","created_at":"2026-11-01T00:24:16.782078Z","updated_at":"2026-11-01T00:24:16.782088Z"}],"total":2,"limit":50,"offset":0} [200]
+--- sort asc
+{"items":[{"id":3,"amount":"100.25","category":"Bills","description":"c","expense_date":"2026-02-10","created_at":"2026-11-01T00:24:16.843799Z","updated_at":"2026-11-01T00:24:16.843805Z"},{"id":1,"amount":"10.50","category":"Food","description":"a","expense_date":"2026-03-01","created_at":"2026-11-01T00:24:16.782078Z","updated_at":"2026-11-01T00:24:16.782088Z"},{"id":2,"amount":"20.00","category":"Food","description":"b","expense_date":"2026-03-15","created_at":"2026-11-01T00:24:16.811158Z","updated_at":"2026-11-01T00:24:16.811167Z"},{"id":4,"amount":"5.05","category":"Transport","description":"d","expense_date":"2026-03-20","created_at":"2026-11-01T00:24:16.869771Z","updated_at":"2026-11-01T00:24:16.869777Z"}],"total":4,"limit":50,"offset":0} [200]
+--- bad range
+{"error":{"code":"validation_error","message":"date_from must not be after date_to."}} [422]
+--- edit 1
+{"id":1,"amount":"11.00","category":"Food","description":"a2","expense_date":"2026-03-01","created_at":"2026-11-01T00:24:16.782078Z","updated_at":"2026-11-01T00:24:17.011799Z"} [200]
+--- get 1
+{"id":1,"amount":"11.00","category":"Food","description":"a2","expense_date":"2026-03-01","created_at":"2026-11-01T00:24:16.782078Z","updated_at":"2026-11-01T00:24:17.011799Z"} [200]
+--- 404
+{"error":{"code":"not_found","message":"Expense not found."}} [404]
+--- delete 4
+ [204]
+--- get 4 after delete
+{"error":{"code":"not_found","message":"Expense not found."}} [404]
+--- summary
+{"total_amount":"131.25","current_month_amount":"0.00","expense_count":3,"by_category":[{"category":"Food","total":"31.00","count":2},{"category":"Transport","total":"0.00","count":0},{"category":"Shopping","total":"0.00","count":0},{"category":"Bills","total":"100.25","count":1},{"category":"Entertainment","total":"0.00","count":0},{"category":"Healthcare","total":"0.00","count":0},{"category":"Other","total":"0.00","count":0}],"recent":[{"id":2,"amount":"20.00","category":"Food","description":"b","expense_date":"2026-03-15","created_at":"2026-11-01T00:24:16.811158Z","updated_at":"2026-11-01T00:24:16.811167Z"},{"id":1,"amount":"11.00","category":"Food","description":"a2","expense_date":"2026-03-01","created_at":"2026-11-01T00:24:16.782078Z","updated_at":"2026-11-01T00:24:17.011799Z"},{"id":3,"amount":"100.25","category":"Bills","description":"c","expense_date":"2026-02-10","created_at":"2026-11-01T00:24:16.843799Z","updated_at":"2026-11-01T00:24:16.843805Z"}]} [200]
+--- logout
+ [204]
+--- old cookie me
+{"error":{"code":"not_authenticated","message":"Authentication required."}} [401]

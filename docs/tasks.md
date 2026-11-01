@@ -1,6 +1,6 @@
 # Task board
 
-Current phase: 3 (application). HC2 and HC3 passed 2026-10-30. Current stage: E complete (frontend F-01..F-06 VERIFIED); next I-01 once X-06 is VERIFIED.
+Current phase: 3 (application). HC2 and HC3 passed 2026-10-30. Current stage: E complete (frontend F-01..F-06 VERIFIED); Stage F: I-01 COMPLETED (HTTP-level; real-browser checks deferred to T-01..T-03); next T-01.
 
 States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPLETED` = owner finished with evidence; `VERIFIED` = an agent that did not implement the task re-ran the check and saved the output. Update only your own rows; append evidence links. Human checkpoints: HC1 plan (done), HC2 infra, HC3 auth review, HC4 E2E pass, HC5 report review, HC6 publish.
 
@@ -37,14 +37,14 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | X-03 | Filters, sorting, pagination | backend | X-02 | VERIFIED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05; verified by testing agent: backend/tests/integration/test_expenses_http.py, 283 passed 2 xfailed, check-20261030T165536Z.txt |
 | X-04 | Dashboard service/route and categories | backend | X-02 | VERIFIED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05; verified by testing agent: backend/tests/integration/test_expenses_http.py, 283 passed 2 xfailed, check-20261030T165536Z.txt |
 | X-05 | Publish contract updates | backend | X-04 | VERIFIED | `make lint-backend` exit 0; `make test-backend` exit 0 (159 passed); `scripts/check-ownership.sh backend` exit 0; tests in backend/tests/unit/test_expenses.py; handoff X-01..X-05; verified by testing agent: backend/tests/integration/test_expenses_http.py, 283 passed 2 xfailed, check-20261030T165536Z.txt |
-| X-06 | Expense and dashboard integration tests | testing | X-05 | COMPLETED | make lint-backend exit 0; make test-backend exit 0 (283 passed, 2 xfailed for open DEF-003); scripts/check-all.sh exit 0, docs/evidence/test-runs/check-20261030T165536Z.txt; scripts/check-ownership.sh testing exit 0 |
+| X-06 | Expense and dashboard integration tests | testing | X-05 | VERIFIED | Orchestrator re-ran scripts/check-all.sh exit 0 (backend 291 passed, frontend 55 passed), docs/evidence/test-runs/check-20261101T001953Z.txt; DEF-003 VERIFIED |
 | F-01 | Frontend scaffold (Vite react-ts strict, ESLint, Vitest, RTL, MSW, proxy) | frontend | INF-11 | VERIFIED | Orchestrator re-ran lint/typecheck/test (20 passed)/ownership: all exit 0; owner evidence in docs/agent-handoffs.md |
 | F-02 | API client, AuthContext, ProtectedRoute, login page | frontend | F-01 | VERIFIED | Orchestrator re-ran lint/typecheck/test (20 passed)/ownership: all exit 0; owner evidence in docs/agent-handoffs.md |
 | F-03 | Layout, navigation, logout, global 401 handling | frontend | F-02 | VERIFIED | Orchestrator re-ran lint/typecheck/test (33 passed)/ownership: all exit 0; handoff F-03/F-04 |
 | F-04 | Expense list, filters, sort, pagination | frontend | F-03 | VERIFIED | Orchestrator re-ran lint/typecheck/test (33 passed)/ownership: all exit 0; handoff F-03/F-04 |
 | F-05 | Create/edit forms, validation, delete confirmation, toasts | frontend | F-04 | VERIFIED | Orchestrator re-ran lint/typecheck/test (55 passed)/ownership: all exit 0; owner: handoff F-05/F-06 |
 | F-06 | Dashboard page and SVG chart | frontend | F-03 | VERIFIED | Orchestrator re-ran lint/typecheck/test (55 passed)/ownership: all exit 0; owner: handoff F-05/F-06 |
-| I-01 | Integration run and checklist | orchestrator | X-06, F-06 | TODO | |
+| I-01 | Integration run and checklist | orchestrator | X-06, F-06 | COMPLETED | Real HTTP checks via Vite proxy, 22 PASS: docs/evidence/test-runs/i01-http-checks.txt, i01-persistence.txt; checklist in docs/test-report.md; browser UI checks NOT RUN (covered by T-01..T-03); no defects found |
 
 ## Phase 4 - testing
 

@@ -167,3 +167,15 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Files created/changed:** `frontend/src/pages/{ExpenseFormPage,DashboardPage,ExpensesPage}.tsx`, `frontend/src/components/{ConfirmDialog,ToastProvider,Layout}.tsx` (+ `toastContext.ts`, `useToast.ts`), `frontend/src/{lib/money.ts,api/*,App.tsx,index.css,test/handlers.ts}`, colocated tests, `docs/tasks.md` (F-05, F-06 rows).
 - **Testing:** `make lint-frontend` exit 0; `make typecheck-frontend` exit 0; `make test-frontend` exit 0 (8 files, 55 passed); `scripts/check-ownership.sh frontend` exit 0. Not run: browser, E2E, 360 px visual check.
 - **Challenge:** the first test run had 14 failures: form tests asserted before the form finished loading (the heading renders during loading) and old tests expected the placeholder home heading; tests now wait for the Amount field and the new "Dashboard" heading.
+
+## 2026-11-01 - I-01 integration run evidence recording (I-01)
+
+- **Module:** Testing and integration
+- **Agent / AI tool (model):** GitHub Copilot testing agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** Record the orchestrator's real HTTP checks (Vite proxy -> FastAPI) as an integration checklist.
+- **Implementation steps:** grepped the raw outputs for secrets (only field names matched), copied them to test-runs, wrote the checklist table in `docs/test-report.md`; no servers were run by this agent.
+- **Key prompt:** none
+- **Files created/changed:** `docs/evidence/test-runs/i01-http-checks.txt`, `docs/evidence/test-runs/i01-persistence.txt`, `docs/test-report.md`, `docs/evidence/development-log.md`.
+- **Testing strategy and actual results:** orchestrator-run `scripts/check-all.sh` exit 0 (backend 291 passed, frontend 55 passed, `docs/evidence/test-runs/check-20261101T001953Z.txt`); live HTTP checks all as expected. Browser-level checks: not run.
+- **Challenge (CHAL-nn):** none; the persistence output summary line is truncated and create status codes were not captured, noted in the report.
+- **Solution applied:** n/a

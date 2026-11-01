@@ -1,0 +1,6 @@
+backend down, via proxy: 500
+login 200
+total 3 [2, 1, 3]
+{"total_amount":"131.25","current_month_amount":"0.00","expe
+
+{"error":{"code":"not_authenticated","message":"Authentication required."}} old cookie 401
