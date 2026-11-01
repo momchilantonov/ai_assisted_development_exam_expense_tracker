@@ -66,5 +66,5 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | DOC-02 | Finalise architecture.md and README | documentation | DOC-01 | COMPLETED | docs/agent-handoffs.md (handoff DOC-01..DOC-04); files in docs/ and README.md |
 | DOC-03 | Draft final report | documentation | DOC-01 | COMPLETED | docs/agent-handoffs.md (handoff DOC-01..DOC-04); files in docs/ and README.md |
 | DOC-04 | Assignment compliance matrix | documentation | DOC-03 | COMPLETED | docs/agent-handoffs.md (handoff DOC-01..DOC-04); files in docs/ and README.md |
-| DOC-05 | Final audit (HC5) | orchestrator | DOC-04 | TODO | |
+| DOC-05 | Final audit (HC5) | orchestrator | DOC-04 | COMPLETED | `make validate` exit 0, check-20261101T012350Z.txt; handoff DOC-05; tree not clean (regenerated screenshots, new test-run files) |
 | DOC-06 | Human publishes: GitHub push, Drive upload and sharing (HC6) | human | DOC-05 | TODO | |

@@ -1,0 +1,64 @@
+# command: make check
+# started: 2026-11-01T01:19:56Z
+All checks passed!
+34 files already formatted
+
+> expense-tracker-frontend@0.1.0 lint
+> eslint .
+
+backend typecheck skipped (no backend/app or mypy not installed)
+
+> expense-tracker-frontend@0.1.0 typecheck
+> tsc -b
+
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+........................................................................ [ 74%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/backend/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+291 passed, 1 warning in 215.71s (0:03:35)
+
+> expense-tracker-frontend@0.1.0 test
+> vitest --run
+
+
+ RUN  v3.2.7 /home/manto/Documents/Projects/ai_assisted_development_exam_expense_tracker/frontend
+
+ ✓ src/components/ProtectedRoute.test.tsx (4 tests) 589ms
+   ✓ protected route > redirects anonymous users to login with the requested path  350ms
+ ✓ src/components/Layout.test.tsx (4 tests) 797ms
+   ✓ layout > shows navigation and the signed-in user, and navigates between pages  424ms
+ ✓ src/pages/DashboardPage.test.tsx (5 tests) 994ms
+   ✓ dashboard page > shows a loading status, then statistics from decimal strings  378ms
+ ✓ src/pages/ExpensesPage.test.tsx (7 tests) 1890ms
+   ✓ expenses page > shows an error with retry that recovers  324ms
+   ✓ expenses page > filters by date range and rejects an inverted range without calling the API  319ms
+   ✓ expenses page > paginates with previous and next  411ms
+ ✓ src/pages/LoginPage.test.tsx (8 tests) 2092ms
+   ✓ login page > signs in and shows the protected home page when credentials are valid  663ms
+   ✓ login page > returns to the requested page after login  308ms
+   ✓ login page > disables the button and shows progress while signing in  332ms
+ ✓ src/api/client.test.ts (8 tests) 104ms
+ ✓ src/lib/money.test.ts (5 tests) 15ms
+ ✓ tests/flows.test.tsx (7 tests) 3162ms
+   ✓ authentication flow > redirects an anonymous deep link to login and returns to it after signing in  731ms
+   ✓ authentication flow > shows the server error for a wrong password and stays on login  317ms
+   ✓ expense lifecycle flow > creates, edits, summarises and deletes an expense, then logs out  1321ms
+ ✓ src/pages/ExpenseFormPage.test.tsx (14 tests) 3190ms
+   ✓ new expense form > shows field-level errors and sends nothing when invalid  674ms
+   ✓ new expense form > rejects a description over 500 characters  330ms
+   ✓ new expense form > creates an expense with a decimal-string amount, shows a toast and returns to the list  545ms
+   ✓ edit expense form > loads the expense, saves changes and shows a toast  361ms
+
+ Test Files  9 passed (9)
+      Tests  62 passed (62)
+   Start at  03:23:39
+   Duration  5.83s (transform 774ms, setup 5.98s, collect 3.50s, tests 12.83s, environment 8.51s, prepare 1.86s)
+
+# finished: 2026-11-01T01:23:45Z exit=0

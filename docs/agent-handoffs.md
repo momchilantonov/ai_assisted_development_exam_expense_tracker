@@ -272,3 +272,12 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 
 - Human replied "HC5 approved" after the DOC-01..DOC-04 handoff. DOC-05 (orchestrator final audit) and DOC-06 (human publishing) rows are not changed by this agent.
 - Still open for the human: screenshot review, repository URL in the report, Google Drive upload and sharing.
+
+---
+
+### HANDOFF DOC-05 - orchestrator final audit - 2026-11-01
+
+- **Task ID(s):** DOC-05
+- **State set:** COMPLETED with one FAIL (clean tree) and gaps below.
+- **Results:** (1) requirements vs `docs/assignment-evidence.md`: cited files exist; PARTIAL on key prompts for modules 1-5, NOT VERIFIED on page/half-page lengths. (2) `make validate` exit 0, backend 291, frontend 62, E2E 3 passed, `docs/evidence/test-runs/check-20261101T012350Z.txt`; 3 real PNG screenshots exist: PASS. (3) secrets scan: no `.env`, `*.db` or credential files tracked; `.env.example` placeholders only; grep hits only in skill docs/test fixtures: PASS. (4) `git status` NOT clean: the audit runs rewrote `docs/evidence/screenshots/{dashboard,expenses}.png` and added `check-20261101T011956Z.txt`, `check-20261101T012350Z.txt`; `check-ownership.sh` backend/frontend/documentation exit 1 only because of these files, testing exit 0: FAIL until the human reviews and commits them. README commands: `make validate` run; `make setup`/`seed-user`/dev servers not re-run.
+- **Human must do (HC5/HC6):** review regenerated screenshots, commit evidence, replace `<GITHUB_URL_TO_BE_ADDED_BY_HUMAN>`, upload report to Google Drive (anyone with link can view), push. Nothing pushed.
