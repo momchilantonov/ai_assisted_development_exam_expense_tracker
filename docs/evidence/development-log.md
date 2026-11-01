@@ -191,3 +191,13 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 - **Testing strategy and actual results:** final `scripts/check-all.sh --e2e` exit 0: backend 291 passed, frontend 62 passed, E2E 3 passed. Earlier runs exit 2 (see challenges).
 - **Challenge (CHAL-nn):** (1) first run failed: an integration test depended on the developer's root `.env` (DEF-005); (2) second run failed on a race in my new frontend flow test; (3) first screenshots had a toast covering the table.
 - **Solution applied:** (1) run that CLI test in a scratch repo layout; (2) wait for the list heading and use cell roles; (3) wait for the toast to disappear before capturing.
+
+## 2026-11-01 - Documentation (DOC-01..DOC-04)
+
+- **Module:** Documentation
+- **Agent / AI tool (model):** GitHub Copilot documentation agent (Claude Sonnet 5.5 as stated by the session)
+- **Technical objective:** inventory evidence, finalise architecture and README, write the final report and the assignment compliance matrix.
+- **Key prompt:** `.github/prompts/generate-exam-documentation.prompt.md` ("Execute DOC-01..DOC-04.").
+- **Files created/changed:** `README.md`, `docs/architecture.md`, `docs/report/final-report.md`, `docs/assignment-evidence.md`.
+- **Testing:** `make check-env` exit 2 (Node 22.13.1 below 22.20 in this shell, nvm not active); no other command re-run (counts quoted from `docs/evidence/test-runs/check-20261101T005613Z.txt`, exit 0).
+- **Challenge:** key prompts for the build modules were never recorded verbatim; listed as a gap, not invented.

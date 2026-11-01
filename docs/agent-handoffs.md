@@ -255,3 +255,20 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Test results (Node 22):** `npm --prefix frontend run typecheck` exit 0; `--listFilesOnly` lists `tests/flows.test.tsx`; injected `number = "x"` gave TS2322, exit 2; after revert exit 0.
 - **Known issues:** none for DEF-004.
 - **Next action:** orchestrator proceeds with T-06.
+
+---
+
+### HANDOFF DOC-01..DOC-04 - documentation agent - 2026-11-01
+
+- **Task ID(s):** DOC-01, DOC-02, DOC-03, DOC-04
+- **State set:** COMPLETED (not VERIFIED; DOC-05 audit is the orchestrator's).
+- **Modified files:** `README.md`, `docs/architecture.md`, `docs/report/final-report.md`, `docs/assignment-evidence.md`, `docs/evidence/development-log.md`, `docs/tasks.md` (own rows).
+- **Commands run:** `make check-env` exit 2 (Node 22.13.1 in this shell); `file docs/evidence/screenshots/*.png` (3 PNGs); `scripts/check-ownership.sh documentation` see below.
+- **Known issues / gaps:** no verbatim prompts for build modules; page lengths unmeasured; `make setup`/`seed-user`/dev servers not re-run; screenshots not reviewed by a human.
+- **Human must do:** review the three screenshots for sensitive data; confirm the repository URL and replace `<GITHUB_URL_TO_BE_ADDED_BY_HUMAN>` in the report; export the report to a Google Drive document and set "anyone with the link can view".
+- **Next action:** orchestrator DOC-05 final audit (HC5).
+
+### NOTE HC5 - documentation agent - 2026-11-01
+
+- Human replied "HC5 approved" after the DOC-01..DOC-04 handoff. DOC-05 (orchestrator final audit) and DOC-06 (human publishing) rows are not changed by this agent.
+- Still open for the human: screenshot review, repository URL in the report, Google Drive upload and sharing.

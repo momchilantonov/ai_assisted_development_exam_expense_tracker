@@ -62,9 +62,9 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 
 | ID | Task | Agent | Depends | State | Evidence |
 |---|---|---|---|---|---|
-| DOC-01 | Compile and verify evidence | documentation | HC4 | TODO | |
-| DOC-02 | Finalise architecture.md and README | documentation | DOC-01 | TODO | |
-| DOC-03 | Draft final report | documentation | DOC-01 | TODO | |
-| DOC-04 | Assignment compliance matrix | documentation | DOC-03 | TODO | |
+| DOC-01 | Compile and verify evidence | documentation | HC4 | COMPLETED | docs/agent-handoffs.md (handoff DOC-01..DOC-04); files in docs/ and README.md |
+| DOC-02 | Finalise architecture.md and README | documentation | DOC-01 | COMPLETED | docs/agent-handoffs.md (handoff DOC-01..DOC-04); files in docs/ and README.md |
+| DOC-03 | Draft final report | documentation | DOC-01 | COMPLETED | docs/agent-handoffs.md (handoff DOC-01..DOC-04); files in docs/ and README.md |
+| DOC-04 | Assignment compliance matrix | documentation | DOC-03 | COMPLETED | docs/agent-handoffs.md (handoff DOC-01..DOC-04); files in docs/ and README.md |
 | DOC-05 | Final audit (HC5) | orchestrator | DOC-04 | TODO | |
 | DOC-06 | Human publishes: GitHub push, Drive upload and sharing (HC6) | human | DOC-05 | TODO | |

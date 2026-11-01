@@ -1,6 +1,6 @@
 # Architecture
 
-Status: design from the approved plan (`docs/plan/master-plan.md`). Finalised by the documentation agent in Phase 5 after implementation.
+Status: finalised in Phase 5 against the implemented code (plan: `docs/plan/master-plan.md`). Diagram and module list match the files under `backend/app` and `frontend/src`.
 
 ```mermaid
 flowchart TD
@@ -25,7 +25,12 @@ flowchart TD
 2. Backend API: FastAPI routes, services, error envelope, contract in `docs/api-contract.md`.
 3. Database and persistence: SQLite, SQLAlchemy 2.x models, constraints, `create_all` (ADR-003..005).
 4. Frontend: React + TypeScript (strict) + Vite, protected routes, dashboard, expense list and forms.
-5. Testing and integration: pytest, Vitest + RTL + MSW, Playwright E2E.
+5. Testing and integration: pytest (unit in `backend/tests/unit`, black-box HTTP in `backend/tests/integration`), Vitest + RTL + MSW (`frontend/src/**/*.test.*`, `frontend/tests/flows.test.tsx`), Playwright E2E in `e2e/` (16-step workflow, persistence across backend restart, screenshots) on a temporary SQLite file with a run-time generated password.
+
+## Code layout
+
+- Backend: `app/main.py` (factory), `api/{auth,expenses,health}.py`, `core/{deps,errors,origin,security}.py`, `models/{user,session,expense}.py`, `schemas/{auth,expense}.py`, `services/{auth,expenses}.py`, `cli.py`, `config.py`, `db.py`.
+- Frontend: `src/api` (typed client, 401 hook), `src/auth` (AuthContext), `src/components` (Layout, ProtectedRoute, ConfirmDialog, ToastProvider), `src/pages` (Login, Expenses, ExpenseForm, Dashboard), `src/lib/money.ts`.
 
 ## AI development system
 
