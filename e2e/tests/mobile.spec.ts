@@ -31,7 +31,10 @@ test("expenses and dashboard fit a 360 px viewport without page scroll", async (
     timeout: 10_000,
   });
   await noHorizontalScroll(page);
-  await page.screenshot({ path: `${SHOTS}/expenses-mobile.png`, fullPage: true });
+  await page.screenshot({
+    path: `${SHOTS}/expenses-mobile.png`,
+    fullPage: true,
+  });
 
   await page.getByRole("link", { name: "Dashboard" }).click();
   await expect(page.getByText("Total spent")).toBeVisible();

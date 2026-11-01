@@ -38,6 +38,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-padding-top: 4rem;
+}
+
 body {
   margin: 0;
   font-size: 0.9375rem;
@@ -95,6 +99,9 @@ main {
   align-items: center;
   gap: 0.5rem 1.5rem;
   padding: 0.5rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
 }
@@ -140,15 +147,51 @@ main {
   height: 12rem;
   margin: -1rem -1rem 0;
   background:
-    radial-gradient(circle at 20% 30%, rgb(42 90 133 / 70%), transparent 55%),
-    linear-gradient(135deg, #0f3a3f, #12264a);
+    linear-gradient(to bottom, rgb(25 25 25 / 35%), rgb(25 25 25 / 75%)),
+    url("./assets/cover.jpg") center 60% / cover no-repeat;
+  background-color: #191919;
+}
+
+.page-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 1rem;
+}
+
+.page-header > .cover,
+.page-header > :not(.page-icon, h1) {
+  grid-column: 1 / -1;
 }
 
 .page-icon {
-  margin: -2.25rem 0 0.25rem;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  margin: -2rem 0 0 0.25rem;
   position: relative;
-  font-size: 4.5rem;
+  font-size: 2rem;
   line-height: 1;
+  border-radius: 1rem;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 45%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+
+.page-header h1 {
+  margin-top: 0.75rem;
+  font-size: clamp(1.625rem, 4vw, 2.125rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  background: linear-gradient(180deg, #fff, rgb(255 255 255 / 68%));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--color-title);
 }
 
 .callout {
@@ -175,6 +218,7 @@ main {
 }
 
 .field {
+  min-width: 0;
   margin-bottom: 1rem;
 }
 
@@ -195,6 +239,14 @@ textarea {
   background: var(--color-bg);
   color: var(--color-title);
   font: inherit;
+  max-width: 100%;
+  min-width: 0;
+}
+
+textarea {
+  min-height: 5rem;
+  resize: vertical;
+  overflow-wrap: anywhere;
 }
 
 input:focus-visible,
@@ -409,6 +461,82 @@ tbody th {
   padding: 0.25rem 0.6rem;
 }
 
+/* Expenses table: fixed columns; Actions padding-left creates the gap after Amount. */
+.table-wrap table:has(.row-actions) {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.table-wrap table:has(.row-actions) th:nth-child(1) {
+  width: 7.5rem;
+}
+
+.table-wrap table:has(.row-actions) th:nth-child(2) {
+  width: 9rem;
+}
+
+.table-wrap table:has(.row-actions) th:nth-child(4) {
+  width: 8rem;
+}
+
+.table-wrap table:has(.row-actions) th:nth-child(5) {
+  width: 14rem;
+}
+
+.table-wrap table:has(.row-actions) td:nth-child(3) {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-wrap table:has(.row-actions) th:last-child,
+.table-wrap table:has(.row-actions) td.row-actions {
+  padding-left: 4rem;
+}
+
+.recent-expenses table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.recent-expenses th:nth-child(1) {
+  width: 6.5rem;
+}
+
+.recent-expenses th:nth-child(2) {
+  width: 7.5rem;
+}
+
+.recent-expenses th:nth-child(4) {
+  width: 6rem;
+}
+
+.recent-expenses td {
+  vertical-align: top;
+}
+
+.recent-expenses td:nth-child(3) {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (width <= 480px) {
+  .recent-expenses th:nth-child(1) {
+    width: 5rem;
+  }
+
+  .recent-expenses th:nth-child(2) {
+    width: 5.5rem;
+  }
+
+  .recent-expenses th:nth-child(4) {
+    width: 4.5rem;
+  }
+}
+
 /* Category tags (HTML pills and SVG bars share the colours) */
 .tag {
   display: inline-block;
@@ -455,8 +583,13 @@ tbody th {
   content: attr(data-icon) " ";
 }
 
+/* Narrow, centred column for the create/edit page only; h1 and form share its edges. */
+main:has(> .expense-form) {
+  max-width: 40rem;
+}
+
 .expense-form {
-  max-width: 28rem;
+  min-width: 0;
   padding: 1.5rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -477,6 +610,7 @@ tbody th {
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  z-index: 100;
   background: rgb(0 0 0 / 60%);
 }
 
@@ -503,6 +637,7 @@ tbody th {
   position: fixed;
   right: 1rem;
   bottom: 1rem;
+  z-index: 110;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -592,7 +727,16 @@ tbody th {
   }
 
   .page-icon {
+    width: 3rem;
+    height: 3rem;
+    margin: 0.5rem 0 0;
+    font-size: 1.5rem;
+    border-radius: 0.75rem;
+  }
+
+  .page-header h1 {
     margin-top: 0.5rem;
+    font-size: 1.5rem;
   }
 
   .login-page {
@@ -659,6 +803,37 @@ tbody th {
   .table-wrap th,
   .table-wrap td {
     padding-inline: 0.2rem;
+  }
+
+  .table-wrap table:has(.row-actions) {
+    table-layout: auto;
+  }
+
+  .table-wrap table:has(.row-actions) th:nth-child(n) {
+    width: auto;
+  }
+
+  .table-wrap table:has(.row-actions) td:nth-child(3) {
+    max-width: 4.5rem;
+  }
+
+  .table-wrap table:has(.row-actions) {
+    font-size: 0.75rem;
+  }
+
+  .table-wrap table:has(.row-actions) th,
+  .table-wrap table:has(.row-actions) td {
+    padding-inline: 0.15rem;
+  }
+
+  .table-wrap table:has(.row-actions) th:last-child,
+  .table-wrap table:has(.row-actions) td.row-actions {
+    text-indent: 0;
+  }
+
+  .table-wrap table:has(.row-actions) th:last-child,
+  .table-wrap table:has(.row-actions) td.row-actions {
+    padding-left: 0.2rem;
   }
 }
 

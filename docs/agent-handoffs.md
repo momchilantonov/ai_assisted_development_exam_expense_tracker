@@ -372,3 +372,144 @@ Use the block from `.github/skills/agent-handoff/handoff-template.md`. Newest en
 - **Not run:** ownership script, automated in-table clipping test.
 - **Known issue:** last-row border on the actions cell is shorter (pre-existing `.row-actions` is `display:flex` on a `td`).
 - **Next action:** testing agent re-verifies DEF-006 and may close it.
+
+---
+### HANDOFF UI review round 1 (cover photo) - frontend agent - 2026-11-01
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/index.css` (`.cover` now a dark overlay gradient over `url("./assets/cover.jpg")`, `center 60% / cover`; the `< 600px` hide rule is unchanged); new `frontend/src/assets/cover.jpg` (1600 px wide copy made with ffmpeg, 216 KB; original `docs/design/reference/close-up-hands-counting-money.jpg` is 1.99 MB and untouched, not git-ignored copy). `PageHeader.tsx` unchanged (still `aria-hidden`). `Tag.tsx` and `e2e/tests/mobile.spec.ts` were not touched by me.
+- **Results:** `make lint && make typecheck && make test-frontend` exit 0 (10 files, 70 passed).
+- **Not run:** screenshot regeneration: `npx playwright test tests/screenshots.spec.ts` aborted because ports 8000 and 5173 are in use by foreign processes (python pids 2023067/2023069, node 2023133), which I did not kill. No visual check of the result was made; `ownership` script not run.
+- **Note:** source and licence of the photo are unknown to me (supplied by the user); record attribution before submission.
+- **Next action:** free the ports and rerun the screenshot spec, or inspect the banner in the running dev server.
+---
+### HANDOFF UI review round 2 (swap cover photo) - frontend agent - 2026-11-01
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/assets/cover.jpg` only (1600x914, 129,847 bytes, made with ffmpeg from `docs/design/reference/heap-wealth-success-growth-generated-by-ai.jpg`, original untouched). `index.css` unchanged (`center 60%` still frames the coins and calculator).
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Note:** photo is AI-generated and user-supplied; licence/attribution to be recorded by the user.
+- **Next action:** regenerate screenshots and run checks when allowed.
+---
+### HANDOFF UI review round 3 (page header style) - frontend agent - 2026-11-01
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/index.css` only (`.page-header` grid, `.page-icon` rounded chip, `.page-header h1` typography/gradient, 600 px breakpoint). `PageHeader.tsx`, Tag.tsx, mobile.spec.ts untouched; DOM, h1 text and aria-hidden icons unchanged.
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Next action:** visual check at desktop and 360 px, regenerate screenshots, run checks when allowed.
+---
+### HANDOFF UI review round 4 (centre expense form page) - frontend agent - 2026-11-01
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/index.css` only. New `main:has(> .expense-form) { max-width: 40rem }` (the global `main` is already 78rem and centred); `.expense-form` lost its `max-width: 28rem`, so h1 and form share the same centred 40rem column. Loading/error states, Dashboard, Expenses and auth pages are unaffected. DOM, text, roles, labels untouched; Tag.tsx and mobile.spec.ts untouched.
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Next action:** visual check on a wide monitor and at 360 px.
+---
+### HANDOFF UI review round 5 (hide single-page pagination) - frontend agent - 2026-11-01
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/pages/ExpensesPage.tsx` only. The pagination `<nav>` renders only when `offset > 0 || total > PAGE_SIZE`; the "VALUES n" footer is unchanged.
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Possibly affected tests:** none found. `ExpensesPage.test.tsx` "paginates with previous and next" uses `PAGE_SIZE + 5` items (nav still shown). No assertions on the nav or "1–n of n" in `frontend/tests/**` or `e2e/tests/**`.
+- **Next action:** run the frontend checks.
+---
+### HANDOFF UI review round 6 (table footer text) - frontend agent - 2026-11-01
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/pages/ExpensesPage.tsx` only. Footer now reads "Total: N expenses" ("Total: 1 expense" for 1), still from `total`. No CSS change needed (no `text-transform` on `.table-footer`).
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Tests asserting old text:** none found (grep for "VALUES" and `table-footer` in frontend/src, frontend/tests, e2e). No test update needed.
+- **Next action:** run the frontend checks.
+---
+### HANDOFF UI review round 7 (page numbers) - frontend agent - 2026-11-01
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/pages/ExpensesPage.tsx` (pager text now `Page {currentPage} of {pageCount}`; `first`/`last` removed), `frontend/src/pages/ExpensesPage.test.tsx` (asserts "Page 1 of 2" then "Page 2 of 2").
+- **Other tests asserting old text:** none found in frontend/tests, e2e.
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Next action:** run the frontend checks.
+---
+### HANDOFF UI review round 8 (Actions column spacing) - frontend agent - 2026-11-01
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/index.css` only (`.table-wrap td.row-actions` and `.table-wrap table:has(.row-actions) thead th:last-child` get `padding-left: 2.5rem`; `0.6rem` in the `<= 480px` block). Dashboard table unaffected (no `.row-actions`).
+- **Known issue left:** shorter bottom border on `display:flex` td (needs markup change).
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Next action:** run frontend checks and re-check the 360 px layout (DEF-006).
+
+### Handoff - frontend agent - UI review round 9 (2026-11-01)
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/index.css` only. Round 8 `padding-left` on the actions cells replaced by `padding-right: 3rem` on `td.num`/`th.num` scoped with `table:has(.row-actions)` (0.75rem at <= 480px). Dashboard table unaffected.
+- **Why:** left padding on the last auto-layout column only widened it; the content did not move.
+- **Resulting gap:** about 3.5rem between Amount text and Edit/Delete (3rem + 0.5rem default cell padding); about 0.95rem at <= 480px.
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Next action:** visual check at desktop and 360 px.
+### Handoff - frontend agent - UI review round 10 (2026-11-01)
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/index.css` only.
+- **Removed:** round 9 `padding-right` rules on `td.num`/`th.num` (desktop 3rem and <= 480px 0.75rem). No round 8 padding rule remained.
+- **Added:** scoped to `table:has(.row-actions)`: `th:last-child { text-indent: 2rem }` and `.row-actions > * { position: relative; left: 2rem }`; both reset to 0 at <= 480px. Offsets do not change column widths, so Amount is back at its original position; row borders stay on the td.
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Next action:** visual check at desktop and 360 px.
+
+### Handoff - frontend agent - UI review round 11 (2026-11-01)
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/index.css` only.
+- **Removed:** round 10 `th:last-child { text-indent }` and `.row-actions > * { left }` rules, and their <= 480px resets.
+- **Added:** scoped to `.table-wrap table:has(.row-actions)`: `table-layout: fixed; width: 100%`; widths Date 7.5rem, Category 9rem, Description auto, Amount 8rem, Actions 14rem; `th:last-child, td.row-actions { padding-left: 4rem }`; Description `overflow-wrap: anywhere`. At <= 480px: `table-layout: auto`, widths auto, Actions padding-left 0.2rem.
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+- **Next action:** visual check at desktop and 360 px.
+
+### Handoff - frontend agent - UI change round 12 (2026-11-01)
+- **Task ID(s):** human UI change request (no task row changed, nothing set VERIFIED)
+- **Modified files:** `frontend/src/lib/text.ts` (new `truncateText`), `frontend/src/pages/ExpensesPage.tsx`, `frontend/src/pages/ExpensesPage.test.tsx` (one new test).
+- **Change:** Expenses table description shows first 90 code points + "…" when longer; full text in `title` of a wrapper span. Form validation (500), API, aria-labels and delete dialog unchanged. Dashboard unchanged.
+- **Possibly affected:** `e2e/tests/mobile.spec.ts` uses a 52-character description (below 90, unaffected). No frontend/tests or e2e assertion on text over 90 chars found.
+- **Not run:** no tests, lint, typecheck, build, Playwright, screenshots or ownership script (human instruction).
+
+## Handoff - frontend - UI round 13 (textarea long text)
+- Status: CSS-only change in `frontend/src/index.css`; NO checks were run (lint, typecheck, tests, build, Playwright, screenshots) per human instruction.
+- Cause (from reading CSS only; not reproduced): `textarea` kept the browser default `resize: both`, so it could be dragged wider than the 40rem column; no `min-width: 0` on `.field`/`.expense-form`, no `overflow-wrap` for long unbroken words.
+- Changed: `input/select/textarea` get `max-width: 100%; min-width: 0`; `textarea` gets `min-height: 5rem; resize: vertical; overflow-wrap: anywhere`; `.field` and `.expense-form` get `min-width: 0`. No DOM/attribute/validation change.
+- Next: human to verify visually at 360 px and desktop.
+
+## Handoff - frontend - UI round 14 (single-line description)
+
+- Changed: `frontend/src/index.css` only. Expenses table description cell (`td:nth-child(3)`): replaced `overflow-wrap: anywhere` with `max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap`. At <= 480px: `max-width: 8rem` for the same cell.
+- Unchanged: markup, 90-char JS truncation, `title`, Dashboard table, Tag.tsx, tests, e2e.
+- Checks: NOT run (human instruction). Not verified.
+
+## Handoff - frontend - UI round 15 (Dashboard description truncation)
+
+- Changed: `DashboardPage.tsx` recent-expenses description now `<span title>` + `truncateText(..., 250)` (page constant `MAX_DESCRIPTION_CHARS`); recent section gets class `recent-expenses`. `index.css`: `.recent-expenses table { width: 100% }` and `.recent-expenses td:nth-child(3)` nowrap/ellipsis/`max-width: 0` (by-category table untouched). `DashboardPage.test.tsx`: new >250-char test; existing "Rent" assertion selector changed from `td` to `td span`.
+- Unchanged: Expenses page (90), API, contract, validation, Tag.tsx, `frontend/tests/**`, `e2e/**`. Grep of those found no Dashboard description assertions.
+- Note: with the single-line cell the CSS ellipsis usually cuts text well before 250 characters.
+- Checks: NOT run (human instruction). Not verified.
+## Handoff - frontend - fix DashboardPage truncation test
+- Cause: test expected 249 "x" + "…"; `truncateText` keeps `max` (250) characters then appends "…". Changed `DashboardPage.test.tsx` expectation to 250. `ExpensesPage.test.tsx` already expects 90 + "…" (no change). No production code changed. No checks were run by me.
+
+## Handoff - frontend - UI round 16: Dashboard wrapping description
+- Changed: `DashboardPage.tsx` (no `truncateText`/`MAX_DESCRIPTION_CHARS`/`title`; renders `{e.description ?? ""}` after the aria-hidden icon), `index.css` (`.recent-expenses` fixed layout, widths, wrapping, top alignment, narrower widths at <= 480px), `DashboardPage.test.tsx` (long description shown in full; `td span` selector restored to plain `getByText("Rent")`).
+- Expenses page and `lib/text.ts` untouched. No checks were run, per human instruction.
+
+## Handoff - frontend - UI round 17: sticky top bar
+
+- Status: change made, NOT verified. No lint, typecheck, tests, build, Playwright or screenshots were run, per human instruction.
+- Modified: `frontend/src/index.css` only. `.app-header` now `position: sticky; top: 0; z-index: 10` (existing opaque `--color-bg` and border kept); `html { scroll-padding-top: 4rem }`; `.dialog-backdrop` `z-index: 100` and `.toasts` `z-index: 110` so they stay above the header.
+- Unchanged: Layout.tsx / DOM, tests, e2e. The page icon chip (z-index auto) scrolls under the header, as expected.
+- Next: run `make lint-frontend typecheck-frontend test-frontend` and check 360 px wrapping visually.
+
+## Handoff - frontend - UI round 18: Expenses page size 10
+
+- Status: change made, NOT verified. No lint, typecheck, tests, build, Playwright or screenshots were run, per human instruction.
+- Modified: `frontend/src/pages/ExpensesPage.tsx` only (`PAGE_SIZE` 5 -> 10).
+- Test review (read only): `ExpensesPage.test.tsx` pagination test uses `PAGE_SIZE + 5` items, so page 1 has 10 rows and page 2 has the 5 hard-coded remaining rows; still consistent. `frontend/tests/flows.test.tsx` and `e2e/**` have no page-size-dependent numbers. `client.test.ts` `limit=10` is unrelated.
+- Next: run `make lint-frontend typecheck-frontend test-frontend`.
+
+## Handoff - frontend - DEF-006 regression at 360 px
+
+- Modified: `frontend/src/index.css` only, inside `@media (width <= 480px)`: `td:nth-child(3)` `max-width` 8rem -> 4.5rem; Expenses table font 0.75rem; `padding-inline: 0.15rem`; Actions `text-indent: 0` (padding-left 0.2rem kept). Desktop and Dashboard rules untouched.
+- Checks: `cd e2e && npx playwright test tests/mobile.spec.ts tests/screenshots.spec.ts` 2 passed; `make lint && make typecheck && make test-frontend` exit 0 (72 tests passed). `scripts/check-all.sh` not run (human will).
+- Observed: regenerated `docs/evidence/screenshots/expenses-mobile.png` shows all columns and Edit/Delete (stacked) fully visible, no clipping.
+- Status: not marked VERIFIED.
+
+---
+### HANDOFF UI-05 - documentation agent - 2026-11-01
+- **Task ID(s):** UI-05 (set to COMPLETED; not VERIFIED)
+- **Modified files:** `README.md`, `docs/architecture.md`, `docs/design/ui-style-guide.md` (status line, new section 8), `docs/assignment-evidence.md`, `docs/report/final-report.md`, `docs/evidence/development-log.md`, `docs/tasks.md`, this file. No code, tests or `.github/**` edited; historical entries untouched.
+- **Verified by reading:** counts in `docs/evidence/test-runs/check-20261101T145021Z.txt` (ruff clean, backend 389 passed, frontend 72 passed, E2E 5 passed, exit=0); CSS tokens, page size 10, callout text; all five screenshots viewed.
+- **Not run:** no tests or checks by me; README commands not re-run; final `check-all` after the 360 px CSS fix pending (orchestrator).
+- **Gaps:** banner image licence/attribution (human); contrast not measured; `docs/defects.md` still shows DEF-006 OPEN (testing agent to close); screenshots need human privacy review; key prompts still missing for modules 1-5.
+- **Next action:** orchestrator runs final `scripts/check-all.sh --e2e`; SUB-01 (`/create-final-document`).

@@ -51,15 +51,16 @@ Workflow: one planning step in Copilot Plan Mode, one infrastructure step in Cop
 
 - **Approach:** SPA with protected routes, auth state from `/api/auth/me`, a typed API client with a global 401 hook, forms that mirror contract validation, accessible delete dialog and toasts, no chart or state libraries; development uses a Vite proxy so no CORS is needed (ADR-001).
 - **Workflow:** F-01/F-02 scaffold, client, AuthContext, login; F-03/F-04 layout, logout, list, filters, sort, pagination; F-05/F-06 forms, confirmation, toasts and dashboard with an SVG chart; CR2-F sign-up page.
-- **Testing:** 55 component tests with MSW at F-06; 70 in the final run, including the sign-up page tests and `frontend/tests/flows.test.tsx`. The first F-05/F-06 run had 14 failing tests because of async loading assumptions; tests were changed to wait for the form fields. DEF-004 (tests not type-checked) fixed and verified.
+- **Testing:** 55 component tests with MSW at F-06; 72 in the latest full run (`docs/evidence/test-runs/check-20261101T145021Z.txt`), including the sign-up page tests and `frontend/tests/flows.test.tsx`. The first F-05/F-06 run had 14 failing tests because of async loading assumptions; tests were changed to wait for the form fields. DEF-004 (tests not type-checked) fixed and verified.
+- **UI refinement (UI-01..UI-05):** after the first version the human asked for a Notion-style dark UI based on a reference screenshot (`docs/design/ui-style-guide.md`). The frontend agent restyled all pages in plain CSS: design tokens, dark theme, sticky top bar, photo cover banner with an icon chip, colour-coded category tags with icons, All / This month / Past month tabs, fixed-layout tables with a 90-character description limit, a "Total: N expenses" footer, a "Page X of Y" paginator (only with more than one page, 10 per page) and a 360 px layout. Eighteen small review rounds by the human followed; behaviour and API did not change. Deviations from the reference (no right-hand total panel, no Past year tab, no light theme, no toolbar icons) are listed in the style guide, section 8. The banner image is user-supplied and AI-generated; its licence is for the human to record.
 - **AI tool and why:** Copilot frontend agent, guided by the React feature skill and frontend instructions.
-- **Key prompts:** none recorded verbatim. Gap. Not run: 360 px layout check.
+- **Key prompts:** none recorded verbatim. Gap.
 
 ### Module 5 - Testing and integration
 
 - **Approach:** three layers: pytest (unit plus black-box HTTP, temp DB per test), Vitest/RTL/MSW (component and flow), Playwright (real browser, real backend, temp DB, run-time generated password, ports 8000/5173).
 - **Workflow:** orchestrator ran live HTTP checks through the proxy (I-01, 22 PASS with 4 browser checks NOT RUN at the time); testing agent added a 16-step E2E workflow, a persistence scenario with backend restart, a two-user isolation scenario in separate browser contexts, flow tests and screenshots (T-01..T-05, CR2-T); `make validate` for HC4.
-- **Testing result:** `make validate` exit 0: lint OK, typecheck OK (mypy not installed), backend 389 passed, frontend 70 passed, E2E 4 passed, in `docs/evidence/test-runs/check-20261101T103505Z.txt`. Five defects were filed, all VERIFIED (`docs/defects.md`).
+- **Testing result:** `scripts/check-all.sh --e2e` exit 0: ruff clean, backend 389 passed, frontend 72 passed, E2E 5 passed (including the 360 px no-scroll spec), in `docs/evidence/test-runs/check-20261101T145021Z.txt`. A CSS-only 360 px fix followed that run; the frontend agent re-ran lint, typecheck, frontend tests (72 passed) and the mobile and screenshot specs (2 passed), and a final full check is pending. Five defects were filed and VERIFIED; DEF-006 (360 px clipping) is recorded in `docs/defects.md`, whose status is for the testing agent to update.
 - **AI tool and why:** Copilot testing agent, separate from the implementing agents. Limit: tests were not shown to fail against deliberately broken code except where defects were found; Chromium only.
 - **Key prompts:** none recorded verbatim. Gap.
 
@@ -77,6 +78,7 @@ Challenges (from the development log; CHAL entries 01-04 are tagged, others are 
 - CHAL-02: VS Code save settings reformatted 13 infrastructure files; `validate-infra` was re-run (exit 0, 33/33 hook cases).
 - CHAL-03/CHAL-04: the agent could not create or push to GitHub (no `gh`, HTTPS password auth rejected); the human switched the remote to SSH and pushed.
 - Test and tooling issues, each recorded with its fix: `conftest` imported under two module names (3 failures), route guard test via `app.routes` replaced by OpenAPI paths, DEF-005 (a test depended on the developer's `.env`), a race in a new flow test, a toast covering the table in the first screenshots.
+- UI refinement issues: the tag icon text broke the E2E dashboard reader (`innerText` returned an emoji before "Healthcare"; fixed by drawing the icon in CSS); the 360 px clipping of the Actions column was found only by looking at the screenshot because the spec checks page scroll only (DEF-006); the Amount/Actions gap took several attempts because padding on the last auto-layout column only moves the column boundary, fixed widths solved it; a frontend test expected 249 instead of 250 characters (a hook-run test failure; the expectation was wrong, not the code); the E2E run was blocked twice by the human's dev servers on ports 8000 and 5173.
 - Iteration example, not a failure: the planning prompt asked for a single-user application, so the first design (and ADR-002) was single-user with a CLI-provisioned account. After manual testing the human changed the requirement to multi-user with open sign-up and per-user data (CR-002, ADR-011). An interim first-run sign-up change (CR-001, ADR-010) was superseded before it was implemented. The agents added registration, per-user scoping of every query, a sign-up page and isolation tests (backend, frontend, two-user E2E), and the final checks pass (`docs/evidence/test-runs/check-20261101T103505Z.txt`). Earlier history is kept unchanged in the development log and decisions.
 - A recurring limit: the ownership guard blocked some cross-agent edits (for example the frontend agent could not edit `docs/defects.md`), so fixes needed handoffs between agents.
 
@@ -84,19 +86,20 @@ Tool comparison (honest): only GitHub Copilot in VS Code was used (Plan Mode, Ag
 
 ## 5. Working system evidence
 
-Real captures from `e2e/tests/screenshots.spec.ts`, taken from the running app with data created through the UI (PNG files verified with `file`; the testing agent inspected them; human review for sensitive data is still pending):
+Real captures from `e2e/tests/screenshots.spec.ts` and `e2e/tests/mobile.spec.ts` of the restyled UI, taken from the running app with data created through the UI (PNG files viewed by the documentation agent; human review for sensitive data is still pending). They show rows left by other specs because the specs share one temporary database.
 
-- `docs/evidence/screenshots/login.png` (1100x800) - login page
-- `docs/evidence/screenshots/signup.png` - sign-up page
-- `docs/evidence/screenshots/expenses.png` (1100x800) - expense list with filters
-- `docs/evidence/screenshots/dashboard.png` (1100x1151) - dashboard with totals and chart
+- `docs/evidence/screenshots/login.png` (1100x800) - dark sign-in card
+- `docs/evidence/screenshots/signup.png` - sign-up card with confirm password
+- `docs/evidence/screenshots/expenses.png` (1100 px wide) - sticky top bar, photo banner with icon chip, callout, "New expense", All / This month / Past month tabs, filters, table with tag pills, Edit/Delete, "Total: 7 expenses"
+- `docs/evidence/screenshots/dashboard.png` - banner, three summary cards, category bars in tag colours, category table, recent expenses
+- `docs/evidence/screenshots/expenses-mobile.png` (360 px wide) - banner hidden, filters in two columns, table with Date, Category, truncated Description, Amount and stacked Edit/Delete visible
 
-Test output: `docs/evidence/test-runs/check-20261101T103505Z.txt` (exit 0; backend 389, frontend 70, E2E 4 passed). The files are named `login`, `signup`, `expenses`, `dashboard`, not `NN-description.png` as the documentation instructions suggest; the Playwright spec produces these names.
+Test output: `docs/evidence/test-runs/check-20261101T145021Z.txt` (exit 0; backend 389, frontend 72, E2E 5 passed). The files are named `login`, `signup`, `expenses`, `dashboard`, `expenses-mobile`, not `NN-description.png` as the documentation instructions suggest; the Playwright specs produce these names.
 
 ## 6. Possible improvements
 
 - Login rate limiting and lockout; test the Secure cookie over TLS.
-- Run mypy in CI (not installed now); add Firefox/WebKit and 360 px E2E checks.
+- Run mypy in CI (not installed now); add Firefox/WebKit and an in-table clipping check at 360 px (only page scroll is tested).
 - Mutation checks to show tests fail against broken code.
 - Alembic migrations if the schema evolves; CSV export; budgets.
 - Record every key prompt verbatim at the time (several modules have no recorded prompt).

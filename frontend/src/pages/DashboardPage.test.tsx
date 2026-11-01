@@ -50,7 +50,18 @@ describe("dashboard page", () => {
     expect(
       screen.getByRole("heading", { name: "Recent expenses" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Rent", { selector: "td" })).toBeInTheDocument();
+    expect(screen.getByText("Rent")).toBeInTheDocument();
+  });
+
+  it("shows a long description in full", async () => {
+    setMockLoggedIn();
+    const long = "x".repeat(300);
+    setMockExpenses([makeExpense(1, { description: long })]);
+    renderApp("/");
+    const recent = await screen.findByRole("table", {
+      name: "Recent expenses",
+    });
+    expect(within(recent).getByText(long)).toBeInTheDocument();
   });
 
   it("renders an SVG chart with a text alternative and a table of category totals", async () => {

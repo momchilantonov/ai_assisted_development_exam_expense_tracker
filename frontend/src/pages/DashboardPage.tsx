@@ -171,7 +171,7 @@ export function DashboardPage() {
             </div>
           </section>
 
-          <section aria-labelledby="recent-heading">
+          <section aria-labelledby="recent-heading" className="recent-expenses">
             <h2 id="recent-heading">Recent expenses</h2>
             <div className="table-wrap">
               <table>

@@ -30,7 +30,21 @@ flowchart TD
 ## Code layout
 
 - Backend: `app/main.py` (factory), `api/{auth,expenses,health}.py`, `core/{deps,errors,origin,security}.py`, `models/{user,session,expense}.py`, `schemas/{auth,expense}.py`, `services/{auth,expenses}.py`, `cli.py`, `config.py`, `db.py`.
-- Frontend: `src/api` (typed client, 401 hook), `src/auth` (AuthContext), `src/components` (Layout, ProtectedRoute, ConfirmDialog, ToastProvider), `src/pages` (Login, Signup, Expenses, ExpenseForm, Dashboard), `src/lib/money.ts`.
+- Frontend: `src/api` (typed client, 401 hook), `src/auth` (AuthContext), `src/components` (Layout, PageHeader, Tag, ProtectedRoute, ConfirmDialog, ToastProvider), `src/pages` (Login, Signup, Expenses, ExpenseForm, Dashboard), `src/lib` (`money.ts`, `categories.ts` icon map and month ranges, `text.ts` `truncateText`), `src/assets/cover.jpg`, one stylesheet `src/index.css`.
+
+## Frontend UI (implemented in UI-01..UI-05)
+
+Plain CSS, no UI, icon or animation library. Rules for the design are in `docs/design/ui-style-guide.md`; deviations are listed in its "Implemented" section.
+
+- **Design tokens and dark theme:** CSS custom properties in `:root` in `index.css` (`--color-bg #191919`, surface, text, muted, border, primary, `--color-primary-strong #1a6fc9` for buttons, callout, danger, success). Dark only; there is no light theme. `prefers-reduced-motion` is respected.
+- **Page shell:** `Layout.tsx` renders a sticky top bar (`position: sticky; top: 0; z-index: 10`, brand, Dashboard/Expenses links, username, Log out). Dialog backdrop (z-index 100) and toasts (110) stay above it. Content is centred, about 78 rem wide.
+- **Page header:** `PageHeader.tsx` draws a decorative (`aria-hidden`) cover banner (`cover.jpg` under a dark gradient, hidden below 600 px), a rounded icon chip and the `h1`. The Expenses page adds a callout bar explaining the tabs.
+- **Tags and icons:** `Tag.tsx` renders only the category text; the emoji comes from CSS (`.tag[data-icon]::before`), so text reads and E2E `innerText` stay clean. One fixed colour per category; rows also show a decorative category icon before the description.
+- **View tabs:** "All / This month / Past month" buttons (`aria-pressed`) only set `date_from`/`date_to` in the existing filter state; no API change.
+- **Tables:** Expenses table uses a fixed layout (Date, Category, Description, Amount, Actions with a wider gap before Actions); the description is one line, cut to 90 characters in code and with an ellipsis in CSS, full text in `title`. Footer "Total: N expenses" uses the list `total`. Dashboard recent-expenses table wraps full descriptions.
+- **Pagination:** page size 10; the "Previous / Page X of Y / Next" nav renders only when there is more than one page.
+- **Forms and auth pages:** centred cards; the expense form page is a centred 40 rem column; textareas resize vertically only.
+- **360 px:** at <= 480 px the Expenses table uses smaller type and padding, a 4.5 rem description cap, wrapping tags and stacked Edit/Delete; `e2e/tests/mobile.spec.ts` checks there is no page-level horizontal scroll and writes `expenses-mobile.png`.
 
 ## AI development system
 

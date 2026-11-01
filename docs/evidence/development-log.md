@@ -262,3 +262,82 @@ Template: `.github/skills/ai-dev-evidence/log-entry-template.md`. Only record wh
 
 ## 2026-11-01 - DEF-006 mobile table fix (frontend)
 CSS-only change in `frontend/src/index.css` for widths <= 480 px so the Expenses table fits 360 px. Lint, typecheck, frontend tests and Playwright exit 0; screenshot `expenses-mobile.png` checked visually.
+
+## 2026-11-01 - UI review round 1: cover photo (frontend)
+Replaced the gradient banner background with a user-supplied photo (downscaled copy at `frontend/src/assets/cover.jpg`, 216 KB, plus dark overlay). Lint, typecheck and frontend tests exit 0. Screenshot regeneration not run: ports 8000/5173 were occupied by other processes. Photo source/licence unknown.
+
+## 2026-11-01 - UI review round 2: cover photo swap (frontend)
+Replaced `frontend/src/assets/cover.jpg` with a 1600 px wide copy (129,847 bytes) of the AI-generated, user-supplied `heap-wealth-success-growth-generated-by-ai.jpg`. No CSS change. No checks were run (human instruction). Licence/attribution to be recorded by the user.
+## 2026-11-01 - UI review round 3: modern page header (frontend)
+CSS-only restyle of the page header: icon in a rounded surface chip overlapping the banner, h1 beside it with weight 800, tight letter-spacing, smaller clamp size and subtle text gradient; smaller variant under 600 px. No checks were run (human instruction).
+
+## 2026-11-01 - UI review round 4: centred expense form page (frontend)
+CSS-only: the New/Edit expense `main` is now a centred 40rem column (`main:has(> .expense-form)`), form fills it. No checks were run (human instruction).
+
+## 2026-11-01 - UI review round 5 (frontend agent)
+Pagination nav on the Expenses page is hidden when all results fit on the first page. No checks were run (human instruction).
+## 2026-11-01 - UI review round 6 (frontend agent)
+Expenses page footer changed from "VALUES n" to "Total: n expenses" (singular for 1). No checks were run (human instruction).
+## 2026-11-01 - UI review round 7 (frontend agent)
+Pagination status on the Expenses page changed from "a–b of N" to "Page X of Y"; co-located test updated. No checks were run (human instruction).
+
+## 2026-11-01 - UI review round 8 (frontend agent)
+Interpretation: "move this for all rows on left... too close to its left column" = add space between the right-aligned Amount column and the Actions column. Added padding-left 2.5rem to `td.row-actions` and the Actions header (0.6rem at <= 480px) in `frontend/src/index.css`. CSS only; the flex-td shorter border issue was left as is (fixing it needs markup). No checks were run (human instruction).
+
+## 2026-11-01 - UI review round 9 (frontend agent)
+Round 8 padding-left on the actions column had no visible effect (it only widened the column). Replaced with `padding-right: 3rem` on Amount cells/header of the expenses table (`table:has(.row-actions)`, 0.75rem at <= 480px) in `frontend/src/index.css`. CSS only. No checks were run (human instruction).
+
+## 2026-11-01 - UI review round 10 (frontend agent)
+Reverted round 9 Amount padding; shifted only the Actions header (`text-indent`) and the Edit/Delete buttons (`position: relative; left: 2rem`) in `frontend/src/index.css`, 0 at <= 480px. CSS only. No checks were run (human instruction).
+
+## 2026-11-01 - UI review round 11 (frontend)
+Replaced relative offsets on the Expenses table with a fixed layout (Date 7.5rem, Category 9rem, Description auto, Amount 8rem, Actions 14rem, 4rem left padding on Actions) in `frontend/src/index.css`. No checks were run (human instruction).
+
+## 2026-11-01 - UI change round 12 (description truncation)
+
+- **Module:** Frontend
+- **Agent / AI tool (model):** frontend agent
+- **Technical objective:** Limit the Expenses table description to 90 characters (display only).
+- **Files created/changed:** `frontend/src/lib/text.ts`, `frontend/src/pages/ExpensesPage.tsx`, `frontend/src/pages/ExpensesPage.test.tsx`, `docs/agent-handoffs.md`.
+- **Result:** No checks were run (tests, lint, typecheck, build, Playwright, screenshots), per human instruction.
+
+## 2026-11-01 - UI round 13: textarea long-text fix (frontend)
+CSS-only fix in `frontend/src/index.css` (vertical-only resize, max-width, overflow-wrap, min-width: 0). No checks were run, as instructed by the human.
+
+## 2026-11-01 - UI round 14: single-line expense description (frontend)
+
+CSS-only change in `frontend/src/index.css` (nowrap + ellipsis on the Expenses description cell, 8rem cap at <= 480px). No lint, typecheck, tests, build, Playwright or screenshots were run, per human instruction.
+
+## 2026-11-01 - UI round 15: Dashboard description truncation (frontend)
+
+Recent-expenses description truncated at 250 characters with `title`, plus single-line ellipsis CSS scoped to the recent section; one new component test. No lint, typecheck, tests, build, Playwright or screenshots were run, per human instruction.
+
+## 2026-11-01 - UI round 16: Dashboard full wrapping description (frontend)
+
+Removed the 250-character truncation and `title` from the Dashboard recent-expenses description; the cell now wraps (`table-layout: fixed`, explicit Date/Category/Amount widths, `overflow-wrap: anywhere`, `vertical-align: top`). Replaced the truncation test with a full-description test. No lint, typecheck, tests, build, Playwright or screenshots were run, per human instruction.
+
+## 2026-11-01 - UI round 17: Sticky top bar (frontend)
+
+Made `.app-header` sticky (`top: 0`, `z-index: 10`), added `html { scroll-padding-top: 4rem }`, and raised `.dialog-backdrop` (100) and `.toasts` (110) above it. CSS only. No lint, typecheck, tests, build, Playwright or screenshots were run, per human instruction.
+
+## 2026-11-01 - frontend - UI round 18: page size 10
+
+- Set `PAGE_SIZE` to 10 in `ExpensesPage.tsx` on human request. Reviewed tests for hard-coded page-size numbers; none need changes. No checks were run (human instruction).
+
+## 2026-11-01 - frontend - DEF-006 regression: Actions clipped at 360 px
+
+Capped the description cell at `max-width: 4.5rem` (<= 480px), set the Expenses table font to 0.75rem, `padding-inline: 0.15rem`, and `text-indent: 0` on Actions (CSS only, scoped to `.table-wrap table:has(.row-actions)`). `npx playwright test tests/mobile.spec.ts tests/screenshots.spec.ts`: 2 passed. `expenses-mobile.png` shows Date, Category, Description (ellipsis), Amount and Edit/Delete fully visible. `make lint && make typecheck && make test-frontend`: exit 0, 72 tests passed.
+
+## 2026-11-01 - documentation - UI-05 and the whole refine-ui run
+
+- **Module/tool:** documentation agent (GitHub Copilot), after the human approved the UI ("UI approved").
+- **Run summary (from handoffs and test runs):** UI-01..UI-03 restyle (frontend), UI-04 screenshots and 360 px spec (testing), DEF-006 fix, 18 human review rounds (cover photo, page header, centred form, Page X of Y, Total footer, 90-character description, Actions gap, sticky top bar, page size 10) and a final 360 px CSS fix.
+- **UI-05 steps:** read tasks, handoffs, UI log entries, test report, style guide, `index.css`, pages and components; viewed the five screenshots; updated `README.md` (features, screenshot table, latest run), `docs/architecture.md` (frontend UI section), `docs/design/ui-style-guide.md` (status line and section 8 "Implemented", original sections untouched), `docs/assignment-evidence.md` and `docs/report/final-report.md`.
+- **Real results:** `scripts/check-all.sh --e2e` exit 0 (ruff clean, backend 389 passed, frontend 72 passed, E2E 5 passed), `docs/evidence/test-runs/check-20261101T145021Z.txt` (counts re-read from the file). After it only CSS changed (360 px Actions fix): frontend agent ran `make lint`, `make typecheck`, `make test-frontend` exit 0 and the mobile and screenshots specs (2 passed). Final `check-all` after UI-05 is pending (orchestrator). I ran no tests.
+- **Challenges that happened (CHAL-05..CHAL-09):**
+  - CHAL-05: the tag icon text made the E2E dashboard reader return "🩺 Healthcare"; fixed by rendering the icon with CSS `data-icon` (`check-20261101T124618Z.txt` failed, `check-20261101T130002Z.txt` passed).
+  - CHAL-06: the 360 px clipping of Actions (DEF-006) was found only by looking at `expenses-mobile.png`; the spec checks page scroll only, so it passed.
+  - CHAL-07: Amount/Actions spacing took several rounds (8-11): padding on the last auto-layout column only moves the column boundary; offsets and fixed table layout with column widths solved it.
+  - CHAL-08: a hook-run test failed because the Dashboard truncation test expected 249 characters instead of 250; the test was corrected (code was right); the truncation itself was later removed in round 16.
+  - CHAL-09: E2E was blocked twice by the user's dev servers on ports 8000 and 5173; the human stopped them and the runs were repeated.
+- **Not verified:** contrast, pixel diff against the reference, licence of the banner image, final `check-all` after the last CSS fix, whether DEF-006 is closed in `docs/defects.md` (testing agent).

@@ -29,6 +29,15 @@ describe("expenses page", () => {
     expect(within(row).getByText("Food")).toBeInTheDocument();
   });
 
+  it("truncates long descriptions to 90 characters plus an ellipsis, full text in title", async () => {
+    setMockLoggedIn();
+    const long = "a".repeat(120);
+    setMockExpenses([makeExpense(1, { description: long })]);
+    renderApp("/expenses");
+    const shown = await screen.findByText(`${"a".repeat(90)}…`);
+    expect(shown).toHaveAttribute("title", long);
+  });
+
   it("shows an empty state without filters", async () => {
     setMockLoggedIn();
     renderApp("/expenses");
@@ -125,17 +134,13 @@ describe("expenses page", () => {
     renderApp("/expenses");
     await screen.findAllByRole("row");
     const pager = await screen.findByRole("navigation", { name: "Pagination" });
-    expect(pager).toHaveTextContent(`1–${PAGE_SIZE} of ${PAGE_SIZE + 5}`);
+    expect(pager).toHaveTextContent("Page 1 of 2");
     expect(screen.getByRole("button", { name: "Previous" })).toBeDisabled();
     expect(bodyRows()).toHaveLength(PAGE_SIZE);
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Next" }));
-    expect(
-      await screen.findByText(
-        `${PAGE_SIZE + 1}–${PAGE_SIZE + 5} of ${PAGE_SIZE + 5}`,
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Page 2 of 2")).toBeInTheDocument();
     expect(bodyRows()).toHaveLength(5);
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
   });

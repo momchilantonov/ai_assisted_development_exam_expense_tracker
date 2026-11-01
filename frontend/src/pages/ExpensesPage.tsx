@@ -9,8 +9,9 @@ import { Tag } from "../components/Tag";
 import { useToast } from "../components/useToast";
 import { CATEGORY_ICON, monthRange } from "../lib/categories";
 import { formatMoney } from "../lib/money";
+import { truncateText } from "../lib/text";
 
-export const PAGE_SIZE = 20;
+export const PAGE_SIZE = 10;
 
 interface Filters {
   category: Category | "";
@@ -116,8 +117,8 @@ export function ExpensesPage() {
   }
 
   const total = data?.total ?? 0;
-  const first = total === 0 ? 0 : offset + 1;
-  const last = Math.min(offset + PAGE_SIZE, total);
+  const currentPage = Math.floor(offset / PAGE_SIZE) + 1;
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const filtered =
     filters.category !== "" || filters.dateFrom !== "" || filters.dateTo !== "";
 
@@ -289,7 +290,9 @@ export function ExpensesPage() {
                       <span className="row-icon" aria-hidden="true">
                         {CATEGORY_ICON[e.category]}
                       </span>
-                      {e.description ?? ""}
+                      <span title={e.description ?? undefined}>
+                        {truncateText(e.description ?? "")}
+                      </span>
                     </td>
                     <td className="num">{formatMoney(e.amount)}</td>
                     <td className="row-actions">
@@ -313,26 +316,30 @@ export function ExpensesPage() {
               </tbody>
             </table>
           </div>
-          <p className="table-footer">VALUES {total}</p>
-          <nav className="pagination" aria-label="Pagination">
-            <button
-              type="button"
-              onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-              disabled={offset === 0}
-            >
-              Previous
-            </button>
-            <span aria-live="polite">
-              {first}–{last} of {total}
-            </span>
-            <button
-              type="button"
-              onClick={() => setOffset(offset + PAGE_SIZE)}
-              disabled={offset + PAGE_SIZE >= total}
-            >
-              Next
-            </button>
-          </nav>
+          <p className="table-footer">
+            Total: {total} {total === 1 ? "expense" : "expenses"}
+          </p>
+          {(offset > 0 || total > PAGE_SIZE) && (
+            <nav className="pagination" aria-label="Pagination">
+              <button
+                type="button"
+                onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
+                disabled={offset === 0}
+              >
+                Previous
+              </button>
+              <span aria-live="polite">
+                Page {currentPage} of {pageCount}
+              </span>
+              <button
+                type="button"
+                onClick={() => setOffset(offset + PAGE_SIZE)}
+                disabled={offset + PAGE_SIZE >= total}
+              >
+                Next
+              </button>
+            </nav>
+          )}
         </>
       )}
 

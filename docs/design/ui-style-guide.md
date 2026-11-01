@@ -1,6 +1,6 @@
 # UI style guide (Notion-style expenses tracker)
 
-Status: planned (task UI-01..UI-05). Updated by the documentation agent after the redesign with what was actually implemented.
+Status: implemented and approved by the human ("UI approved"); sections 1-7 below are the original plan and are kept as written, see section 8 "Implemented" for what was actually built and where it differs (task UI-05).
 Owner of the implementation: `frontend` agent. Behaviour, API and accessibility must not change.
 
 ## 1. Target look and source of truth
@@ -95,3 +95,40 @@ Source: github/awesome-copilot `skills/premium-frontend-ui/SKILL.md`, author Utk
 - Style fit: the requested reference is a minimal Notion page, which conflicts with the skill's "brutalism / cinematic / cyber" directions.
 - Reused ideas (adapted, no skill installed): animate only `transform` and `opacity`, respect `prefers-reduced-motion`, guard hover effects with `@media (hover: hover)`, a clear type hierarchy, crisp 16px body text.
 - Security audit results for this skill were not checked; it contains no scripts.
+
+## 8. Implemented (UI-01..UI-05, 2026-11-01)
+
+Source of truth for the result: `frontend/src/index.css`, `frontend/src/pages/*.tsx`, `frontend/src/components/*.tsx` and the screenshots `login.png`, `signup.png`, `expenses.png`, `dashboard.png`, `expenses-mobile.png` in `docs/evidence/screenshots/` (all viewed by the documentation agent). Plain CSS, no new dependencies.
+
+### Done as planned
+- Dark default theme with the section 2 tokens, system font stack, 4 px controls and 6 px cards, thin 1 px rules.
+- Top bar with brand, links, username and "Log out"; page header with banner, rounded icon chip, bold title; ochre callout on the Expenses page.
+- Seven category tag pills with one fixed colour and icon each (section 3); the icon is drawn by CSS from `data-icon`, the category stays text.
+- View tabs "All / This month / Past month" that only set `date_from` and `date_to`.
+- Database-style tables with muted headers, hover rows, right-aligned amounts; dashboard cards and tag-coloured bars; centred login, sign-up and expense form cards.
+- 360 px layout with no page-level horizontal scroll (`e2e/tests/mobile.spec.ts`); `prefers-reduced-motion` respected.
+
+### Deviations from the plan
+- No right-hand "Total Expenses" panel (it would need an extra summary call on the Expenses page); totals are on the Dashboard.
+- No "Past year" tab.
+- No light theme.
+- No toolbar icons; filters stay a labelled form (Category, From, To, Sort by, Clear filters).
+- No separate Name column; the description cell carries the category icon.
+- The banner is a photo, not a CSS gradient: `frontend/src/assets/cover.jpg` (1600x914, 129,847 bytes), a downscaled copy of the AI-generated, user-supplied `docs/design/reference/heap-wealth-success-growth-generated-by-ai.jpg` (original untouched). It sits under a dark overlay and is hidden below 600 px. Licence and attribution are to be recorded by the human. The source of the first photo tried (`close-up-hands-counting-money.jpg`) is unknown; it was replaced in review round 2.
+- Primary button background is `#1a6fc9` (`--color-primary-strong`) instead of `#2383e2` for white-text contrast; `--color-primary` `#2383e2` is kept for links and focus; muted alpha raised to 0.58. Contrast was not measured.
+- Footer is "Total: N expenses" (not "VALUES n").
+
+### Behaviour and layout changes made during the human review rounds
+- Expenses table description: one line, truncated to 90 characters plus an ellipsis in code, CSS ellipsis on the cell, full text in `title`.
+- Footer "Total: N expenses" ("Total: 1 expense" for one), from the list `total`.
+- Paginator reads "Page X of Y" and is shown only when there is more than one page; page size is 10.
+- Dashboard recent-expenses table shows full descriptions and wraps them.
+- Top bar is sticky; dialog and toasts are layered above it.
+- Expense form page is a centred 40 rem column; textareas resize vertically only.
+- Expenses table uses a fixed layout with a wider gap between Amount and the Actions column. Several attempts were needed: padding on the last auto-layout column only widened it (rounds 8-10), fixed widths plus `padding-left` on the Actions cells worked (round 11).
+- At <= 480 px: smaller table type, description cap 4.5 rem, stacked Edit/Delete (fix for DEF-006, which the screenshot showed after the first 360 px attempt).
+
+### Known limits
+- The last-row bottom border of the Actions cell is shorter (the cell is `display: flex`); not fixed.
+- Screenshots contain rows left by other E2E specs (shared temporary database).
+- No pixel diff against `docs/design/reference/image.png`; comparison was by eye.
