@@ -1,6 +1,6 @@
 # Task board
 
-Current phase: 3 (application). HC2 and HC3 passed 2026-10-30. Current stage: E complete (frontend F-01..F-06 VERIFIED); Stage F: I-01 COMPLETED (HTTP-level; real-browser checks deferred to T-01..T-03); next T-01.
+Current phase: 3 (application). HC2 and HC3 passed 2026-10-30; HC4 approved 2026-11-01. Current stage: F complete (T-01..T-05 VERIFIED, T-06 COMPLETED); next: documentation (Phase 5).
 
 States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPLETED` = owner finished with evidence; `VERIFIED` = an agent that did not implement the task re-ran the check and saved the output. Update only your own rows; append evidence links. Human checkpoints: HC1 plan (done), HC2 infra, HC3 auth review, HC4 E2E pass, HC5 report review, HC6 publish.
 
@@ -55,8 +55,8 @@ States: `TODO` -> `IN_PROGRESS` -> `BLOCKED` | `COMPLETED` -> `VERIFIED`. `COMPL
 | T-03 | Persistence scenario (backend restart) | testing | T-01 | VERIFIED | persistence.spec.ts passed in orchestrator re-run check-20261101T005613Z.txt |
 | T-04 | Frontend integration tests | testing | F-06 | VERIFIED | frontend/tests/flows.test.tsx 7 passed; full frontend 62 passed in orchestrator re-run check-20261101T005613Z.txt; DEF-004 fixed and VERIFIED |
 | T-05 | Screenshot capture (>= 2 real PNGs) | testing | T-02 | VERIFIED | docs/evidence/screenshots/{login,expenses,dashboard}.png (PNG verified with `file`) |
-| T-06 | Full validation and test report (HC4) | orchestrator + testing | T-02..T-05 | COMPLETED | `make validate` exit 0 (docs/evidence/test-runs/check-20261101T005613Z.txt); DEF-004 VERIFIED (def-004-verify.txt); awaiting HC4 human approval |
-| D-nn | Defect fixes (tracked in docs/defects.md) | owners | T-06 | TODO | |
+| T-06 | Full validation and test report (HC4) | orchestrator + testing | T-02..T-05 | VERIFIED | `make validate` exit 0 (docs/evidence/test-runs/check-20261101T005613Z.txt); DEF-004 VERIFIED (def-004-verify.txt); HC4 approved by human 2026-11-01 |
+| D-nn | Defect fixes (tracked in docs/defects.md) | owners | T-06 | COMPLETED | No open defects at HC4 (DEF-004, DEF-005 VERIFIED) |
 
 ## Phase 5 - documentation
 
