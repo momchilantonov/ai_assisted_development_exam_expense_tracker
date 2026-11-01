@@ -6,15 +6,15 @@ Source of every claim below: files under `docs/evidence/`, `docs/test-report.md`
 
 ## 1. Project overview
 
-The project is a single-user expense tracker. The owner logs in, records expenses (amount, one of seven fixed categories, date, optional description), filters, sorts and pages through them, edits or deletes them, and sees a dashboard with the total, the current-month total, a per-category breakdown drawn as an SVG chart and the most recent expenses. Data persists in SQLite.
+The project is a multi-user expense tracker with open sign-up. Each user signs up, logs in, records expenses (amount, one of seven fixed categories, date, optional description), filters, sorts and pages through them, edits or deletes them, and sees a dashboard with the total, the current-month total, a per-category breakdown drawn as an SVG chart and the most recent expenses. Every user sees only their own data. Data persists in SQLite.
 
 Requirements that shaped the design:
 
-- Single user, no public registration; the user is provisioned through a CLI.
+- Open sign-up with per-user data: every expense query is scoped to the session user, and another user's expense returns 404 (ADR-011).
 - Secure authentication: Argon2id password hash, opaque server-side session in an HttpOnly, SameSite=Strict cookie, Origin check on unsafe methods, logout that deletes the session row (ADR-002).
 - Money is exact: integer cents in the database, decimal strings in the API, never floats (ADR-003).
-- The application was written by AI agents only; the human gave approvals at checkpoints (HC1 plan, HC2 infrastructure, HC3 auth review, HC4 E2E pass).
-- Out of scope by plan: Redis, Celery, cloud databases, microservices, payments, multi-user roles, external auth, Alembic, MCP.
+- The application was written by AI agents only; the human gave approvals at checkpoints (HC1 plan, HC2 infrastructure, HC3 auth review, HC4 E2E pass), plus one change request (CR-002, multi-user) after manual testing.
+- Out of scope by plan: Redis, Celery, cloud databases, microservices, payments, user roles, external auth, Alembic, MCP.
 
 Stack: FastAPI, Pydantic v2, SQLAlchemy 2.x, SQLite, pytest; React, TypeScript (strict), Vite, Vitest, React Testing Library, MSW; Playwright. Architecture and diagram: `docs/architecture.md`; endpoints: `docs/api-contract.md`.
 
@@ -25,7 +25,7 @@ Workflow: one planning step in Copilot Plan Mode, one infrastructure step in Cop
 ### Module 1 - Authentication and security
 
 - **Approach:** compare session cookie and JWT in Plan Mode; session cookie chosen because logout can truly invalidate it (ADR-002). Token hashed with SHA-256 before storage; identical 401 for unknown user and wrong password using a dummy-hash verification; injectable clock for expiry tests.
-- **Workflow:** backend agent built the CLI, hashing and session services, routes, `require_auth` and the Origin check (A-01..A-04); the testing agent wrote 55 black-box HTTP tests (A-05) and reviewed a 15-item checklist (A-06).
+- **Workflow:** backend agent built hashing and session services, the register and login routes, `require_auth` and the Origin check (A-01..A-04, later CR2-B); the testing agent wrote black-box HTTP tests for auth, registration and user isolation (A-05, CR2-T) and reviewed a 15-item checklist (A-06).
 - **Testing:** 12 PASS, 1 FAIL (minor), 2 NOT RUN (frontend) at review time (`docs/test-report.md`); the minor defects DEF-001 (`.env` credentials ignored by the CLI) and DEF-002 (committed test passwords) were fixed and verified. A route-guard test enumerates OpenAPI paths and requires auth for all but the allow-list. The browser-side checks were later covered by E2E steps 3-6, 15-16.
 - **AI tool and why:** GitHub Copilot backend agent (model recorded as Claude Sonnet 5.5 by the session) for implementation; a separate Copilot testing agent for the independent review, to avoid self-review.
 - **Key prompts:** no verbatim prompt for this task was recorded (agents were delegated tasks A-01..A-06 by the orchestrator; see `docs/agent-handoffs.md`). Gap.
@@ -35,13 +35,13 @@ Workflow: one planning step in Copilot Plan Mode, one infrastructure step in Cop
 
 - **Approach:** app factory taking `Settings` so tests inject a temp database; one JSON error envelope for all errors; validation errors drop echoed input; contract-first (`docs/api-contract.md`) shared with the frontend.
 - **Workflow:** B-01 scaffold and health; X-01..X-05 expense schemas, service, CRUD routes, filters, sorting, pagination, dashboard summary and categories, contract update.
-- **Testing:** unit tests (159 passed at X-05) and 100+ black-box tests; final backend count 291 passed (`docs/evidence/test-runs/check-20261101T005613Z.txt`). DEF-003 (amounts with surrounding spaces accepted) was found by an integration test, fixed and the strict-xfail marker removed.
+- **Testing:** unit tests (159 passed at X-05) and 100+ black-box tests; final backend count 389 passed (`docs/evidence/test-runs/check-20261101T103505Z.txt`). DEF-003 (amounts with surrounding spaces accepted) was found by an integration test, fixed and the strict-xfail marker removed.
 - **AI tool and why:** Copilot backend agent; instructions and the `fastapi` and `fastapi-feature-development` skills constrained the order model, schema, service, route, tests and contract.
 - **Key prompts:** none recorded verbatim. Gap.
 
 ### Module 3 - Database and persistence
 
-- **Approach:** SQLAlchemy 2.x models with constraints enforced in the database: `amount_cents > 0`, category CHECK, `users.id = 1`, unique username, session foreign key; `create_all` instead of migrations (ADR-005).
+- **Approach:** SQLAlchemy 2.x models with constraints enforced in the database: `amount_cents > 0`, category CHECK, case-insensitive unique username, `expenses.user_id` NOT NULL foreign key, session foreign key; `create_all` instead of migrations (ADR-005).
 - **Workflow:** B-02 models and tests asserting `IntegrityError` on a temporary SQLite file.
 - **Testing:** 24 backend tests at B-02; persistence across a backend restart checked over HTTP in I-01 (`docs/evidence/test-runs/i01-persistence.txt`) and in E2E `persistence.spec.ts` (PASS).
 - **AI tool and why:** Copilot backend agent. First run hit ruff UP042 (use `StrEnum`) and a session/user flush-order error in a test; both fixed (development log, B-02).
@@ -50,16 +50,16 @@ Workflow: one planning step in Copilot Plan Mode, one infrastructure step in Cop
 ### Module 4 - Frontend
 
 - **Approach:** SPA with protected routes, auth state from `/api/auth/me`, a typed API client with a global 401 hook, forms that mirror contract validation, accessible delete dialog and toasts, no chart or state libraries; development uses a Vite proxy so no CORS is needed (ADR-001).
-- **Workflow:** F-01/F-02 scaffold, client, AuthContext, login; F-03/F-04 layout, logout, list, filters, sort, pagination; F-05/F-06 forms, confirmation, toasts and dashboard with an SVG chart.
-- **Testing:** 55 component tests with MSW at F-06; 62 including `frontend/tests/flows.test.tsx`. The first F-05/F-06 run had 14 failing tests because of async loading assumptions; tests were changed to wait for the form fields. DEF-004 (tests not type-checked) fixed and verified.
+- **Workflow:** F-01/F-02 scaffold, client, AuthContext, login; F-03/F-04 layout, logout, list, filters, sort, pagination; F-05/F-06 forms, confirmation, toasts and dashboard with an SVG chart; CR2-F sign-up page.
+- **Testing:** 55 component tests with MSW at F-06; 70 in the final run, including the sign-up page tests and `frontend/tests/flows.test.tsx`. The first F-05/F-06 run had 14 failing tests because of async loading assumptions; tests were changed to wait for the form fields. DEF-004 (tests not type-checked) fixed and verified.
 - **AI tool and why:** Copilot frontend agent, guided by the React feature skill and frontend instructions.
 - **Key prompts:** none recorded verbatim. Gap. Not run: 360 px layout check.
 
 ### Module 5 - Testing and integration
 
 - **Approach:** three layers: pytest (unit plus black-box HTTP, temp DB per test), Vitest/RTL/MSW (component and flow), Playwright (real browser, real backend, temp DB, run-time generated password, ports 8000/5173).
-- **Workflow:** orchestrator ran live HTTP checks through the proxy (I-01, 22 PASS with 4 browser checks NOT RUN at the time); testing agent added a 16-step E2E workflow, a persistence scenario with backend restart, flow tests and screenshots (T-01..T-05); `make validate` for HC4.
-- **Testing result:** `make validate` exit 0: lint OK, typecheck OK (mypy not installed), backend 291 passed, frontend 62 passed, E2E 3 passed, in `docs/evidence/test-runs/check-20261101T005613Z.txt`. Five defects were filed, all VERIFIED (`docs/defects.md`).
+- **Workflow:** orchestrator ran live HTTP checks through the proxy (I-01, 22 PASS with 4 browser checks NOT RUN at the time); testing agent added a 16-step E2E workflow, a persistence scenario with backend restart, a two-user isolation scenario in separate browser contexts, flow tests and screenshots (T-01..T-05, CR2-T); `make validate` for HC4.
+- **Testing result:** `make validate` exit 0: lint OK, typecheck OK (mypy not installed), backend 389 passed, frontend 70 passed, E2E 4 passed, in `docs/evidence/test-runs/check-20261101T103505Z.txt`. Five defects were filed, all VERIFIED (`docs/defects.md`).
 - **AI tool and why:** Copilot testing agent, separate from the implementing agents. Limit: tests were not shown to fail against deliberately broken code except where defects were found; Chromium only.
 - **Key prompts:** none recorded verbatim. Gap.
 
@@ -77,6 +77,7 @@ Challenges (from the development log; CHAL entries 01-04 are tagged, others are 
 - CHAL-02: VS Code save settings reformatted 13 infrastructure files; `validate-infra` was re-run (exit 0, 33/33 hook cases).
 - CHAL-03/CHAL-04: the agent could not create or push to GitHub (no `gh`, HTTPS password auth rejected); the human switched the remote to SSH and pushed.
 - Test and tooling issues, each recorded with its fix: `conftest` imported under two module names (3 failures), route guard test via `app.routes` replaced by OpenAPI paths, DEF-005 (a test depended on the developer's `.env`), a race in a new flow test, a toast covering the table in the first screenshots.
+- Iteration example, not a failure: the planning prompt asked for a single-user application, so the first design (and ADR-002) was single-user with a CLI-provisioned account. After manual testing the human changed the requirement to multi-user with open sign-up and per-user data (CR-002, ADR-011). An interim first-run sign-up change (CR-001, ADR-010) was superseded before it was implemented. The agents added registration, per-user scoping of every query, a sign-up page and isolation tests (backend, frontend, two-user E2E), and the final checks pass (`docs/evidence/test-runs/check-20261101T103505Z.txt`). Earlier history is kept unchanged in the development log and decisions.
 - A recurring limit: the ownership guard blocked some cross-agent edits (for example the frontend agent could not edit `docs/defects.md`), so fixes needed handoffs between agents.
 
 Tool comparison (honest): only GitHub Copilot in VS Code was used (Plan Mode, Agent Mode, five custom agents; model recorded as Claude Sonnet 5.5 for the implementation and testing sessions, not recorded for planning and infrastructure). Claude Code, Augment Code and Cursor were not used, so no comparison between tools can be made. What helped most within Copilot: custom agents with write ownership, skills and a shared task board, which kept the contract between backend and frontend consistent; independent verification by a second agent found DEF-003 and DEF-005 that the implementing agents had not. What was weaker: the infrastructure could not be verified in the Chat diagnostics UI by an agent, and some behaviours (agent-scoped hooks, comma-separated `applyTo`) are recorded as not verified.
@@ -86,10 +87,11 @@ Tool comparison (honest): only GitHub Copilot in VS Code was used (Plan Mode, Ag
 Real captures from `e2e/tests/screenshots.spec.ts`, taken from the running app with data created through the UI (PNG files verified with `file`; the testing agent inspected them; human review for sensitive data is still pending):
 
 - `docs/evidence/screenshots/login.png` (1100x800) - login page
+- `docs/evidence/screenshots/signup.png` - sign-up page
 - `docs/evidence/screenshots/expenses.png` (1100x800) - expense list with filters
 - `docs/evidence/screenshots/dashboard.png` (1100x1151) - dashboard with totals and chart
 
-Test output: `docs/evidence/test-runs/check-20261101T005613Z.txt` (exit 0; backend 291, frontend 62, E2E 3 passed). The files are named `login`, `expenses`, `dashboard`, not `NN-description.png` as the documentation instructions suggest; the Playwright spec produces these names.
+Test output: `docs/evidence/test-runs/check-20261101T103505Z.txt` (exit 0; backend 389, frontend 70, E2E 4 passed). The files are named `login`, `signup`, `expenses`, `dashboard`, not `NN-description.png` as the documentation instructions suggest; the Playwright spec produces these names.
 
 ## 6. Possible improvements
 

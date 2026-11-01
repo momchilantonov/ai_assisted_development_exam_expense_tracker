@@ -16,12 +16,12 @@ flowchart TD
   SVC_A --> ORM[SQLAlchemy 2.x]
   SVC_E --> ORM
   ORM --> DB[(SQLite)]
-  CLI[app.cli create-user] --> ORM
+  CLI[app.cli create-user, optional] --> ORM
 ```
 
 ## Modules
 
-1. Authentication: single user, session cookie, Argon2id, provisioning CLI (ADR-002).
+1. Authentication: multi-user with open sign-up, session cookie, Argon2id, per-user data isolation (ADR-002, ADR-011); optional user-creation CLI.
 2. Backend API: FastAPI routes, services, error envelope, contract in `docs/api-contract.md`.
 3. Database and persistence: SQLite, SQLAlchemy 2.x models, constraints, `create_all` (ADR-003..005).
 4. Frontend: React + TypeScript (strict) + Vite, protected routes, dashboard, expense list and forms.
@@ -30,7 +30,7 @@ flowchart TD
 ## Code layout
 
 - Backend: `app/main.py` (factory), `api/{auth,expenses,health}.py`, `core/{deps,errors,origin,security}.py`, `models/{user,session,expense}.py`, `schemas/{auth,expense}.py`, `services/{auth,expenses}.py`, `cli.py`, `config.py`, `db.py`.
-- Frontend: `src/api` (typed client, 401 hook), `src/auth` (AuthContext), `src/components` (Layout, ProtectedRoute, ConfirmDialog, ToastProvider), `src/pages` (Login, Expenses, ExpenseForm, Dashboard), `src/lib/money.ts`.
+- Frontend: `src/api` (typed client, 401 hook), `src/auth` (AuthContext), `src/components` (Layout, ProtectedRoute, ConfirmDialog, ToastProvider), `src/pages` (Login, Signup, Expenses, ExpenseForm, Dashboard), `src/lib/money.ts`.
 
 ## AI development system
 
@@ -38,14 +38,16 @@ Agents (`.github/agents/`): `orchestrator`, `backend`, `frontend`, `testing`, `d
 
 ## Data model
 
-- `users(id CHECK=1, username UNIQUE, password_hash, created_at)`
+- `users(id, username (case-insensitive unique index), password_hash, created_at)`
 - `sessions(token_hash PK, user_id FK, created_at, expires_at)`
-- `expenses(id, amount_cents CHECK>0, category CHECK in enum, description, expense_date indexed, created_at, updated_at)`
+- `expenses(id, user_id FK NOT NULL indexed, amount_cents CHECK>0, category CHECK in enum, description, expense_date indexed, created_at, updated_at)`
+
+Every expense, list, dashboard and category query is filtered by the session user's id; another user's expense returns 404.
 
 ## Configuration
 
-`.env` (gitignored) from `.env.example`: `DATABASE_URL`, `SESSION_TTL_MINUTES`, `COOKIE_SECURE`, `ALLOWED_ORIGINS`, `APP_TIMEZONE`, `INITIAL_USERNAME`, `INITIAL_PASSWORD`.
+`.env` (gitignored) from `.env.example`: `DATABASE_URL`, `SESSION_TTL_MINUTES`, `COOKIE_SECURE`, `ALLOWED_ORIGINS`, `APP_TIMEZONE`; `INITIAL_USERNAME` and `INITIAL_PASSWORD` are used only by the optional CLI.
 
 ## Ports and commands
 
-Backend 8000, frontend 5173. `make help` lists targets (`setup`, `seed-user`, `dev-backend`, `dev-frontend`, `lint`, `typecheck`, `test-backend`, `test-frontend`, `test-e2e`, `check`, `validate`, `validate-infra`).
+Backend 8000, frontend 5173. `make help` lists targets (`setup`, `dev-backend`, `dev-frontend`, `lint`, `typecheck`, `test-backend`, `test-frontend`, `test-e2e`, `check`, `validate`, `validate-infra`).
